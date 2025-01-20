@@ -25,12 +25,15 @@ def get_rpc_connection(ticker):
 
     return AuthServiceProxy(rpc_url)
 
-@bitcoin_rpc_bp.route('/listunspent/<ticker>', methods=['GET'])
-def list_unspent(ticker):
+@bitcoin_rpc_bp.route('/listunspent/<ticker>/<address>', methods=['GET'])
+def list_unspent(ticker, address):
     try:
         rpc_connection = get_rpc_connection(ticker)
+        # Fetch unspent transactions for the specific address
         unspent = rpc_connection.listunspent()
-        return jsonify(unspent)
+        # Filter unspent transactions by address
+        filtered_unspent = [utxo for utxo in unspent if 'address' in utxo and utxo['address'] == address]
+        return jsonify(filtered_unspent)
     except (JSONRPCException, ValueError) as e:
         return jsonify({'error': str(e)}), 500
 
@@ -62,13 +65,15 @@ def estimate_smart_fee(ticker, conf_target):
     except (JSONRPCException, ValueError) as e:
         return jsonify({'error': str(e)}), 500
 
-@bitcoin_rpc_bp.route('/getlasttransactions/<ticker>', methods=['GET'])
-def get_last_transactions(ticker):
+@bitcoin_rpc_bp.route('/getlasttransactions/<ticker>/<address>', methods=['GET'])
+def get_last_transactions(ticker, address):
     try:
         rpc_connection = get_rpc_connection(ticker)
-        # Fetch the last 10 transactions
+        # Fetch transactions for the specific address
         transactions = rpc_connection.listtransactions("*", 10)
-        return jsonify(transactions)
+        # Filter transactions by address
+        filtered_transactions = [tx for tx in transactions if 'address' in tx and tx['address'] == address]
+        return jsonify(filtered_transactions)
     except (JSONRPCException, ValueError) as e:
         return jsonify({'error': str(e)}), 500
 
