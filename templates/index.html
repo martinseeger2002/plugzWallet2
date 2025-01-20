@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Swipe Wallet</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .frame {
+      width: 393px;
+      height: 852px;
+      overflow: hidden;
+      border: 2px solid black;
+    }
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      margin-bottom: 20px;
+    }
+    .header img {
+      width: 32px;
+      height: 32px;
+    }
+    .balance {
+      background-color: black;
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      margin-bottom: 20px;
+      width: 80%;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .button {
+      background-color: black;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .transaction-history {
+      background-color: black;
+      width: 90%;
+      height: 300px;
+      border-radius: 20px;
+      margin-top: 20px;
+    }
+    .wallet-selector {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: black;
+      color: white;
+      font-size: 16px;
+      width: 90%;
+      text-align: center;
+      appearance: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div id="landing-page">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{{ url_for('static', filename='js/service-worker.js') }}')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

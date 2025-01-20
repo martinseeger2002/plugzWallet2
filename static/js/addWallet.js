@@ -1,0 +1,174 @@
+import { initializeWallet } from './main.js'; // Ensure this function is exported from main.js
+import { walletSettingsUI } from './walletSettings.js'; // Import the walletSettingsUI function
+
+export function walletUI() {
+    // Simplified wallet UI handler
+    console.log("walletUI function called");
+    // Add logic to display the wallet UI
+}
+
+export function addWalletUI(selectedCoin) {
+    const landingPage = document.getElementById('landing-page');
+    landingPage.innerHTML = ''; // Clear existing content
+
+    // Set the background color for the entire landing page
+    landingPage.style.backgroundColor = selectedCoin.color;
+
+    const header = document.createElement('div');
+    header.className = 'header';
+
+    const backButton = document.createElement('button');
+    backButton.className = 'back-button';
+    backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
+    backButton.addEventListener('click', () => {
+        landingPage.innerHTML = ''; // Clear the add wallet UI
+        walletSettingsUI(selectedCoin); // Navigate to the Wallet Settings page with the selected coin
+    });
+
+    header.appendChild(backButton);
+    landingPage.appendChild(header);
+
+    const title = document.createElement('h1');
+    title.textContent = 'Add Wallet';
+    title.className = 'page-title';
+    landingPage.appendChild(title);
+
+    // Create form elements
+    const form = document.createElement('form');
+    form.className = 'wallet-form';
+
+    const walletLabelInput = document.createElement('input');
+    walletLabelInput.type = 'text';
+    walletLabelInput.placeholder = 'Wallet Label';
+    walletLabelInput.className = 'styled-input';
+    form.appendChild(walletLabelInput);
+
+    const addressInput = document.createElement('input');
+    addressInput.type = 'text';
+    addressInput.placeholder = 'Address';
+    addressInput.className = 'styled-input';
+    form.appendChild(addressInput);
+
+    const privkeyInput = document.createElement('input');
+    privkeyInput.type = 'text';
+    privkeyInput.placeholder = 'WIF Private key';
+    privkeyInput.className = 'styled-input';
+    form.appendChild(privkeyInput);
+
+    const infoText = document.createElement('p');
+    infoText.className = 'info-text';
+    infoText.textContent = 'Self-custodial wallet, It is very important to back up your wallet address and private key.';
+    form.appendChild(infoText);
+
+    const addWalletButton = document.createElement('button');
+    addWalletButton.className = 'styled-button';
+    addWalletButton.textContent = 'Add Wallet';
+    addWalletButton.disabled = true; // Initially disable the button
+    addWalletButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent form submission
+
+        // Create a new wallet object
+        const newWallet = {
+            label: walletLabelInput.value,
+            ticker: selectedCoin.ticker,
+            address: addressInput.value,
+            privkey: privkeyInput.value,
+            balance: 0.0, // Initial balance
+            utxos: [], // Initial UTXOs
+            transactions: [] // Initial transactions
+        };
+
+        // Import the address as watch-only
+        fetch(`/api/importaddress/${selectedCoin.ticker}`, { // Ensure /api prefix is used
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: newWallet.address,
+                label: newWallet.label,
+                rescan: false // Ensure rescan is set to false
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Address imported:', data.imported_address);
+
+                // Retrieve existing wallets from local storage
+                const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
+
+                // Add the new wallet to the array
+                walletsData.push(newWallet);
+
+                // Save the updated wallets array back to local storage
+                localStorage.setItem('wallets', JSON.stringify(walletsData));
+
+                console.log('New wallet added:', newWallet);
+
+                // Return to the main UI
+                landingPage.innerHTML = ''; // Clear the add wallet UI
+                initializeWallet(); // Reinitialize the main wallet UI
+            } else {
+                console.error('Error importing address:', data.message);
+                alert('Failed to import address: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while importing the address.');
+        });
+    });
+
+    form.appendChild(addWalletButton);
+
+    // Function to check if all fields are filled
+    const checkFields = () => {
+        if (walletLabelInput.value && addressInput.value && privkeyInput.value) {
+            addWalletButton.disabled = false; // Enable the button if all fields are filled
+        } else {
+            addWalletButton.disabled = true; // Disable the button if any field is empty
+        }
+    };
+
+    // Add event listeners to check fields on input
+    walletLabelInput.addEventListener('input', checkFields);
+    addressInput.addEventListener('input', checkFields);
+    privkeyInput.addEventListener('input', checkFields);
+
+    // Add the "New Wallet" button
+    const newWalletButton = document.createElement('button');
+    newWalletButton.className = 'styled-button';
+    newWalletButton.textContent = 'New Wallet';
+    newWalletButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent form submission
+
+        // Call the generatekey route
+        fetch(`/bitcore/generatekey/${selectedCoin.ticker}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error generating key:', data.error);
+                } else {
+                    // Fill the text fields with the returned values
+                    addressInput.value = data.address;
+                    privkeyInput.value = data.wif;
+                    checkFields(); // Re-check fields after auto-filling
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching key:', error);
+            });
+    });
+
+    form.appendChild(newWalletButton);
+
+    landingPage.appendChild(form);
+
+    // Add the selected coin's icon below the add wallet button
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
+    coinIcon.alt = `${selectedCoin.name} Icon`;
+    coinIcon.className = 'coin-icon';
+    landingPage.appendChild(coinIcon);
+}
