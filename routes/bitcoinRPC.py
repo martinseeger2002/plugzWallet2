@@ -69,10 +69,13 @@ def estimate_smart_fee(ticker, conf_target):
 def get_last_transactions(ticker, address):
     try:
         rpc_connection = get_rpc_connection(ticker)
-        # Fetch transactions for the specific address
-        transactions = rpc_connection.listtransactions("*", 10)
-        # Filter transactions by address
-        filtered_transactions = [tx for tx in transactions if 'address' in tx and tx['address'] == address]
+        # Fetch a larger number of transactions for the specific address
+        transactions = rpc_connection.listtransactions("*", 10000)  # Increase the count to 100
+        # Filter transactions by address and include both incoming and outgoing
+        filtered_transactions = [
+            tx for tx in transactions 
+            if 'address' in tx and tx['address'] == address and tx['category'] in ['receive', 'send']
+        ]
         return jsonify(filtered_transactions)
     except (JSONRPCException, ValueError) as e:
         return jsonify({'error': str(e)}), 500
