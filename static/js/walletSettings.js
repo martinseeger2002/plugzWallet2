@@ -32,8 +32,8 @@ export function walletSettingsUI(selectedCoin) {
 
     // Retrieve wallets from local storage
     const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
-    // Filter wallets for the selected coin
-    const walletsForCoin = walletsData.filter(wallet => wallet.ticker === selectedCoin.ticker);
+    // Filter wallets for the selected coin and exclude those without a label
+    const walletsForCoin = walletsData.filter(wallet => wallet.ticker === selectedCoin.ticker && wallet.label);
 
     // Populate dropdown with wallets for the selected coin
     walletsForCoin.forEach(wallet => {

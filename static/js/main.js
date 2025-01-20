@@ -78,7 +78,7 @@ export function initializeWallet() {
     const walletSelector = document.createElement('select');
     walletSelector.className = 'wallet-selector';
     wallets
-      .filter(wallet => wallet.ticker === coin.name)
+      .filter(wallet => wallet.ticker === coin.name && wallet.label) // Filter out wallets without a label
       .forEach(wallet => {
         const option = document.createElement('option');
         option.value = wallet.label;

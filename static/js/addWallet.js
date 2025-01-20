@@ -10,7 +10,9 @@ export function walletUI() {
 export function addWalletUI(selectedCoin) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
-    landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+
+    // Set the background color for the entire landing page
+    landingPage.style.backgroundColor = selectedCoin.color;
 
     const header = document.createElement('div');
     header.className = 'header';
@@ -61,6 +63,7 @@ export function addWalletUI(selectedCoin) {
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
     addWalletButton.textContent = 'Add Wallet';
+    addWalletButton.disabled = true; // Initially disable the button
     addWalletButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
 
@@ -75,19 +78,63 @@ export function addWalletUI(selectedCoin) {
             transactions: [] // Initial transactions
         };
 
-        // Retrieve existing wallets from local storage
-        const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
+        // Import the address as watch-only
+        fetch(`/api/importaddress/${selectedCoin.ticker}`, { // Ensure /api prefix is used
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                address: newWallet.address,
+                label: newWallet.label,
+                rescan: false // Ensure rescan is set to false
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Address imported:', data.imported_address);
 
-        // Add the new wallet to the array
-        walletsData.push(newWallet);
+                // Retrieve existing wallets from local storage
+                const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
 
-        // Save the updated wallets array back to local storage
-        localStorage.setItem('wallets', JSON.stringify(walletsData));
+                // Add the new wallet to the array
+                walletsData.push(newWallet);
 
-        console.log('New wallet added:', newWallet);
+                // Save the updated wallets array back to local storage
+                localStorage.setItem('wallets', JSON.stringify(walletsData));
+
+                console.log('New wallet added:', newWallet);
+
+                // Return to the main UI
+                landingPage.innerHTML = ''; // Clear the add wallet UI
+                initializeWallet(); // Reinitialize the main wallet UI
+            } else {
+                console.error('Error importing address:', data.message);
+                alert('Failed to import address: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while importing the address.');
+        });
     });
 
     form.appendChild(addWalletButton);
+
+    // Function to check if all fields are filled
+    const checkFields = () => {
+        if (walletLabelInput.value && addressInput.value && privkeyInput.value) {
+            addWalletButton.disabled = false; // Enable the button if all fields are filled
+        } else {
+            addWalletButton.disabled = true; // Disable the button if any field is empty
+        }
+    };
+
+    // Add event listeners to check fields on input
+    walletLabelInput.addEventListener('input', checkFields);
+    addressInput.addEventListener('input', checkFields);
+    privkeyInput.addEventListener('input', checkFields);
 
     // Add the "New Wallet" button
     const newWalletButton = document.createElement('button');
@@ -106,6 +153,7 @@ export function addWalletUI(selectedCoin) {
                     // Fill the text fields with the returned values
                     addressInput.value = data.address;
                     privkeyInput.value = data.wif;
+                    checkFields(); // Re-check fields after auto-filling
                 }
             })
             .catch(error => {

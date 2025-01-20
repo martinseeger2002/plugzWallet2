@@ -23,15 +23,27 @@ export function receiveUI(selectedWallet) {
     // Create a container for the QR code and address
     const container = document.createElement('div');
     container.className = 'receive-container';
+    container.style.position = 'relative'; // Set position to relative for absolute positioning of the icon
 
     // Create a canvas element for the QR code
     const qrCanvas = document.createElement('canvas');
     qrCanvas.width = 325;
     qrCanvas.height = 325;
+    qrCanvas.className = 'qr-code'; // Add class for styling
     container.appendChild(qrCanvas);
 
-    // Generate the QR code using the global QRCode object
-    QRCode.toCanvas(qrCanvas, selectedWallet.address, { width: 325, height: 325 }, (error) => {
+    // Generate the QR code with a blank center
+    QRCode.toCanvas(qrCanvas, selectedWallet.address, {
+        width: 325,
+        height: 325,
+        margin: 1,
+        color: {
+            dark: '#000000',  // QR code color
+            light: '#FFFFFF'  // Background color
+        },
+        // Add a blank area in the center
+        maskPattern: 4 // This is one of the patterns that can create a blank center
+    }, (error) => {
         if (error) console.error('Error generating QR code:', error);
     });
 
@@ -55,4 +67,17 @@ export function receiveUI(selectedWallet) {
     container.appendChild(copyButton);
 
     landingPage.appendChild(container);
+
+    // Add the selected coin's icon in the center of the QR code
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `/static/images/${selectedWallet.ticker}icon.png`; // Ensure the correct property is used
+    coinIcon.alt = `${selectedWallet.ticker} Icon`;
+    coinIcon.className = 'coin-icon';
+    coinIcon.style.position = 'absolute';
+    coinIcon.style.width = '60px'; // Set width to 25px
+    coinIcon.style.height = '60px'; // Set height to 25px
+    coinIcon.style.left = '50%';
+    coinIcon.style.top = '35%';
+    coinIcon.style.transform = 'translate(-50%, -50%)'; // Center the icon
+    container.appendChild(coinIcon);
 } 

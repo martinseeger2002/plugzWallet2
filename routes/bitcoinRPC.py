@@ -7,7 +7,7 @@ bitcoin_rpc_bp = Blueprint('bitcoin_rpc', __name__)
 
 # Read the RPC configuration file
 config = configparser.ConfigParser()
-config.read('config/rpc.conf')
+config.read('./config/rpc.conf')
 
 def get_rpc_connection(ticker):
     """Get RPC connection for a given ticker."""
@@ -20,6 +20,9 @@ def get_rpc_connection(ticker):
     rpc_port = config[ticker]['rpcport']
     rpc_url = f'http://{rpc_user}:{rpc_password}@{rpc_host}:{rpc_port}'
     
+    # Debugging: Print the RPC URL
+    print(f"Connecting to RPC server at: {rpc_url}")
+
     return AuthServiceProxy(rpc_url)
 
 @bitcoin_rpc_bp.route('/listunspent/<ticker>', methods=['GET'])
@@ -73,15 +76,33 @@ def get_last_transactions(ticker):
 def import_address(ticker):
     try:
         rpc_connection = get_rpc_connection(ticker)
-        address = request.json.get('address')
-        label = request.json.get('label', '')  # Optional label
-        rescan = request.json.get('rescan', True)  # Optional rescan, default to True
+        data = request.json
 
-        # Import the address as watch-only
+        # Log the incoming request data
+        print(f"Received import address request: {data}")
+
+        # Extract address from the request
+        address = data.get('address')
+        label = data.get('label', '')  # Optional label
+        rescan = data.get('rescan', False)  # Default to False
+
+        if not address or not isinstance(address, str) or address.strip() == '':
+            return jsonify({"status": "error", "message": "A single valid address is required."}), 400
+
+        # Import the address without rescan
         rpc_connection.importaddress(address, label, rescan)
 
-        return jsonify({'success': True, 'message': f'Address {address} imported as watch-only.'})
+        print(f"Address {address} imported successfully as watch-only.")
+
+        return jsonify({
+            "status": "success",
+            "imported_address": address
+        }), 200
     except (JSONRPCException, ValueError) as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error importing address: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 # Add other routes as needed 
