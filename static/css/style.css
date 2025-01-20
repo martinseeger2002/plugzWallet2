@@ -1,0 +1,309 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  transform: rotate(0deg); /* Lock orientation */
+}
+
+.frame {
+  width: 100%;
+  max-width: 375px; /* Maximum width for smaller screens */
+  height: 100%;
+  max-height: 770px; /* Maximum height for smaller screens */
+  overflow: hidden;
+  border: 2px solid black;
+  box-sizing: border-box;
+  margin: 0; /* Remove negative margin */
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+}
+
+.doge { background-color: #FFD700; }
+.pep { background-color: #4CAF50; }
+.shic { background-color: #FF0000; }
+.flop { background-color: pink; }
+.dgb { background-color: #0066cc; }
+.lky { background-color: silver; }
+.bonk { background-color: #FF4500; }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.header img {
+  width: 24px; /* Smaller icon size */
+  height: 24px;
+}
+
+.balance {
+  background-color: black;
+  padding: 15px;
+  border-radius: 10px;
+  color: white;
+  margin-bottom: 15px;
+  width: 80%;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  background-color: black;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.transaction-history {
+  background-color: black;
+  width: 90%;
+  height: 250px;
+  border-radius: 20px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+.wallet-selector {
+  display: block; /* Make the dropdown a block element */
+  margin: 0 auto 20px auto; /* Center the dropdown and add bottom margin */
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  width: 90%;
+  text-align: center;
+  appearance: none;
+}
+
+.profile-button,
+.settings-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-button:hover,
+.settings-button:hover {
+  opacity: 0.8;
+}
+
+.profile-button img,
+.settings-button img {
+  width: 32px;
+  height: 32px;
+}
+
+.wallet-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.styled-button {
+  display: block; /* Make the button a block element */
+  margin: 10px auto; /* Center the button and add vertical margin */
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  width: 200px; /* Set a fixed width for all buttons */
+  text-align: center; /* Center the text within the button */
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.styled-input {
+  display: block; /* Make the input a block element */
+  width: calc(100% - 40px); /* Adjust width to account for padding/margin */
+  margin: 10px auto; /* Center the input and add vertical margin */
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  background-color: black;
+  color: white;
+  margin-right: 10px;
+}
+
+.close-button {
+  cursor: pointer;
+  color: white;
+  font-size: 20px;
+}
+
+.info-text {
+  color: white;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.back-button {
+  background: none; /* Make the button transparent */
+  border: none; /* Remove any border */
+  padding: 0; /* Remove default padding */
+  cursor: pointer;
+  position: relative; /* Position relative for left adjustment */
+  left: 15px; /* Move the button 15px to the right */
+}
+
+.page-title {
+  text-align: center; /* Center the text horizontally */
+  width: 100%; /* Ensure it takes full width of its container */
+  margin: 0 auto; /* Center the element itself if needed */
+}
+
+.delete-button {
+  background-color: red; /* Make the delete button red */
+  color: white;
+}
+
+.coin-icon {
+  display: block;
+  margin: 20px auto; /* Center the icon horizontally and add top margin */
+  width: 200px; /* Set the width to 200px */
+  height: 200px; /* Set the height to 200px */
+}
+
+@media (max-width: 375px) {
+  .swiper-slide {
+    font-size: 18px;
+  }
+  .header img {
+    width: 24px;
+    height: 24px;
+  }
+  .balance {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .buttons {
+    gap: 6px;
+  }
+  .button {
+    padding: 6px 12px;
+  }
+  .transaction-history {
+    height: 200px;
+    margin-top: 10px;
+  }
+}
+
+.settings-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Create a 2-column grid */
+    gap: 10px; /* Space between grid items */
+    justify-content: center; /* Center the grid horizontally */
+    margin: 20px auto; /* Center the form and add vertical margin */
+    max-width: 400px; /* Optional: limit the width of the form */
+    grid-template-rows: auto auto; /* Allow for automatic row sizing */
+}
+
+.coin-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 5px;
+    background-color: #000; /* Set background to black */
+    color: #fff; /* Set text color to white */
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 5px; /* Add margin around each checkbox box */
+}
+
+.styled-button {
+    grid-column: span 2; /* Make the button span both columns */
+    justify-self: center; /* Center the button horizontally */
+    margin-top: 20px; /* Add some space above the button */
+}
+
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #000000; /* Dark background for contrast */
+    color: #fff; /* White text for readability */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it appears above other elements */
+    width: 90%; /* Increase width for better mobile view */
+    max-width: 300px; /* Limit the width for better appearance */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.dialog input[type="text"] {
+    width: 100%; /* Full width */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #000000; /* Slightly lighter background */
+    color: #fff; /* White text */
+}
+
+.dialog button {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #000000; /* Button background */
+    color: #fff; /* Button text */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%; /* Full width for better mobile view */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.dialog button:hover {
+    background-color: #1b1b1b; /* Darker on hover */
+}
+
+@media (max-width: 375px) {
+    .dialog {
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+    .dialog button {
+        padding: 8px 16px; /* Adjust button padding for smaller screens */
+    }
+}
