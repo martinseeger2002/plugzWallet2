@@ -1,7 +1,10 @@
 import configparser
 from flask import Blueprint, jsonify, request
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
+<<<<<<< HEAD
 import logging
+=======
+>>>>>>> origin/main
 
 # Create a Blueprint for the Bitcoin RPC routes
 bitcoin_rpc_bp = Blueprint('bitcoin_rpc', __name__)
@@ -83,6 +86,7 @@ def get_last_transactions(ticker, address):
 
 @bitcoin_rpc_bp.route('/importaddress/<ticker>', methods=['POST'])
 def import_address(ticker):
+<<<<<<< HEAD
     rpc_connection = get_rpc_connection(ticker)
     data = request.json
 
@@ -98,12 +102,39 @@ def import_address(ticker):
     try:
         # Import the address without rescan using positional arguments
         rpc_connection.importaddress(address, "", False)
+=======
+    try:
+        rpc_connection = get_rpc_connection(ticker)
+        data = request.json
+
+        # Log the incoming request data
+        print(f"Received import address request: {data}")
+
+        # Extract address from the request
+        address = data.get('address')
+        label = data.get('label', '')  # Optional label
+        rescan = data.get('rescan', False)  # Default to False
+
+        if not address or not isinstance(address, str) or address.strip() == '':
+            return jsonify({"status": "error", "message": "A single valid address is required."}), 400
+
+        # Import the address without rescan
+        rpc_connection.importaddress(address, label, rescan)
+
+        print(f"Address {address} imported successfully as watch-only.")
+
+>>>>>>> origin/main
         return jsonify({
             "status": "success",
             "imported_address": address
         }), 200
+<<<<<<< HEAD
     except JSONRPCException as e:
         logging.error(f"Error importing address: {str(e)}")
+=======
+    except (JSONRPCException, ValueError) as e:
+        print(f"Error importing address: {str(e)}")
+>>>>>>> origin/main
         return jsonify({
             "status": "error",
             "message": str(e)
