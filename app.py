@@ -7,7 +7,7 @@ app = Flask(__name__, static_folder='static')
 
 # Register the blueprints
 app.register_blueprint(bitcoin_rpc_bp, url_prefix='/api')
-app.register_blueprint(bitcore_lib_bp, url_prefix='/bitcore')
+app.register_blueprint(bitcore_lib_bp, url_prefix='/bitcore_lib')
 app.register_blueprint(main_bp)
 
 if __name__ == '__main__':

@@ -73,7 +73,7 @@ def generate_tx():
                 }), 400
 
         # Construct the absolute path to the Node.js script
-        script_path = f'/root/plugzWallet2/bitcore-libs/{ticker}/generateTxHex.js'
+        script_path = f'/root/plugzWallet2/bitcore-libs/{ticker}/generateTxHexWrapper.js'
         logging.debug(f"Script path: {script_path}")
 
         # Prepare the input data for the Node.js script
