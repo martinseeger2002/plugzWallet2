@@ -99,13 +99,12 @@ export function sendTXUI(walletData) {
     
     const feeLabel = document.createElement('div');
     feeLabel.textContent = `Fee: `;
-    feeLabel.className = 'fee-label';
-    feeLabel.style.color = 'white';
+    feeLabel.className = 'fee-label styled-text';
     
     const feeDisplay = document.createElement('span');
     feeDisplay.id = 'feeDisplay';
     feeDisplay.textContent = '0.01';
-    feeDisplay.style.color = 'white';
+    feeDisplay.className = 'styled-text';
     feeLabel.appendChild(feeDisplay);
     feeLabel.appendChild(document.createTextNode(` ${walletData.ticker}`));
     
@@ -125,8 +124,8 @@ export function sendTXUI(walletData) {
     // Create submit button
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
-    submitButton.className = 'styled-button';
-    submitButton.textContent = 'Create Transaction';
+    submitButton.className = 'button styled-text';
+    submitButton.textContent = 'Send';
     form.appendChild(submitButton);
 
     // Add wallet selector change handler
@@ -153,11 +152,10 @@ export function sendTXUI(walletData) {
     resultContainer.className = 'tx-result-container';
     resultContainer.innerHTML = `
         <div class="tx-hex-container" style="display: none;">
-            <textarea id="txHex" readonly class="styled-input" 
-                      style="background-color: black; color: white; font-family: 'Press Start 2P', cursive; font-size: 16px; font-weight: bold;"></textarea>
-            <button id="copyTxHex" class="styled-button">Copy Hex</button>
+            <textarea id="txHex" readonly class="styled-input styled-text"></textarea>
+            <button id="copyTxHex" class="button styled-text">Copy</button>
         </div>
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message styled-text" style="display: none;"></div>
     `;
 
     // Add form submission handler
@@ -224,7 +222,7 @@ export function sendTXUI(walletData) {
             txHexContainer.style.display = 'none';
         } finally {
             submitButton.disabled = false;
-            submitButton.textContent = 'Create Transaction';
+            submitButton.textContent = 'Send';
         }
     });
 
@@ -245,10 +243,12 @@ export function sendTXUI(walletData) {
     formContainer.appendChild(resultContainer);
     landingPage.appendChild(formContainer);
 
-    // Add the selected coin's icon at the bottom
+    // Add the coin icon at the bottom
     const coinIcon = document.createElement('img');
-    coinIcon.src = `./static/images/coins/${walletData.ticker.toLowerCase()}icon.png`;
+    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;  // Keep ticker uppercase
     coinIcon.alt = `${walletData.ticker} Icon`;
     coinIcon.className = 'coin-icon';
+    coinIcon.style.width = '100px';
+    coinIcon.style.height = '100px';
     landingPage.appendChild(coinIcon);
 } 
