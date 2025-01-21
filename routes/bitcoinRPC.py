@@ -82,38 +82,31 @@ def estimate_smart_fee(ticker, conf_target):
 def get_last_transactions(ticker, address):
     try:
         rpc_connection = get_rpc_connection(ticker)
-        # Fetch transactions received by the specific address
-        received_transactions = rpc_connection.listreceivedbyaddress(0, True, True)
-        # Find the entry for the specific address
-        address_info = next((entry for entry in received_transactions if entry['address'] == address), None)
         
-        if not address_info:
-            return jsonify({
-                "status": "success",
-                "data": {
-                    "network": ticker,
-                    "address": address,
-                    "transactions": []
-                }
-            })
-
-        # Extract the last 10 transaction IDs
-        last_txids = address_info['txids'][-10:]
-        # Fetch full transaction details for each transaction ID
-        last_transactions = [
-            rpc_connection.gettransaction(txid) for txid in last_txids
+        # Use listtransactions to get the last transactions for the address
+        transactions = rpc_connection.listtransactions("*", 10, 0, True)
+        
+        # Filter transactions for the specific address
+        filtered_transactions = [
+            tx for tx in transactions if tx.get('address') == address
         ]
+
+        # Debugging: Log the filtered transaction data
+        for tx in filtered_transactions:
+            logging.debug(f"Filtered Transaction data: {tx}")
+
         # Format the transactions
         formatted_transactions = [
             {
                 "txid": tx['txid'],
-                "amount": tx['amount'],
+                "amount": f"{tx['amount']:.8f}",  # Format the amount
                 "confirmations": tx['confirmations'],
                 "time": tx.get('time', 'N/A'),  # 'time' might not be available
-                "address": address
+                "address": tx.get('address', 'N/A')
             }
-            for tx in last_transactions
+            for tx in filtered_transactions
         ]
+
         return jsonify({
             "status": "success",
             "data": {

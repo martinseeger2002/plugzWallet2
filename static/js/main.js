@@ -196,6 +196,7 @@ export function initializeWallet() {
 function updateWalletData(ticker, walletLabel, balanceElement) {
   const selectedWallet = wallets.find(wallet => wallet.label === walletLabel && wallet.ticker === ticker);
   if (!selectedWallet) return;
+
   fetch(`/api/listunspent/${ticker}/${selectedWallet.address}`)
     .then(response => response.json())
     .then(data => {
@@ -210,6 +211,9 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
         setTimeout(() => {
           balanceElement.textContent = `${totalBalance.toFixed(8)} ${ticker}`; // Update balance display
           console.log('Updated wallet data:', selectedWallet);
+
+          // Call the function to fetch and display transactions
+          fetchAndDisplayTransactions(ticker, selectedWallet.address);
         }, 500); // 500 milliseconds delay
       } else {
         console.error('Failed to fetch unspent transactions:', data.message);
@@ -219,6 +223,55 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
     .catch(error => {
       console.error('Error fetching unspent transactions:', error);
       balanceElement.textContent = 'Error loading balance';
+    });
+}
+
+function fetchAndDisplayTransactions(ticker, address) {
+  const transactionHistoryContainer = document.querySelector('.transaction-history');
+  transactionHistoryContainer.innerHTML = 'Loading transactions...'; // Initial loading message
+
+  fetch(`/api/getlasttransactions/${ticker}/${address}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        const transactions = data.data.transactions;
+        transactionHistoryContainer.innerHTML = ''; // Clear the loading message
+
+        // Populate the transaction history with the fetched transactions
+        transactions.forEach(tx => {
+          const txElement = document.createElement('div');
+          txElement.className = 'transaction';
+          txElement.style.marginLeft = '20px'; // Add left margin
+
+          // Calculate time since transaction was sent
+          const currentTime = Date.now();
+          const txTime = new Date(tx.time * 1000);
+          const timeSince = Math.floor((currentTime - txTime) / 1000); // Time in seconds
+
+          // Format time since transaction
+          let timeSinceText;
+          if (timeSince < 60) {
+            timeSinceText = `${timeSince} seconds ago`;
+          } else if (timeSince < 3600) {
+            timeSinceText = `${Math.floor(timeSince / 60)} mins ago`;
+          } else if (timeSince < 86400) {
+            timeSinceText = `${Math.floor(timeSince / 3600)} hours ago`;
+          } else {
+            timeSinceText = `${Math.floor(timeSince / 86400)} days ago`;
+          }
+
+          // Display amount and time since transaction
+          txElement.textContent = `${tx.amount} ${timeSinceText}`;
+          transactionHistoryContainer.appendChild(txElement);
+        });
+      } else {
+        transactionHistoryContainer.textContent = 'Failed to load transactions';
+        console.error('Error fetching transactions:', data.message);
+      }
+    })
+    .catch(error => {
+      transactionHistoryContainer.textContent = 'Error loading transactions';
+      console.error('Error fetching transactions:', error);
     });
 }
 
