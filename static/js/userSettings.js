@@ -5,10 +5,15 @@ export function userSettingsUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
 
-    // Find the coin data for the selected wallet to get the color
-    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
-    if (selectedCoin) {
-        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+    // Set default background color if no wallet is selected
+    if (selectedWallet && selectedWallet.ticker) {
+        const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+        if (selectedCoin) {
+            landingPage.style.backgroundColor = selectedCoin.color;
+        }
+    } else {
+        // Default background color when no wallet is selected
+        landingPage.style.backgroundColor = '#2c2c2c'; // Or any default color you prefer
     }
 
     // Create header with back button
@@ -63,10 +68,12 @@ export function userSettingsUI(selectedWallet) {
         landingPage.appendChild(button);
     });
 
-    // Add the selected coin's icon at the bottom
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedWallet.ticker()}icon.png`;
-    coinIcon.alt = `${selectedWallet.ticker} Icon`;
-    coinIcon.className = 'coin-icon';
-    landingPage.appendChild(coinIcon);
+    // Add the coin icon only if a wallet is selected
+    if (selectedWallet && selectedWallet.ticker) {
+        const coinIcon = document.createElement('img');
+        coinIcon.src = `/static/images/${selectedWallet.ticker.toLowerCase()}icon.png`;
+        coinIcon.alt = `${selectedWallet.ticker} Icon`;
+        coinIcon.className = 'coin-icon';
+        landingPage.appendChild(coinIcon);
+    }
 } 

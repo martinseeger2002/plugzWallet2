@@ -100,12 +100,18 @@ export function initializeWallet() {
     // Wallet selector dropdown
     const walletSelector = document.createElement('select');
     walletSelector.className = 'wallet-selector';
+    walletSelector.style.fontFamily = "'Press Start 2P', cursive"; // Match button font
+    walletSelector.style.fontSize = '16px'; // Increased font size
+    walletSelector.style.fontWeight = 'bold'; // Make text bold
     wallets
       .filter(wallet => wallet.ticker === coin.ticker && wallet.label) // Filter by coin ticker and label
       .forEach(wallet => {
         const option = document.createElement('option');
         option.value = wallet.label;
         option.textContent = wallet.label;
+        option.style.fontFamily = "'Press Start 2P', cursive"; // Apply font to options
+        option.style.fontSize = '16px'; // Increased font size for options
+        option.style.fontWeight = 'bold'; // Make options bold
         walletSelector.appendChild(option);
       });
     slide.appendChild(walletSelector);
@@ -175,7 +181,7 @@ export function initializeWallet() {
         fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
         balance.textContent = `0.000 ${coin.name}`;
-        transactionHistory.innerHTML = 'No transactions available';
+        transactionHistory.innerHTML = '<div style="margin-left: 20px;">No recent transactions</div>'; // Added margin
       }
     };
 
@@ -217,7 +223,7 @@ export function initializeWallet() {
         document.body.style.backgroundColor = activeCoins[activeIndex].color;
         selectedCoin = activeCoins[activeIndex]; // Update selected coin
 
-        // Wait for half a second before proceeding with balance update
+        // Wait for half a second before proceeding with balance updatey
         setTimeout(() => {
           const activeSlide = document.querySelector('.swiper-slide-active');
           const walletSelector = activeSlide.querySelector('.wallet-selector');
@@ -270,17 +276,23 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
                     script_hex: tx.script_hex
                 }));
 
-                // Calculate balances
+                // Calculate balances, ignoring UTXOs of 0.01 or less
                 selectedWallet.utxos.forEach(utxo => {
-                    if (utxo.confirmations === 0) {
-                        incomingBalance += utxo.value;
+                    if (utxo.value > 0.01) { // Only count UTXOs greater than 0.01
+                        if (utxo.confirmations === 0) {
+                            incomingBalance += utxo.value;
+                        }
+                        totalBalance += utxo.value;
                     }
-                    totalBalance += utxo.value;
                 });
 
                 // Update wallet properties
                 selectedWallet.balance = totalBalance;
                 selectedWallet.incoming = incomingBalance;
+                
+                // Remove the duplicate unspent_transactions field
+                delete selectedWallet.unspent_transactions;
+                delete selectedWallet.transactions;
 
                 // Save updated wallet to local storage
                 localStorage.setItem('wallets', JSON.stringify(wallets));
@@ -302,7 +314,7 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
 }
 
 function fetchAndDisplayTransactions(ticker, address, transactionHistoryContainer) {
-  transactionHistoryContainer.innerHTML = 'Loading transactions...'; // Initial loading message
+  transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Loading transactions...</div>'; // Added margin
 
   fetch(`/api/getlasttransactions/${ticker}/${address}`)
     .then(response => response.json())
@@ -339,12 +351,12 @@ function fetchAndDisplayTransactions(ticker, address, transactionHistoryContaine
           transactionHistoryContainer.appendChild(txElement);
         });
       } else {
-        transactionHistoryContainer.textContent = 'Failed to load transactions';
+        transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Failed to load transactions</div>'; // Added margin
         console.error('Error fetching transactions:', data.message);
       }
     })
     .catch(error => {
-      transactionHistoryContainer.textContent = 'Error loading transactions';
+      transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Error loading transactions</div>'; // Added margin
       console.error('Error fetching transactions:', error);
     });
 }
