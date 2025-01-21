@@ -12,6 +12,9 @@ export function initializeWallet() {
   // Retrieve saved settings from local storage
   const savedSettings = JSON.parse(localStorage.getItem('coinSettings')) || {};
 
+  // Retrieve saved selected wallets from local storage
+  const savedSelectedWallets = JSON.parse(localStorage.getItem('selectedWallets')) || {};
+
   // Filter coins based on saved settings
   const activeCoins = coins.filter(coin => savedSettings[coin.ticker] !== false);
 
@@ -85,27 +88,49 @@ export function initializeWallet() {
       });
     slide.appendChild(walletSelector);
 
+    // Set the selected wallet from local storage if available
+    if (savedSelectedWallets[coin.ticker]) {
+      walletSelector.value = savedSelectedWallets[coin.ticker];
+    }
+
     // Balance display
     const balance = document.createElement('div');
     balance.className = 'balance';
     slide.appendChild(balance);
 
-    // Update balance display based on selected wallet
-    const updateBalance = () => {
+    // Transaction history
+    const transactionHistory = document.createElement('div');
+    transactionHistory.className = 'transaction-history';
+    slide.appendChild(transactionHistory);
+
+    // Update balance and transaction history based on selected wallet
+    const updateWalletInfo = () => {
       const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
-      balance.textContent = selectedWallet ? `${selectedWallet.balance} ${coin.name}` : `0.000 ${coin.name}`;
+      if (selectedWallet) {
+        balance.textContent = `${selectedWallet.balance} ${coin.name}`;
+        fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
+      } else {
+        balance.textContent = `0.000 ${coin.name}`;
+        transactionHistory.innerHTML = 'No transactions available';
+      }
     };
 
     walletSelector.addEventListener('change', () => {
       updateWalletData(coin.ticker, walletSelector.value, balance); // Update wallet data on selection change
+      updateWalletInfo(); // Update transaction history
+
+      // Save the selected wallet to local storage
+      savedSelectedWallets[coin.ticker] = walletSelector.value;
+      localStorage.setItem('selectedWallets', JSON.stringify(savedSelectedWallets));
     });
 
     // Trigger updateWalletData on dropdown click to ensure it runs even if the same wallet is selected
     walletSelector.addEventListener('click', () => {
       updateWalletData(coin.ticker, walletSelector.value, balance);
+      updateWalletInfo(); // Update transaction history
     });
 
-    updateBalance(); // Initialize balance display
+    updateWalletInfo(); // Initialize balance and transaction history display
 
     // Buttons
     const buttons = document.createElement('div');
@@ -134,11 +159,6 @@ export function initializeWallet() {
     buttons.appendChild(mintButton);
 
     slide.appendChild(buttons);
-
-    // Transaction history
-    const transactionHistory = document.createElement('div');
-    transactionHistory.className = 'transaction-history';
-    slide.appendChild(transactionHistory);
   });
 
   // Initialize Swiper
@@ -226,8 +246,7 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
     });
 }
 
-function fetchAndDisplayTransactions(ticker, address) {
-  const transactionHistoryContainer = document.querySelector('.transaction-history');
+function fetchAndDisplayTransactions(ticker, address, transactionHistoryContainer) {
   transactionHistoryContainer.innerHTML = 'Loading transactions...'; // Initial loading message
 
   fetch(`/api/getlasttransactions/${ticker}/${address}`)
