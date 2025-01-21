@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import json
 from flask import Blueprint, jsonify, request
 
 # Create a Blueprint for the bitcore library routes
@@ -41,3 +42,88 @@ def generate_key(ticker):
     except FileNotFoundError:
         logging.error(f"Script not found for ticker: {ticker}")
         return jsonify({'error': f'Script not found for ticker: {ticker}'}), 404 
+
+@bitcore_lib_bp.route('/generate-tx', methods=['POST'])
+def generate_tx():
+    try:
+        # Get JSON data from request
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['walletData', 'receivingAddress', 'amount', 'fee']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'error': f'Missing required field: {field}'
+                }), 400
+
+        # Extract data
+        wallet_data = data['walletData']
+        receiving_address = data['receivingAddress']
+        amount = data['amount']  # Should be in satoshis
+        fee = data['fee']  # Should be in satoshis
+        ticker = wallet_data.get('ticker', '').lower()
+
+        # Validate wallet data structure
+        required_wallet_fields = ['label', 'ticker', 'address', 'privkey', 'balance', 'utxos']
+        for field in required_wallet_fields:
+            if field not in wallet_data:
+                return jsonify({
+                    'error': f'Missing required wallet field: {field}'
+                }), 400
+
+        # Construct the absolute path to the Node.js script
+        script_path = f'/root/plugzWallet2/bitcore-libs/{ticker}/generateTxHex.js'
+        logging.debug(f"Script path: {script_path}")
+
+        # Prepare the input data for the Node.js script
+        input_data = json.dumps({
+            'walletData': wallet_data,
+            'receivingAddress': receiving_address,
+            'amount': amount,
+            'fee': fee
+        })
+
+        # Call the Node.js script
+        process = subprocess.Popen(
+            ['node', script_path],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        # Send input data and get output
+        stdout, stderr = process.communicate(input=input_data)
+        
+        if process.returncode != 0:
+            logging.error(f"Node.js script error: {stderr}")
+            return jsonify({
+                'error': 'Failed to generate transaction',
+                'details': stderr
+            }), 500
+
+        # Parse the output
+        try:
+            result = json.loads(stdout)
+            return jsonify({
+                'success': True,
+                'txHex': result['txHex']
+            })
+        except json.JSONDecodeError as e:
+            logging.error(f"Failed to parse script output: {stdout}")
+            return jsonify({
+                'error': 'Invalid script output format',
+                'details': str(e)
+            }), 500
+
+    except FileNotFoundError:
+        logging.error(f"Script not found for ticker: {ticker}")
+        return jsonify({
+            'error': f'Script not found for ticker: {ticker}'
+        }), 404
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({
+            'error': str(e)
+        }), 500 
