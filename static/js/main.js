@@ -2,17 +2,22 @@ import { coins } from './networks.js';
 import { walletSettingsUI } from './walletSettings.js';
 import { receiveUI } from './receive.js'; // Import the receiveUI function
 
+// Initialize wallets variable
+let wallets = [];
+
 let selectedCoin = null; // Global variable to store the selected coin
-let wallets = JSON.parse(localStorage.getItem('wallets')) || []; // Retrieve wallets from local storage
 
 export function initializeWallet() {
+  // Refresh wallets data from localStorage each time initializeWallet is called
+  wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+  
   const landingPage = document.getElementById('landing-page');
   landingPage.innerHTML = ''; // Clear existing content
 
   // Retrieve saved settings from local storage
   const savedSettings = JSON.parse(localStorage.getItem('coinSettings')) || {};
 
-  // Retrieve saved selected wallets from local storage
+  // Then, read selected wallets after wallets are loaded
   const savedSelectedWallets = JSON.parse(localStorage.getItem('selectedWallets')) || {};
 
   // Filter coins based on saved settings
@@ -214,36 +219,55 @@ export function initializeWallet() {
 }
 
 function updateWalletData(ticker, walletLabel, balanceElement) {
-  const selectedWallet = wallets.find(wallet => wallet.label === walletLabel && wallet.ticker === ticker);
-  if (!selectedWallet) return;
+    const selectedWallet = wallets.find(wallet => wallet.label === walletLabel && wallet.ticker === ticker);
+    if (!selectedWallet) return;
 
-  fetch(`/api/listunspent/${ticker}/${selectedWallet.address}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === 'success') {
-        selectedWallet.unspent_transactions = data.data.txs;
-        localStorage.setItem('wallets', JSON.stringify(wallets)); // Update local storage
+    fetch(`/api/listunspent/${ticker}/${selectedWallet.address}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Calculate total balance and incoming (unconfirmed) amount
+                let totalBalance = 0;
+                let incomingBalance = 0;
 
-        // Calculate total balance from unspent transactions
-        const totalBalance = selectedWallet.unspent_transactions.reduce((sum, tx) => sum + parseFloat(tx.value), 0);
+                // Update UTXOs with the correct structure
+                selectedWallet.utxos = data.data.txs.map(tx => ({
+                    txid: tx.txid,
+                    value: parseFloat(tx.value),
+                    confirmations: tx.confirmations,
+                    vout: tx.vout,
+                    script_hex: tx.script_hex
+                }));
 
-        // Wait for half a second before updating the balance display
-        setTimeout(() => {
-          balanceElement.textContent = `${totalBalance.toFixed(8)} ${ticker}`; // Update balance display
-          console.log('Updated wallet data:', selectedWallet);
+                // Calculate balances
+                selectedWallet.utxos.forEach(utxo => {
+                    if (utxo.confirmations === 0) {
+                        incomingBalance += utxo.value;
+                    }
+                    totalBalance += utxo.value;
+                });
 
-          // Call the function to fetch and display transactions
-          fetchAndDisplayTransactions(ticker, selectedWallet.address);
-        }, 500); // 500 milliseconds delay
-      } else {
-        console.error('Failed to fetch unspent transactions:', data.message);
-        balanceElement.textContent = 'Error loading balance';
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching unspent transactions:', error);
-      balanceElement.textContent = 'Error loading balance';
-    });
+                // Update wallet properties
+                selectedWallet.balance = totalBalance;
+                selectedWallet.incoming = incomingBalance;
+
+                // Save updated wallet to local storage
+                localStorage.setItem('wallets', JSON.stringify(wallets));
+
+                // Update UI
+                setTimeout(() => {
+                    balanceElement.textContent = `${totalBalance.toFixed(8)} ${ticker}`;
+                    console.log('Updated wallet data:', selectedWallet);
+                }, 500);
+            } else {
+                console.error('Failed to fetch unspent transactions:', data.message);
+                balanceElement.textContent = 'Error loading balance';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching unspent transactions:', error);
+            balanceElement.textContent = 'Error loading balance';
+        });
 }
 
 function fetchAndDisplayTransactions(ticker, address, transactionHistoryContainer) {

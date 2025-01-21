@@ -67,19 +67,17 @@ export function addWalletUI(selectedCoin) {
     addWalletButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
 
-        // Create a new wallet object
+        // Create a new wallet object with the correct structure
         const newWallet = {
             label: walletLabelInput.value,
             ticker: selectedCoin.ticker,
             address: addressInput.value,
             privkey: privkeyInput.value,
-            balance: 0.0, // Initial balance
-            utxos: [], // Initial UTXOs
-            transactions: [] // Initial transactions
+            utxos: [] // Only include utxos array
         };
 
         // Import the address as watch-only
-        fetch(`/api/importaddress/${selectedCoin.ticker}`, { // Ensure /api prefix is used
+        fetch(`/api/importaddress/${selectedCoin.ticker}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -87,7 +85,7 @@ export function addWalletUI(selectedCoin) {
             body: JSON.stringify({
                 address: newWallet.address,
                 label: newWallet.label,
-                rescan: false // Ensure rescan is set to false
+                rescan: false
             })
         })
         .then(response => response.json())

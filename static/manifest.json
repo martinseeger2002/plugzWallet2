@@ -1,7 +1,7 @@
 {
-  "name": "Swipe Wallet",
-  "short_name": "Wallet",
-  "start_url": "/",
+  "name": "Plugz Wallet",
+  "short_name": "Plugz",
+  "start_url": "/wallet",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
