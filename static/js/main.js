@@ -3,6 +3,7 @@ import { walletSettingsUI } from './walletSettings.js';
 import { receiveUI } from './receive.js'; // Import the receiveUI function
 
 let selectedCoin = null; // Global variable to store the selected coin
+let wallets = JSON.parse(localStorage.getItem('wallets')) || []; // Retrieve wallets from local storage
 
 export function initializeWallet() {
   const landingPage = document.getElementById('landing-page');
@@ -29,9 +30,6 @@ export function initializeWallet() {
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
   swiperContainer.appendChild(swiperWrapper);
-
-  // Retrieve wallets from local storage
-  const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
 
   // Create a slide for each active coin
   activeCoins.forEach((coin, index) => {
@@ -78,7 +76,7 @@ export function initializeWallet() {
     const walletSelector = document.createElement('select');
     walletSelector.className = 'wallet-selector';
     wallets
-      .filter(wallet => wallet.ticker === coin.name && wallet.label) // Filter out wallets without a label
+      .filter(wallet => wallet.ticker === coin.ticker && wallet.label) // Filter by coin ticker and label
       .forEach(wallet => {
         const option = document.createElement('option');
         option.value = wallet.label;
@@ -94,11 +92,19 @@ export function initializeWallet() {
 
     // Update balance display based on selected wallet
     const updateBalance = () => {
-      const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value);
+      const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
       balance.textContent = selectedWallet ? `${selectedWallet.balance} ${coin.name}` : `0.000 ${coin.name}`;
     };
 
-    walletSelector.addEventListener('change', updateBalance);
+    walletSelector.addEventListener('change', () => {
+      updateWalletData(coin.ticker, walletSelector.value, balance); // Update wallet data on selection change
+    });
+
+    // Trigger updateWalletData on dropdown click to ensure it runs even if the same wallet is selected
+    walletSelector.addEventListener('click', () => {
+      updateWalletData(coin.ticker, walletSelector.value, balance);
+    });
+
     updateBalance(); // Initialize balance display
 
     // Buttons
@@ -114,7 +120,7 @@ export function initializeWallet() {
     receiveButton.className = 'button';
     receiveButton.textContent = 'Receive';
     receiveButton.addEventListener('click', () => {
-      const selectedWallet = wallets.find(wallet => wallet.ticker === coin.name && wallet.label === walletSelector.value);
+      const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
       if (selectedWallet) {
         landingPage.innerHTML = ''; // Clear the current UI
         receiveUI(selectedWallet); // Call the receiveUI function with the selected wallet
@@ -154,12 +160,66 @@ export function initializeWallet() {
         const activeIndex = this.realIndex;
         document.body.style.backgroundColor = activeCoins[activeIndex].color;
         selectedCoin = activeCoins[activeIndex]; // Update selected coin
+
+        // Wait for half a second before proceeding with balance update
+        setTimeout(() => {
+          const activeSlide = document.querySelector('.swiper-slide-active');
+          const walletSelector = activeSlide.querySelector('.wallet-selector');
+          const balanceElement = activeSlide.querySelector('.balance');
+
+          if (walletSelector && balanceElement) {
+            walletSelector.selectedIndex = 0; // Select the first wallet in the dropdown
+            
+            // Clear the balance display immediately to avoid showing the old balance
+            balanceElement.textContent = 'Loading...';
+
+            updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement);
+          }
+        }, 500); // 500 milliseconds delay
       }
     }
   });
 
   // Set initial background color
   document.body.style.backgroundColor = selectedCoin ? selectedCoin.color : activeCoins[0].color;
+
+  // Update wallet data for the initial coin and wallet
+  const initialWalletSelector = document.querySelector('.swiper-slide-active .wallet-selector');
+  const initialBalanceElement = document.querySelector('.swiper-slide-active .balance');
+  if (initialWalletSelector && initialBalanceElement) {
+    initialWalletSelector.selectedIndex = 0; // Select the first wallet initially
+    initialBalanceElement.textContent = 'Loading...'; // Clear initial balance display
+    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement);
+  }
+}
+
+function updateWalletData(ticker, walletLabel, balanceElement) {
+  const selectedWallet = wallets.find(wallet => wallet.label === walletLabel && wallet.ticker === ticker);
+  if (!selectedWallet) return;
+  fetch(`/api/listunspent/${ticker}/${selectedWallet.address}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        selectedWallet.unspent_transactions = data.data.txs;
+        localStorage.setItem('wallets', JSON.stringify(wallets)); // Update local storage
+
+        // Calculate total balance from unspent transactions
+        const totalBalance = selectedWallet.unspent_transactions.reduce((sum, tx) => sum + parseFloat(tx.value), 0);
+
+        // Wait for half a second before updating the balance display
+        setTimeout(() => {
+          balanceElement.textContent = `${totalBalance.toFixed(8)} ${ticker}`; // Update balance display
+          console.log('Updated wallet data:', selectedWallet);
+        }, 500); // 500 milliseconds delay
+      } else {
+        console.error('Failed to fetch unspent transactions:', data.message);
+        balanceElement.textContent = 'Error loading balance';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching unspent transactions:', error);
+      balanceElement.textContent = 'Error loading balance';
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -22,21 +22,33 @@ def get_rpc_connection(ticker):
     rpc_url = f'http://{rpc_user}:{rpc_password}@{rpc_host}:{rpc_port}'
     
     # Debugging: Print the RPC URL
-    print(f"Connecting to RPC server at: {rpc_url}")
+    # print(f"Connecting to RPC server at: {rpc_url}")
 
     return AuthServiceProxy(rpc_url)
 
 @bitcoin_rpc_bp.route('/listunspent/<ticker>/<address>', methods=['GET'])
-def list_unspent(ticker, address):
+def get_unspent_txs(ticker, address):
+    rpc_connection = get_rpc_connection(ticker)
     try:
-        rpc_connection = get_rpc_connection(ticker)
-        # Fetch unspent transactions for the specific address
-        unspent = rpc_connection.listunspent()
-        # Filter unspent transactions by address
-        filtered_unspent = [utxo for utxo in unspent if 'address' in utxo and utxo['address'] == address]
-        return jsonify(filtered_unspent)
-    except (JSONRPCException, ValueError) as e:
-        return jsonify({'error': str(e)}), 500
+        utxos = rpc_connection.listunspent(0, 9999999, [address])
+        return jsonify({
+            "status": "success",
+            "data": {
+                "network": ticker,
+                "address": address,
+                "txs": [
+                    {
+                        "txid": utxo['txid'],
+                        "vout": utxo['vout'],
+                        "script_hex": utxo['scriptPubKey'],
+                        "value": utxo['amount'],
+                        "confirmations": utxo['confirmations']
+                    } for utxo in utxos
+                ]
+            }
+        })
+    except JSONRPCException as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 @bitcoin_rpc_bp.route('/sendrawtransaction/<ticker>', methods=['POST'])
 def send_raw_transaction(ticker):
@@ -70,16 +82,48 @@ def estimate_smart_fee(ticker, conf_target):
 def get_last_transactions(ticker, address):
     try:
         rpc_connection = get_rpc_connection(ticker)
-        # Fetch a larger number of transactions for the specific address
-        transactions = rpc_connection.listtransactions("*", 10000)  # Increase the count to 100
-        # Filter transactions by address and include both incoming and outgoing
-        filtered_transactions = [
-            tx for tx in transactions 
-            if 'address' in tx and tx['address'] == address and tx['category'] in ['receive', 'send']
+        # Fetch transactions received by the specific address
+        received_transactions = rpc_connection.listreceivedbyaddress(0, True, True)
+        # Find the entry for the specific address
+        address_info = next((entry for entry in received_transactions if entry['address'] == address), None)
+        
+        if not address_info:
+            return jsonify({
+                "status": "success",
+                "data": {
+                    "network": ticker,
+                    "address": address,
+                    "transactions": []
+                }
+            })
+
+        # Extract the last 10 transaction IDs
+        last_txids = address_info['txids'][-10:]
+        # Fetch full transaction details for each transaction ID
+        last_transactions = [
+            rpc_connection.gettransaction(txid) for txid in last_txids
         ]
-        return jsonify(filtered_transactions)
+        # Format the transactions
+        formatted_transactions = [
+            {
+                "txid": tx['txid'],
+                "amount": tx['amount'],
+                "confirmations": tx['confirmations'],
+                "time": tx.get('time', 'N/A'),  # 'time' might not be available
+                "address": address
+            }
+            for tx in last_transactions
+        ]
+        return jsonify({
+            "status": "success",
+            "data": {
+                "network": ticker,
+                "address": address,
+                "transactions": formatted_transactions
+            }
+        })
     except (JSONRPCException, ValueError) as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @bitcoin_rpc_bp.route('/importaddress/<ticker>', methods=['POST'])
 def import_address(ticker):
