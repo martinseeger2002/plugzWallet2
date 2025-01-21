@@ -306,3 +306,42 @@ body {
     padding: 8px 16px;
   }
 }
+
+.wallet-info-container {
+    margin: 20px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.wallet-info {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: white;
+    margin: 0;
+}
+
+.mint-button-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px;
+    padding: 15px;
+}
+
+.mint-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.mint-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}

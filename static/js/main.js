@@ -1,6 +1,9 @@
 import { coins } from './networks.js';
 import { walletSettingsUI } from './walletSettings.js';
 import { receiveUI } from './receive.js'; // Import the receiveUI function
+import { sendTXUI } from './sendTX.js';
+import { mintUI } from './mint.js';
+import { userSettingsUI } from './userSettings.js';
 
 // Initialize wallets variable
 let wallets = [];
@@ -51,20 +54,26 @@ export function initializeWallet() {
     header.className = 'header';
 
     const maleIcon = document.createElement('img');
-    maleIcon.src = '/static/images/male-silhouette.png'; // Ensure this path is correct
+    maleIcon.src = '/static/images/male-silhouette.png';
     maleIcon.alt = 'Male Silhouette';
     maleIcon.className = 'male-icon';
+    // Add click event to male icon for user settings
+    maleIcon.style.cursor = 'pointer'; // Add pointer cursor to indicate it's clickable
+    maleIcon.addEventListener('click', () => {
+        landingPage.innerHTML = '';
+        userSettingsUI();
+    });
 
     const settingsButton = document.createElement('button');
     settingsButton.className = 'settings-button';
     settingsButton.innerHTML = '<img src="/static/images/settings-icon.png" alt="Settings Icon" />';
-    settingsButton.style.backgroundColor = 'transparent'; // Make button background transparent
-    settingsButton.style.border = 'none'; // Remove border
+    settingsButton.style.backgroundColor = 'transparent';
+    settingsButton.style.border = 'none';
     settingsButton.addEventListener('click', () => {
-      selectedCoin = coin; // Store the selected coin
-      console.log('Selected Coin:', selectedCoin); // Debugging: Log the selected coin
-      landingPage.innerHTML = ''; // Clear the wallet UI
-      walletSettingsUI(coin); // Call the walletSettingsUI function with the selected coin
+        selectedCoin = coin;
+        console.log('Selected Coin:', selectedCoin);
+        landingPage.innerHTML = '';
+        walletSettingsUI(coin);
     });
 
     header.appendChild(maleIcon);
@@ -110,6 +119,13 @@ export function initializeWallet() {
     const sendButton = document.createElement('div');
     sendButton.className = 'button';
     sendButton.textContent = 'Send';
+    sendButton.addEventListener('click', () => {
+        const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
+        if (selectedWallet) {
+            landingPage.innerHTML = ''; // Clear the current UI
+            sendTXUI(selectedWallet); // Call the sendTXUI function with the selected wallet
+        }
+    });
     buttons.appendChild(sendButton);
 
     const receiveButton = document.createElement('div');
@@ -127,6 +143,13 @@ export function initializeWallet() {
     const mintButton = document.createElement('div');
     mintButton.className = 'button';
     mintButton.textContent = 'Mint';
+    mintButton.addEventListener('click', () => {
+        const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
+        if (selectedWallet) {
+            landingPage.innerHTML = ''; // Clear the current UI
+            mintUI(selectedWallet); // Call the mintUI function with the selected wallet
+        }
+    });
     buttons.appendChild(mintButton);
 
     slide.appendChild(buttons); // Append buttons before transaction history

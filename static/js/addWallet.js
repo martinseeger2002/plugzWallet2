@@ -33,6 +33,15 @@ export function addWalletUI(selectedCoin) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
+    // Add warning text below title
+    const warningText = document.createElement('p');
+    warningText.textContent = 'Only import wallets created with Plugz';
+    warningText.className = 'warning-text'; // Add a class for styling
+    warningText.style.textAlign = 'center'; // Center the text
+    warningText.style.marginTop = '10px'; // Add some space below the title
+    landingPage.appendChild(warningText);
+
+
     // Create form elements
     const form = document.createElement('form');
     form.className = 'wallet-form';

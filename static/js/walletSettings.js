@@ -49,7 +49,7 @@ export function walletSettingsUI(selectedCoin) {
     renameButton.textContent = 'Rename Wallet';
     renameButton.addEventListener('click', () => {
         const currentLabel = walletDropdown.value;
-        const newLabel = prompt('Enter new label:', currentLabel);
+        const newLabel = prompt('Enter new wallet label:', currentLabel);
         if (newLabel && newLabel !== currentLabel) {
             // Update the wallet label in local storage
             const walletIndex = walletsData.findIndex(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
@@ -57,10 +57,8 @@ export function walletSettingsUI(selectedCoin) {
                 walletsData[walletIndex].label = newLabel;
                 localStorage.setItem('wallets', JSON.stringify(walletsData));
                 console.log('Wallet label updated:', newLabel);
-                
                 // Update the dropdown option text
                 walletDropdown.options[walletDropdown.selectedIndex].textContent = newLabel;
-                walletDropdown.options[walletDropdown.selectedIndex].value = newLabel;
             }
         }
     });
@@ -152,9 +150,3 @@ export function walletSettingsUI(selectedCoin) {
     coinIcon.className = 'coin-icon';
     landingPage.appendChild(coinIcon);
 }
-
-// Example function to get wallets for a selected coin
-function getWalletsForCoin(coin) {
-    // Replace with actual logic to retrieve wallets for the selected coin
-    return ['Wallet 1', 'Wallet 2', 'Wallet 3'];
-} 
