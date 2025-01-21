@@ -1,6 +1,6 @@
 // createTXhex.js
 
-const dogecore = require('./bitcore-lib-doge');
+const dogecore = require('bitcore-lib-doge');
 const { PrivateKey, Transaction, Script } = dogecore;
 
 /**

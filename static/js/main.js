@@ -29,7 +29,7 @@ export function initializeWallet() {
   // Create the frame for the wallet UI
   const frame = document.createElement('div');
   frame.className = 'frame';
-  frame.style.border = 'none'; // Remove the border
+  frame.style.border = 'none'; // Ensure no border is applied to the frame
   landingPage.appendChild(frame);
 
   // Create the swiper container
@@ -99,7 +99,7 @@ export function initializeWallet() {
 
     // Wallet selector dropdown
     const walletSelector = document.createElement('select');
-    walletSelector.className = 'wallet-selector';
+    walletSelector.className = 'wallet-selector styled-text';
     walletSelector.style.fontFamily = "'Press Start 2P', cursive"; // Match button font
     walletSelector.style.fontSize = '16px'; // Increased font size
     walletSelector.style.fontWeight = 'bold'; // Make text bold
@@ -109,6 +109,7 @@ export function initializeWallet() {
         const option = document.createElement('option');
         option.value = wallet.label;
         option.textContent = wallet.label;
+        option.className = 'styled-text';
         option.style.fontFamily = "'Press Start 2P', cursive"; // Apply font to options
         option.style.fontSize = '16px'; // Increased font size for options
         option.style.fontWeight = 'bold'; // Make options bold
@@ -123,7 +124,7 @@ export function initializeWallet() {
 
     // Balance display
     const balance = document.createElement('div');
-    balance.className = 'balance';
+    balance.className = 'balance styled-text';
     slide.appendChild(balance);
 
     // Buttons

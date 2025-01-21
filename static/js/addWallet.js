@@ -153,7 +153,7 @@ export function addWalletUI(selectedCoin) {
         event.preventDefault(); // Prevent form submission
 
         // Call the generatekey route
-        fetch(`/bitcore/generatekey/${selectedCoin.ticker}`)
+        fetch(`/bitcore_lib/generatekey/${selectedCoin.ticker}`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {

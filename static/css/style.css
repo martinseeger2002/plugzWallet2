@@ -155,9 +155,23 @@ body {
   padding: 10px;
   border-radius: 20px;
   border: none;
-  background-color: black;
-  color: white;
+  background-color: black !important;
+  color: white !important;
   margin: 10px auto;
+  font-family: 'Press Start 2P', cursive !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.styled-input:-webkit-autofill,
+.styled-input:-webkit-autofill:hover,
+.styled-input:-webkit-autofill:focus,
+.styled-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px black inset !important;
+  -webkit-text-fill-color: white !important;
+  font-family: 'Press Start 2P', cursive !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
 }
 
 .close-button {
@@ -215,7 +229,7 @@ body {
   padding: 5px;
   background-color: black;
   color: white;
-  border-radius: 5px;
+  border-10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin: 5px;
 }
@@ -241,7 +255,7 @@ body {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: black;
   color: white;
 }
@@ -253,7 +267,7 @@ body {
   background-color: black;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   width: 100%;
 }
@@ -285,7 +299,7 @@ body {
   max-width: 325px;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: white;
   color: black;
   text-align: center;
@@ -319,7 +333,7 @@ body {
     margin: 20px;
     padding: 15px;
     background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow-x: auto;
 }
 
@@ -463,4 +477,159 @@ body {
     #txHex {
         height: 80px;
     }
+}
+
+.fee-slider-container {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.fee-slider {
+    width: 100%;
+    height: 15px;
+    border-radius: 10px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.fee-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.fee-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #000000;
+    cursor: pointer;
+}
+
+.fee-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    color: #666;
+    font-size: 0.8em;
+}
+
+#feeDisplay {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.wallet-info-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.wallet-info-header .wallet-selector {
+    width: 80%;
+    max-width: 300px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+}
+
+.wallet-info-header .balance {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 18px;
+    color: white;
+    text-align: center;
+}
+
+.tx-hex-container textarea {
+    background-color: black !important;
+    color: white !important;
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+}
+
+/* Base styled text class for consistent fonts across all devices */
+.styled-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: white !important;
+}
+
+/* Shared styles for wallet selector and balance */
+.wallet-selector, .balance {
+    display: block !important;
+    margin: 15px auto !important;
+    width: 80% !important;
+    text-align: center !important;
+    text-align-last: center !important;
+    background-color: black !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 12px !important;
+    border-radius: 10px !important;
+}
+
+/* Specific styling for inputs */
+.styled-input {
+    background-color: black !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 8px 0 !important;
+    border-radius: 10px !important;
+}
+
+/* Specific styling for select elements */
+.wallet-selector {
+    display: block !important;
+    margin: 15px auto !important;
+    width: 90% !important;
+    text-align: center !important;
+    text-align-last: center !important;
+    background-color: black !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 12px !important;
+    border-radius: 10px !important;
+}
+
+/* Ensure correct font rendering on iOS */
+@supports (-webkit-touch-callout: none) {
+    .styled-text {
+        /* iOS-specific font adjustments if needed */
+        letter-spacing: 0 !important;
+        text-rendering: optimizeLegibility !important;
+    }
+}
+
+/* Autofill styling */
+.styled-input:-webkit-autofill,
+.styled-input:-webkit-autofill:hover,
+.styled-input:-webkit-autofill:focus,
+.styled-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px black inset !important;
+    -webkit-text-fill-color: white !important;
+    font-family: 'Press Start 2P', cursive !important;
+}
+
+/* Textarea specific styling */
+.tx-hex-container textarea {
+    background-color: black !important;
+    min-height: 60px !important;
+    resize: vertical !important;
 }

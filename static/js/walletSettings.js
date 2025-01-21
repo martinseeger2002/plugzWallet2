@@ -28,7 +28,7 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
     landingPage.appendChild(title);
 
     const walletDropdown = document.createElement('select');
-    walletDropdown.className = 'wallet-selector';
+    walletDropdown.className = 'wallet-selector styled-text';
 
     // Retrieve wallets from local storage
     const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
@@ -40,6 +40,7 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
         const option = document.createElement('option');
         option.value = wallet.label;
         option.textContent = wallet.label;
+        option.className = 'styled-text';
         walletDropdown.appendChild(option);
     });
 
@@ -83,8 +84,9 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
             const privKeyInput = document.createElement('input');
             privKeyInput.type = 'text';
             privKeyInput.value = wallet.privkey;
-            privKeyInput.readOnly = true; // Make the input read-only
-            privKeyInput.style.width = '100%'; // Full width for better visibility
+            privKeyInput.readOnly = true;
+            privKeyInput.className = 'styled-input styled-text';
+            privKeyInput.style.width = '100%';
             dialog.appendChild(privKeyInput);
 
             const copyButton = document.createElement('button');

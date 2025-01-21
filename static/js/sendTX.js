@@ -1,6 +1,15 @@
 import { initializeWallet } from './main.js';
 import { coins } from './networks.js'; // Import coins to get the color
 
+/**
+ * Converts coin amount to satoshis
+ * @param {number} amount - Amount in coins
+ * @returns {number} Amount in satoshis
+ */
+function toSatoshis(amount) {
+    return Math.floor(amount * 100000000);
+}
+
 export function sendTXUI(walletData) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
@@ -32,40 +41,121 @@ export function sendTXUI(walletData) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
+    // Add wallet selector with mobile-friendly styling
+    const walletSelector = document.createElement('select');
+    walletSelector.className = 'wallet-selector styled-text';
+    const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+    wallets
+        .filter(wallet => wallet.ticker === walletData.ticker)
+        .forEach(wallet => {
+            const option = document.createElement('option');
+            option.value = wallet.label;
+            option.textContent = wallet.label;
+            option.className = 'styled-text';
+            if (wallet.label === walletData.label) {
+                option.selected = true;
+            }
+            walletSelector.appendChild(option);
+        });
+    landingPage.appendChild(walletSelector);
+
+    // Add balance display with mobile-friendly styling
+    const balance = document.createElement('div');
+    balance.className = 'balance styled-text';
+    balance.textContent = `${walletData.balance.toFixed(8)} ${walletData.ticker}`;
+    landingPage.appendChild(balance);
+
     // Create form container
     const formContainer = document.createElement('div');
     formContainer.className = 'tx-form-container';
 
     // Create form
     const form = document.createElement('form');
-    form.className = 'tx-form';
-    form.innerHTML = `
-        <div class="form-group">
-            <label for="receivingAddress">Receiving Address:</label>
-            <input type="text" id="receivingAddress" required placeholder="Enter receiving address">
-        </div>
+    form.className = 'wallet-form';
 
-        <div class="form-group">
-            <label for="amount">Amount (in satoshis):</label>
-            <input type="number" id="amount" required placeholder="Enter amount in satoshis">
-        </div>
+    // Create receiving address input
+    const receivingAddressInput = document.createElement('input');
+    receivingAddressInput.type = 'text';
+    receivingAddressInput.id = 'receivingAddress';
+    receivingAddressInput.placeholder = 'Receiving Address';
+    receivingAddressInput.className = 'styled-input styled-text';
+    receivingAddressInput.required = true;
+    form.appendChild(receivingAddressInput);
 
-        <div class="form-group">
-            <label for="fee">Fee (in satoshis):</label>
-            <input type="number" id="fee" required placeholder="Enter fee in satoshis">
-        </div>
+    // Create amount input
+    const amountInput = document.createElement('input');
+    amountInput.type = 'number';
+    amountInput.id = 'amount';
+    amountInput.placeholder = `Amount in ${walletData.ticker}`;
+    amountInput.className = 'styled-input styled-text';
+    amountInput.required = true;
+    amountInput.step = '0.00000001';
+    amountInput.min = '0.00000001';
+    form.appendChild(amountInput);
 
-        <button type="submit" class="create-tx-button">Create Transaction</button>
-    `;
+    // Create fee display and slider
+    const feeContainer = document.createElement('div');
+    feeContainer.className = 'fee-container';
+    
+    const feeLabel = document.createElement('div');
+    feeLabel.textContent = `Fee: `;
+    feeLabel.className = 'fee-label';
+    feeLabel.style.color = 'white';
+    
+    const feeDisplay = document.createElement('span');
+    feeDisplay.id = 'feeDisplay';
+    feeDisplay.textContent = '0.01';
+    feeDisplay.style.color = 'white';
+    feeLabel.appendChild(feeDisplay);
+    feeLabel.appendChild(document.createTextNode(` ${walletData.ticker}`));
+    
+    const feeSlider = document.createElement('input');
+    feeSlider.type = 'range';
+    feeSlider.id = 'fee';
+    feeSlider.className = 'styled-input fee-slider';
+    feeSlider.min = '100000';
+    feeSlider.max = '10000000';
+    feeSlider.step = '100000';
+    feeSlider.value = '1000000';
+
+    feeContainer.appendChild(feeLabel);
+    feeContainer.appendChild(feeSlider);
+    form.appendChild(feeContainer);
+
+    // Create submit button
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.className = 'styled-button';
+    submitButton.textContent = 'Create Transaction';
+    form.appendChild(submitButton);
+
+    // Add wallet selector change handler
+    walletSelector.addEventListener('change', () => {
+        const selectedWallet = wallets.find(wallet => 
+            wallet.ticker === walletData.ticker && 
+            wallet.label === walletSelector.value
+        );
+        if (selectedWallet) {
+            walletData = selectedWallet;
+            balance.textContent = `${selectedWallet.balance.toFixed(8)} ${selectedWallet.ticker}`;
+        }
+    });
+
+    // Add fee slider event listener
+    feeSlider.addEventListener('input', (e) => {
+        const satoshiValue = parseInt(e.target.value);
+        const coinValue = (satoshiValue / 100000000).toFixed(8);
+        feeDisplay.textContent = parseFloat(coinValue).toString();
+    });
 
     // Create result container
     const resultContainer = document.createElement('div');
     resultContainer.className = 'tx-result-container';
     resultContainer.innerHTML = `
         <div class="tx-hex-container" style="display: none;">
-            <h3>Transaction Hex:</h3>
-            <textarea id="txHex" readonly></textarea>
-            <button id="copyTxHex" class="copy-button">Copy Hex</button>
+            <textarea id="txHex" readonly class="styled-input" 
+                      style="background-color: black; color: white; font-family: 'Press Start 2P', cursive; font-size: 16px; font-weight: bold;"></textarea>
+            <button id="copyTxHex" class="styled-button">Copy Hex</button>
         </div>
         <div id="errorMessage" class="error-message" style="display: none;"></div>
     `;
@@ -82,15 +172,26 @@ export function sendTXUI(walletData) {
             submitButton.disabled = true;
             submitButton.textContent = 'Creating...';
 
-            // Get values directly in satoshis
-            const amountInSats = parseInt(document.getElementById('amount').value);
+            // Get values
+            const amountInputValue = parseFloat(document.getElementById('amount').value);
             const feeInSats = parseInt(document.getElementById('fee').value);
             const receivingAddress = document.getElementById('receivingAddress').value.trim();
 
             // Validate inputs
             if (!receivingAddress) throw new Error('Receiving address is required');
-            if (isNaN(amountInSats) || amountInSats <= 0) throw new Error('Invalid amount');
-            if (isNaN(feeInSats) || feeInSats < 0) throw new Error('Invalid fee');
+            if (isNaN(amountInputValue) || amountInputValue <= 0) {
+                throw new Error('Invalid amount');
+            }
+            if (amountInputValue < 0.00000001) {
+                throw new Error('Amount must be at least 0.00000001');
+            }
+            if (isNaN(feeInSats) || feeInSats < 100000 || feeInSats > 10000000) {
+                throw new Error('Invalid fee (must be between 0.001 and 0.1 coins)');
+            }
+
+            // Convert amount to satoshis
+            const amountInSats = toSatoshis(amountInputValue);
+            console.log(`Converting ${amountInputValue} ${walletData.ticker} to ${amountInSats} satoshis`);
 
             // Call the API endpoint
             const response = await fetch('/bitcore_lib/generate-tx', {
@@ -101,8 +202,8 @@ export function sendTXUI(walletData) {
                 body: JSON.stringify({
                     walletData,
                     receivingAddress,
-                    amount: amountInSats,  // Already in satoshis
-                    fee: feeInSats  // Already in satoshis
+                    amount: amountInSats,
+                    fee: feeInSats
                 })
             });
 
@@ -139,22 +240,7 @@ export function sendTXUI(walletData) {
         }, 2000);
     });
 
-    // Add wallet info display
-    const walletInfoContainer = document.createElement('div');
-    walletInfoContainer.className = 'wallet-info-container';
-    
-    const walletInfo = document.createElement('pre');
-    walletInfo.className = 'wallet-info';
-    walletInfo.textContent = JSON.stringify({
-        address: walletData.address,
-        balance: walletData.balance,
-        ticker: walletData.ticker
-    }, null, 2);
-    
-    walletInfoContainer.appendChild(walletInfo);
-
     // Append everything to the page
-    landingPage.appendChild(walletInfoContainer);
     formContainer.appendChild(form);
     formContainer.appendChild(resultContainer);
     landingPage.appendChild(formContainer);
