@@ -1,5 +1,6 @@
 import { coins } from './networks.js';
 import { walletSettingsUI } from './walletSettings.js'; // Import the walletSettingsUI function
+import { initializeWallet } from './main.js';  // Add this import
 
 export function settingsUI(selectedCoin) {
     const landingPage = document.getElementById('landing-page');
@@ -12,8 +13,11 @@ export function settingsUI(selectedCoin) {
     backButton.className = 'back-button';
     backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
     backButton.addEventListener('click', () => {
-        landingPage.innerHTML = ''; // Clear the settings UI
-        walletSettingsUI(selectedCoin); // Navigate back to the Wallet Settings page
+        const confirmExit = confirm('Go back without saving?');
+        if (confirmExit) {
+            landingPage.innerHTML = ''; // Clear the settings UI
+            walletSettingsUI(selectedCoin); // Navigate back to the Wallet Settings page
+        }
     });
 
     header.appendChild(backButton);
@@ -51,8 +55,14 @@ export function settingsUI(selectedCoin) {
         form.appendChild(label);
     });
 
+    // Save Settings button
     const saveButton = document.createElement('button');
     saveButton.className = 'styled-button';
+    saveButton.style.width = '100%';
+    saveButton.style.maxWidth = '200px';
+    saveButton.style.fontSize = '20px';
+    saveButton.style.fontWeight = '500';
+    saveButton.style.textTransform = 'none';
     saveButton.textContent = 'Save Settings';
     saveButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
@@ -65,6 +75,11 @@ export function settingsUI(selectedCoin) {
 
         localStorage.setItem('coinSettings', JSON.stringify(newSettings));
         console.log('Settings saved:', newSettings);
+        
+        // Show success message and return to main
+        alert('Settings saved successfully!');
+        landingPage.innerHTML = '';
+        initializeWallet();
     });
 
     form.appendChild(saveButton);

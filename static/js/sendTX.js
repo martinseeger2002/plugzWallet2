@@ -80,6 +80,7 @@ export function sendTXUI(walletData) {
     receivingAddressInput.placeholder = 'Receiving Address';
     receivingAddressInput.className = 'styled-input styled-text';
     receivingAddressInput.required = true;
+    receivingAddressInput.autocomplete = 'off';
     form.appendChild(receivingAddressInput);
 
     // Create amount input
@@ -87,11 +88,30 @@ export function sendTXUI(walletData) {
     amountInput.type = 'number';
     amountInput.id = 'amount';
     amountInput.placeholder = `Amount in ${walletData.ticker}`;
-    amountInput.className = 'styled-input styled-text';
+    amountInput.className = 'styled-input styled-text no-spinner';
     amountInput.required = true;
     amountInput.step = '0.00000001';
     amountInput.min = '0.00000001';
+    amountInput.autocomplete = 'off';
     form.appendChild(amountInput);
+
+    // Add subtract fee checkbox
+    const subtractFeeContainer = document.createElement('div');
+    subtractFeeContainer.className = 'subtract-fee-container';
+    
+    const subtractFeeCheckbox = document.createElement('input');
+    subtractFeeCheckbox.type = 'checkbox';
+    subtractFeeCheckbox.id = 'subtractFee';
+    subtractFeeCheckbox.className = 'styled-checkbox';
+    
+    const subtractFeeLabel = document.createElement('label');
+    subtractFeeLabel.htmlFor = 'subtractFee';
+    subtractFeeLabel.className = 'styled-text';
+    subtractFeeLabel.textContent = 'Subtract fee';
+    
+    subtractFeeContainer.appendChild(subtractFeeCheckbox);
+    subtractFeeContainer.appendChild(subtractFeeLabel);
+    form.appendChild(subtractFeeContainer);
 
     // Create fee display and slider
     const feeContainer = document.createElement('div');
@@ -127,6 +147,25 @@ export function sendTXUI(walletData) {
     submitButton.className = 'button styled-text';
     submitButton.textContent = 'Send';
     form.appendChild(submitButton);
+
+    // Add error message div
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'errorMessage';
+    errorDiv.className = 'error-message styled-text';
+    errorDiv.style.display = 'none';
+    form.appendChild(errorDiv);
+
+    // Append form to landing page
+    landingPage.appendChild(form);
+
+    // Add the coin icon at the bottom
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;
+    coinIcon.alt = `${walletData.ticker} Icon`;
+    coinIcon.className = 'coin-icon';
+    coinIcon.style.width = '100px';
+    coinIcon.style.height = '100px';
+    landingPage.appendChild(coinIcon);
 
     // Add wallet selector change handler
     walletSelector.addEventListener('change', () => {
@@ -172,6 +211,7 @@ export function sendTXUI(walletData) {
             const amountInputValue = parseFloat(document.getElementById('amount').value);
             const feeInSats = parseInt(document.getElementById('fee').value);
             const receivingAddress = document.getElementById('receivingAddress').value.trim();
+            const subtractFee = document.getElementById('subtractFee').checked;
 
             // Validate inputs
             if (!receivingAddress) throw new Error('Receiving address is required');
@@ -192,8 +232,17 @@ export function sendTXUI(walletData) {
             };
 
             // Convert amount to satoshis
-            const amountInSats = toSatoshis(amountInputValue);
-            console.log(`Converting ${amountInputValue} ${walletData.ticker} to ${amountInSats} satoshis`);
+            let amountInSats = toSatoshis(amountInputValue);
+            
+            // If subtract fee is checked, reduce the amount by the fee
+            if (subtractFee) {
+                amountInSats -= feeInSats;
+                if (amountInSats <= 0) {
+                    throw new Error('Amount after fee subtraction must be greater than 0');
+                }
+            }
+            
+            console.log(`Converting ${amountInputValue} ${walletData.ticker} to ${amountInSats} satoshis${subtractFee ? ' (fee subtracted)' : ''}`);
 
             // Generate the transaction with filtered UTXOs
             const generateResponse = await fetch('/bitcore_lib/generate-tx', {
@@ -259,18 +308,4 @@ export function sendTXUI(walletData) {
             copyButton.textContent = 'Copy Hex';
         }, 2000);
     });
-
-    // Append everything to the page
-    formContainer.appendChild(form);
-    formContainer.appendChild(resultContainer);
-    landingPage.appendChild(formContainer);
-
-    // Add the coin icon at the bottom
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;
-    coinIcon.alt = `${walletData.ticker} Icon`;
-    coinIcon.className = 'coin-icon';
-    coinIcon.style.width = '100px';
-    coinIcon.style.height = '100px';
-    landingPage.appendChild(coinIcon);
 } 

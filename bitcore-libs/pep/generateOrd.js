@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const dogecore = require('./bitcore-lib-bonk')
+const dogecore = require('./bitcore-lib-pepe')
 const fs = require('fs')
 const dotenv = require('dotenv')
 const mime = require('mime-types')
@@ -247,7 +247,7 @@ function inscribe(wallet, address, contentType, data, mintAddress, mintPrice) {
         }
 
         // Get coin config and use its fee values
-        const coinConfig = getCoinConfig('BONC'); // Or pass ticker as parameter
+        const coinConfig = getCoinConfig('PEP'); // Or pass ticker as parameter
         const additionalAmount = txs.length * parseInt(coinConfig.plugzfee);
         const additionalAddress = coinConfig.plugzfee_address;
         finalTx.to(additionalAddress, additionalAmount);

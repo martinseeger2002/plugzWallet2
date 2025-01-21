@@ -632,3 +632,33 @@ body {
     min-height: 60px !important;
     resize: vertical !important;
 }
+
+.subtract-fee-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto;
+    gap: 10px;
+    width: 80%;
+    background-color: black !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 12px !important;
+    border-radius: 5px !important;
+}
+
+.styled-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Remove spinner arrows from number inputs */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield; /* Firefox */
+}

@@ -51,7 +51,12 @@ export function mintUI(selectedWallet) {
 
     mintButtons.forEach(btn => {
         const button = document.createElement('button');
-        button.className = 'styled-button';  // Use the same button style as wallet settings
+        button.className = 'styled-button';
+        button.style.width = '100%';
+        button.style.maxWidth = '200px';
+        button.style.fontSize = '20px';
+        button.style.fontWeight = '500';
+        button.style.textTransform = 'none';
         button.textContent = btn.text;
         button.addEventListener('click', () => {
             console.log(`Mint ${btn.value} clicked for wallet:`, selectedWallet);
@@ -65,5 +70,7 @@ export function mintUI(selectedWallet) {
     coinIcon.src = `/static/images/${selectedWallet.ticker()}icon.png`; // Ensure the correct property is used
     coinIcon.alt = `${selectedWallet.ticker} Icon`;
     coinIcon.className = 'coin-icon';
+    coinIcon.style.width = '150px';
+    coinIcon.style.height = '150px';
     landingPage.appendChild(coinIcon);
 } 

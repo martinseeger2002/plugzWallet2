@@ -1,5 +1,6 @@
 import { initializeWallet } from './main.js';
 import { coins } from './networks.js';
+import { myInscriptionsUI } from './myInscriptions.js';
 
 export function userSettingsUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -42,8 +43,8 @@ export function userSettingsUI(selectedWallet) {
         {
             text: 'My Inscriptions',
             onClick: () => {
-                console.log('View inscriptions clicked');
-                // Add inscription viewing functionality here
+                landingPage.innerHTML = ''; // Clear the UI
+                myInscriptionsUI(selectedWallet); // Navigate to My Inscriptions UI
             }
         },
         {
@@ -63,6 +64,11 @@ export function userSettingsUI(selectedWallet) {
     settingsButtons.forEach(btn => {
         const button = document.createElement('button');
         button.className = 'styled-button';
+        button.style.width = '100%';
+        button.style.maxWidth = '200px';
+        button.style.fontSize = '20px';
+        button.style.fontWeight = '500';
+        button.style.textTransform = 'none';
         button.textContent = btn.text;
         button.addEventListener('click', btn.onClick);
         landingPage.appendChild(button);
@@ -71,7 +77,7 @@ export function userSettingsUI(selectedWallet) {
     // Add the coin icon only if a wallet is selected
     if (selectedWallet && selectedWallet.ticker) {
         const coinIcon = document.createElement('img');
-        coinIcon.src = `/static/images/${selectedWallet.ticker.toLowerCase()}icon.png`;
+        coinIcon.src = `/static/images/${selectedWallet.ticker}icon.png`;
         coinIcon.alt = `${selectedWallet.ticker} Icon`;
         coinIcon.className = 'coin-icon';
         landingPage.appendChild(coinIcon);

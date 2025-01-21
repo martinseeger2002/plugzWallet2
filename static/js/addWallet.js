@@ -71,6 +71,11 @@ export function addWalletUI(selectedCoin) {
 
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
+    addWalletButton.style.width = '100%';
+    addWalletButton.style.maxWidth = '200px';
+    addWalletButton.style.fontSize = '20px';
+    addWalletButton.style.fontWeight = '500';
+    addWalletButton.style.textTransform = 'none';
     addWalletButton.textContent = 'Add Wallet';
     addWalletButton.disabled = true; // Initially disable the button
     addWalletButton.addEventListener('click', (event) => {
@@ -148,6 +153,11 @@ export function addWalletUI(selectedCoin) {
     // Add the "New Wallet" button
     const newWalletButton = document.createElement('button');
     newWalletButton.className = 'styled-button';
+    newWalletButton.style.width = '100%';
+    newWalletButton.style.maxWidth = '200px';
+    newWalletButton.style.fontSize = '20px';
+    newWalletButton.style.fontWeight = '500';
+    newWalletButton.style.textTransform = 'none';
     newWalletButton.textContent = 'New Wallet';
     newWalletButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
@@ -179,5 +189,7 @@ export function addWalletUI(selectedCoin) {
     coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
     coinIcon.alt = `${selectedCoin.name} Icon`;
     coinIcon.className = 'coin-icon';
+    coinIcon.style.width = '150px';
+    coinIcon.style.height = '150px';
     landingPage.appendChild(coinIcon);
 }
