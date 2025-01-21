@@ -70,10 +70,14 @@ export function initializeWallet() {
     settingsButton.style.backgroundColor = 'transparent';
     settingsButton.style.border = 'none';
     settingsButton.addEventListener('click', () => {
-        selectedCoin = coin;
-        console.log('Selected Coin:', selectedCoin);
+        // Get the currently selected wallet
+        const selectedWallet = wallets.find(wallet => 
+            wallet.ticker === coin.ticker && 
+            wallet.label === walletSelector.value
+        );
+        
         landingPage.innerHTML = '';
-        walletSettingsUI(coin);
+        walletSettingsUI(coin, selectedWallet); // Pass both coin and selected wallet
     });
 
     header.appendChild(maleIcon);

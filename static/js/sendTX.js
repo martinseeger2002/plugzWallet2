@@ -1,8 +1,15 @@
 import { initializeWallet } from './main.js';
+import { coins } from './networks.js'; // Import coins to get the color
 
 export function sendTXUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
+
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+    }
 
     // Create header with back button
     const header = document.createElement('div');
@@ -36,4 +43,11 @@ export function sendTXUI(selectedWallet) {
     walletInfoContainer.appendChild(walletInfo);
 
     landingPage.appendChild(walletInfoContainer);
+
+    // Add the selected coin's icon at the bottom
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `/static/images/${selectedWallet.ticker.toLowerCase()}icon.png`;
+    coinIcon.alt = `${selectedWallet.ticker} Icon`;
+    coinIcon.className = 'coin-icon';
+    landingPage.appendChild(coinIcon);
 } 

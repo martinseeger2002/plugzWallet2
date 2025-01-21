@@ -3,7 +3,7 @@ import { coins } from './networks.js';
 import { addWalletUI } from './addWallet.js'; // Import the addWalletUI function
 import { settingsUI } from './settings.js'; // Import the settingsUI function
 
-export function walletSettingsUI(selectedCoin) {
+export function walletSettingsUI(selectedCoin, currentWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
     landingPage.style.backgroundColor = selectedCoin.color; // Set background color
@@ -42,6 +42,12 @@ export function walletSettingsUI(selectedCoin) {
         option.textContent = wallet.label;
         walletDropdown.appendChild(option);
     });
+
+    // Set the selected wallet if provided
+    if (currentWallet) {
+        walletDropdown.value = currentWallet.label;
+    }
+
     landingPage.appendChild(walletDropdown);
 
     const renameButton = document.createElement('button');
