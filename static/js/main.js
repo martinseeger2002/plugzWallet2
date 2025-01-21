@@ -98,6 +98,34 @@ export function initializeWallet() {
     balance.className = 'balance';
     slide.appendChild(balance);
 
+    // Buttons
+    const buttons = document.createElement('div');
+    buttons.className = 'buttons';
+
+    const sendButton = document.createElement('div');
+    sendButton.className = 'button';
+    sendButton.textContent = 'Send';
+    buttons.appendChild(sendButton);
+
+    const receiveButton = document.createElement('div');
+    receiveButton.className = 'button';
+    receiveButton.textContent = 'Receive';
+    receiveButton.addEventListener('click', () => {
+      const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
+      if (selectedWallet) {
+        landingPage.innerHTML = ''; // Clear the current UI
+        receiveUI(selectedWallet); // Call the receiveUI function with the selected wallet
+      }
+    });
+    buttons.appendChild(receiveButton);
+
+    const mintButton = document.createElement('div');
+    mintButton.className = 'button';
+    mintButton.textContent = 'Mint';
+    buttons.appendChild(mintButton);
+
+    slide.appendChild(buttons); // Append buttons before transaction history
+
     // Transaction history
     const transactionHistory = document.createElement('div');
     transactionHistory.className = 'transaction-history';
@@ -131,34 +159,6 @@ export function initializeWallet() {
     });
 
     updateWalletInfo(); // Initialize balance and transaction history display
-
-    // Buttons
-    const buttons = document.createElement('div');
-    buttons.className = 'buttons';
-
-    const sendButton = document.createElement('div');
-    sendButton.className = 'button';
-    sendButton.textContent = 'Send';
-    buttons.appendChild(sendButton);
-
-    const receiveButton = document.createElement('div');
-    receiveButton.className = 'button';
-    receiveButton.textContent = 'Receive';
-    receiveButton.addEventListener('click', () => {
-      const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
-      if (selectedWallet) {
-        landingPage.innerHTML = ''; // Clear the current UI
-        receiveUI(selectedWallet); // Call the receiveUI function with the selected wallet
-      }
-    });
-    buttons.appendChild(receiveButton);
-
-    const mintButton = document.createElement('div');
-    mintButton.className = 'button';
-    mintButton.textContent = 'Mint';
-    buttons.appendChild(mintButton);
-
-    slide.appendChild(buttons);
   });
 
   // Initialize Swiper
