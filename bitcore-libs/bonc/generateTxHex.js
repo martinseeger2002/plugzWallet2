@@ -4,8 +4,8 @@ const dogecore = require('./bitcore-lib-bonk');
 const { PrivateKey, Transaction, Script } = dogecore;
 
 /**
- * Converts PEP amount to satoshis
- * @param {number} amount - Amount in PEP
+ * Converts BONC amount to satoshis
+ * @param {number} amount - Amount in BONC
  * @returns {number} Amount in satoshis
  */
 function toSatoshis(amount) {
@@ -24,29 +24,47 @@ function toSatoshis(amount) {
 function selectUtxos(utxos, amount, fee) {
     const totalNeeded = amount + fee;
     
-    // Convert all UTXO values to satoshis and sort by value
+    // Convert all UTXO values to satoshis and sort by value (largest first)
     const sortedUtxos = utxos
         .map(utxo => ({
             ...utxo,
             satoshis: toSatoshis(utxo.value)
         }))
-        .sort((a, b) => a.satoshis - b.satoshis);
+        .sort((a, b) => b.satoshis - a.satoshis);  // Sort largest to smallest
 
-    // Find the smallest UTXO that covers the amount needed
-    const selectedUtxo = sortedUtxos.find(utxo => utxo.satoshis >= totalNeeded);
-    
-    if (selectedUtxo) {
+    // First try to find a single UTXO that's big enough
+    const singleUtxo = sortedUtxos.find(utxo => utxo.satoshis >= totalNeeded);
+    if (singleUtxo) {
         console.error('Selected single UTXO:', {
-            txid: selectedUtxo.txid,
-            value: selectedUtxo.value,
-            satoshis: selectedUtxo.satoshis,
+            txid: singleUtxo.txid,
+            value: singleUtxo.value,
+            satoshis: singleUtxo.satoshis,
             needed: totalNeeded
         });
-        return [selectedUtxo];
+        return [singleUtxo];
     }
 
-    // If no single UTXO is big enough, throw an error
-    throw new Error(`No single UTXO found that covers the amount needed (${totalNeeded} satoshis)`);
+    // If no single UTXO is big enough, combine multiple UTXOs
+    let selectedUtxos = [];
+    let totalSelected = 0;
+
+    for (const utxo of sortedUtxos) {
+        selectedUtxos.push(utxo);
+        totalSelected += utxo.satoshis;
+
+        if (totalSelected >= totalNeeded) {
+            console.error('Selected multiple UTXOs:', {
+                count: selectedUtxos.length,
+                totalValue: totalSelected,
+                needed: totalNeeded,
+                utxos: selectedUtxos.map(u => u.satoshis)
+            });
+            return selectedUtxos;
+        }
+    }
+
+    // If we get here, even combining all UTXOs isn't enough
+    throw new Error(`Insufficient funds. Available: ${totalSelected} satoshis, Required: ${totalNeeded} satoshis`);
 }
 
 /**

@@ -162,13 +162,11 @@ export function sendTXUI(walletData) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const errorDiv = document.getElementById('errorMessage');
-        const txHexContainer = document.querySelector('.tx-hex-container');
-        const txHexArea = document.getElementById('txHex');
         const submitButton = form.querySelector('button[type="submit"]');
 
         try {
             submitButton.disabled = true;
-            submitButton.textContent = 'Creating...';
+            submitButton.textContent = 'Sending...';
 
             // Get values
             const amountInputValue = parseFloat(document.getElementById('amount').value);
@@ -191,8 +189,8 @@ export function sendTXUI(walletData) {
             const amountInSats = toSatoshis(amountInputValue);
             console.log(`Converting ${amountInputValue} ${walletData.ticker} to ${amountInSats} satoshis`);
 
-            // Call the API endpoint
-            const response = await fetch('/bitcore_lib/generate-tx', {
+            // Generate the transaction
+            const generateResponse = await fetch('/bitcore_lib/generate-tx', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -205,21 +203,39 @@ export function sendTXUI(walletData) {
                 })
             });
 
-            const result = await response.json();
+            const generateResult = await generateResponse.json();
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to generate transaction');
+            if (!generateResponse.ok) {
+                throw new Error(generateResult.error || 'Failed to generate transaction');
             }
 
-            // Display the result
-            txHexArea.value = result.txHex;
-            txHexContainer.style.display = 'block';
-            errorDiv.style.display = 'none';
+            // Broadcast the transaction
+            const broadcastResponse = await fetch(`/api/sendrawtransaction/${walletData.ticker}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    raw_tx: generateResult.txHex
+                })
+            });
+
+            const broadcastResult = await broadcastResponse.json();
+
+            if (!broadcastResponse.ok) {
+                throw new Error(broadcastResult.error || 'Failed to broadcast transaction');
+            }
+
+            // Show success message with txid
+            alert(`Transaction sent successfully!\nTransaction ID: ${broadcastResult.txid}`);
+            
+            // Return to wallet
+            landingPage.innerHTML = '';
+            initializeWallet();
 
         } catch (error) {
             errorDiv.textContent = `Error: ${error.message}`;
             errorDiv.style.display = 'block';
-            txHexContainer.style.display = 'none';
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = 'Send';
@@ -245,7 +261,7 @@ export function sendTXUI(walletData) {
 
     // Add the coin icon at the bottom
     const coinIcon = document.createElement('img');
-    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;  // Keep ticker uppercase
+    coinIcon.src = `./static/images/coins/${walletData.ticker}icon.png`;
     coinIcon.alt = `${walletData.ticker} Icon`;
     coinIcon.className = 'coin-icon';
     coinIcon.style.width = '100px';
