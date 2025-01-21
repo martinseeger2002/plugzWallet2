@@ -29,7 +29,7 @@ export function initializeWallet() {
   // Create the frame for the wallet UI
   const frame = document.createElement('div');
   frame.className = 'frame';
-  frame.style.border = 'none'; // Ensure no border is applied to the frame
+  frame.style.border = 'none'; // Remove the border
   landingPage.appendChild(frame);
 
   // Create the swiper container

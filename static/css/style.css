@@ -16,7 +16,7 @@ body {
   height: 100%;
   max-height: 770px; /* Maximum height for smaller screens */
   overflow: hidden;
-  border: 2px solid black;
+  border: 0px solid black;
   box-sizing: border-box;
   margin: 0;
 }
