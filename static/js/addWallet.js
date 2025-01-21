@@ -49,19 +49,22 @@ export function addWalletUI(selectedCoin) {
     const walletLabelInput = document.createElement('input');
     walletLabelInput.type = 'text';
     walletLabelInput.placeholder = 'Wallet Label';
-    walletLabelInput.className = 'styled-input';
+    walletLabelInput.className = 'styled-input styled-text';
+    walletLabelInput.autocomplete = 'off';
     form.appendChild(walletLabelInput);
 
     const addressInput = document.createElement('input');
     addressInput.type = 'text';
     addressInput.placeholder = 'Address';
-    addressInput.className = 'styled-input';
+    addressInput.className = 'styled-input styled-text';
+    addressInput.autocomplete = 'off';
     form.appendChild(addressInput);
 
     const privkeyInput = document.createElement('input');
     privkeyInput.type = 'text';
     privkeyInput.placeholder = 'WIF Private key';
-    privkeyInput.className = 'styled-input';
+    privkeyInput.className = 'styled-input styled-text';
+    privkeyInput.autocomplete = 'off';
     form.appendChild(privkeyInput);
 
     const infoText = document.createElement('p');
