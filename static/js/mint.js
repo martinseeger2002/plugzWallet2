@@ -1,9 +1,15 @@
 import { initializeWallet } from './main.js';
+import { coins } from './networks.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
-    landingPage.style.backgroundColor = selectedWallet.color; // Set background color
+
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+    }
 
     // Create header with back button
     const header = document.createElement('div');
@@ -56,8 +62,8 @@ export function mintUI(selectedWallet) {
 
     // Add the selected coin's icon below the settings button
     const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
-    coinIcon.alt = `${selectedCoin.name} Icon`;
+    coinIcon.src = `/static/images/${selectedWallet.ticker()}icon.png`; // Ensure the correct property is used
+    coinIcon.alt = `${selectedWallet.ticker} Icon`;
     coinIcon.className = 'coin-icon';
     landingPage.appendChild(coinIcon);
 } 

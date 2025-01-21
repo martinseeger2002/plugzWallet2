@@ -46,7 +46,7 @@ export function sendTXUI(selectedWallet) {
 
     // Add the selected coin's icon at the bottom
     const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedWallet.ticker.toLowerCase()}icon.png`;
+    coinIcon.src = `/static/images/${selectedWallet.ticker()}icon.png`;
     coinIcon.alt = `${selectedWallet.ticker} Icon`;
     coinIcon.className = 'coin-icon';
     landingPage.appendChild(coinIcon);

@@ -1,8 +1,15 @@
 import { initializeWallet } from './main.js'; // Ensure this function is exported from main.js
+import { coins } from './networks.js';
 
 export function receiveUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
+
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+    }
 
     // Create a header for the back button
     const header = document.createElement('div');

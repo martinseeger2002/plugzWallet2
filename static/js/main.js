@@ -60,8 +60,12 @@ export function initializeWallet() {
     // Add click event to male icon for user settings
     maleIcon.style.cursor = 'pointer'; // Add pointer cursor to indicate it's clickable
     maleIcon.addEventListener('click', () => {
+        const selectedWallet = wallets.find(wallet => 
+            wallet.ticker === coin.ticker && 
+            wallet.label === walletSelector.value
+        );
         landingPage.innerHTML = '';
-        userSettingsUI();
+        userSettingsUI(selectedWallet);
     });
 
     const settingsButton = document.createElement('button');

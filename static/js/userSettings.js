@@ -1,8 +1,15 @@
 import { initializeWallet } from './main.js';
+import { coins } from './networks.js';
 
-export function userSettingsUI() {
+export function userSettingsUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
+
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+    }
 
     // Create header with back button
     const header = document.createElement('div');
@@ -55,4 +62,11 @@ export function userSettingsUI() {
         button.addEventListener('click', btn.onClick);
         landingPage.appendChild(button);
     });
+
+    // Add the selected coin's icon at the bottom
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `/static/images/${selectedWallet.ticker()}icon.png`;
+    coinIcon.alt = `${selectedWallet.ticker} Icon`;
+    coinIcon.className = 'coin-icon';
+    landingPage.appendChild(coinIcon);
 } 
