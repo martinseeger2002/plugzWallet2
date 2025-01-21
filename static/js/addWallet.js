@@ -94,21 +94,6 @@ export function addWalletUI(selectedCoin) {
         .then(data => {
             if (data.status === 'success') {
                 console.log('Address imported:', data.imported_address);
-
-                // Retrieve existing wallets from local storage
-                const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
-
-                // Add the new wallet to the array
-                walletsData.push(newWallet);
-
-                // Save the updated wallets array back to local storage
-                localStorage.setItem('wallets', JSON.stringify(walletsData));
-
-                console.log('New wallet added:', newWallet);
-
-                // Return to the main UI
-                landingPage.innerHTML = ''; // Clear the add wallet UI
-                initializeWallet(); // Reinitialize the main wallet UI
             } else {
                 console.error('Error importing address:', data.message);
                 alert('Failed to import address: ' + data.message);
@@ -117,6 +102,23 @@ export function addWalletUI(selectedCoin) {
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while importing the address.');
+        })
+        .finally(() => {
+            // Retrieve existing wallets from local storage
+            const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
+            console.log('Existing wallets:', walletsData);
+
+            // Add the new wallet to the array
+            walletsData.push(newWallet);
+            console.log('Updated wallets:', walletsData);
+
+            // Save the updated wallets array back to local storage
+            localStorage.setItem('wallets', JSON.stringify(walletsData));
+            console.log('New wallet added to local storage:', newWallet);
+
+            // Return to the main UI
+            landingPage.innerHTML = ''; // Clear the add wallet UI
+            initializeWallet(); // Reinitialize the main wallet UI
         });
     });
 

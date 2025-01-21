@@ -170,6 +170,7 @@ body {
   padding: 0;
   cursor: pointer;
   position: relative;
+  display: inline-block;
 }
 
 .page-title {
