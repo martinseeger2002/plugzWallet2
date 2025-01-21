@@ -185,18 +185,24 @@ export function sendTXUI(walletData) {
                 throw new Error('Invalid fee (must be between 0.001 and 0.1 coins)');
             }
 
+            // Filter out UTXOs less than or equal to 0.01
+            const filteredWalletData = {
+                ...walletData,
+                utxos: walletData.utxos.filter(utxo => utxo.value > 0.01)
+            };
+
             // Convert amount to satoshis
             const amountInSats = toSatoshis(amountInputValue);
             console.log(`Converting ${amountInputValue} ${walletData.ticker} to ${amountInSats} satoshis`);
 
-            // Generate the transaction
+            // Generate the transaction with filtered UTXOs
             const generateResponse = await fetch('/bitcore_lib/generate-tx', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    walletData,
+                    walletData: filteredWalletData,
                     receivingAddress,
                     amount: amountInSats,
                     fee: feeInSats
@@ -261,7 +267,7 @@ export function sendTXUI(walletData) {
 
     // Add the coin icon at the bottom
     const coinIcon = document.createElement('img');
-    coinIcon.src = `./static/images/coins/${walletData.ticker}icon.png`;
+    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;
     coinIcon.alt = `${walletData.ticker} Icon`;
     coinIcon.className = 'coin-icon';
     coinIcon.style.width = '100px';

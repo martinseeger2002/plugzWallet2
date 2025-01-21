@@ -229,7 +229,7 @@ body {
   padding: 5px;
   background-color: black;
   color: white;
-  border-10px;
+  border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin: 5px;
 }
@@ -490,7 +490,6 @@ body {
     border-radius: 10px;
     background: #ddd;
     outline: none;
-    -webkit-appearance: none;
 }
 
 .fee-slider::-webkit-slider-thumb {
