@@ -7,7 +7,6 @@ body {
   align-items: center;
   height: 100vh;
   width: 100vw;
-  transform: rotate(0deg); /* Lock orientation */
 }
 
 .frame {
@@ -15,7 +14,21 @@ body {
   height: 852px;
   overflow: hidden;
   border: 0px solid black;
-  margin: 0 auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#landing-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .swiper {
@@ -288,4 +301,263 @@ body {
     font-weight: 500;
     text-align: center;
     display: block;
+}
+
+/* Mobile devices (portrait) */
+@media screen and (max-width: 393px) {
+    .frame {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .styled-button {
+        max-width: 250px;
+        font-size: 14px;
+    }
+
+    .wallet-selector {
+        max-width: 250px;
+        font-size: 14px;
+    }
+}
+
+/* Mobile devices (landscape) */
+@media screen and (max-height: 852px) {
+    .frame {
+        height: 100vh;
+    }
+}
+
+/* Tablets */
+@media screen and (min-width: 768px) {
+    .frame {
+        width: 393px;
+        height: 852px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+    }
+}
+
+/* Large screens */
+@media screen and (min-width: 1024px) {
+    .frame {
+        width: 393px;
+        height: 852px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Extra large screens */
+@media screen and (min-width: 1440px) {
+    .frame {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+/* Add Wallet specific styles */
+.warning-text {
+    text-align: center;
+    color: white;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 300px;
+}
+
+.wallet-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+    gap: 10px;
+}
+
+.styled-input {
+    width: 90%;
+    max-width: 300px;
+    padding: 12px;
+    margin: 10px auto;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 16px;
+}
+
+.info-text {
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 300px;
+}
+
+/* Inscriber specific styles */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.styled-text {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    color: white;
+    margin: 10px auto;
+}
+
+/* File input specific styles */
+.hidden-input {
+    display: none;
+}
+
+.file-container {
+    width: 90%;
+    max-width: 400px;
+    margin: 10px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.scrollable-iframe {
+    width: 90%;
+    max-width: 400px;
+    height: 550px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: auto;
+    background-color: black;
+    margin: 10px auto;
+}
+
+.receive-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+    position: relative;
+}
+
+.qr-code {
+    width: 325px;
+    height: 325px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 0 auto;
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.qr-coin-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+}
+
+.address-input {
+    width: 90%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    font-size: 14px;
+    margin: 0 auto;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 300px;
+}
+
+.styled-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.fee-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 300px;
+}
+
+.fee-label {
+    text-align: center;
+    width: 100%;
+}
+
+.styled-slider {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.styled-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.styled-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.error-message {
+    color: #ff4444;
+    text-align: center;
+    margin: 10px auto;
+    display: none;
+}
+
+.wallet-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
 }

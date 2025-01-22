@@ -43,7 +43,7 @@ export function sendTXUI(walletData) {
 
     // Add wallet selector with mobile-friendly styling
     const walletSelector = document.createElement('select');
-    walletSelector.className = 'wallet-selector styled-text';
+    walletSelector.className = 'wallet-selector';
     const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
     wallets
         .filter(wallet => wallet.ticker === walletData.ticker)
@@ -51,7 +51,6 @@ export function sendTXUI(walletData) {
             const option = document.createElement('option');
             option.value = wallet.label;
             option.textContent = wallet.label;
-            option.className = 'styled-text';
             if (wallet.label === walletData.label) {
                 option.selected = true;
             }
@@ -61,7 +60,7 @@ export function sendTXUI(walletData) {
 
     // Add balance display with mobile-friendly styling
     const balance = document.createElement('div');
-    balance.className = 'balance styled-text';
+    balance.className = 'balance';
     balance.textContent = `${walletData.balance.toFixed(8)} ${walletData.ticker}`;
     landingPage.appendChild(balance);
 
@@ -73,31 +72,31 @@ export function sendTXUI(walletData) {
     const form = document.createElement('form');
     form.className = 'wallet-form';
 
-    // Create receiving address input
+    // Receiving address input
     const receivingAddressInput = document.createElement('input');
     receivingAddressInput.type = 'text';
     receivingAddressInput.id = 'receivingAddress';
     receivingAddressInput.placeholder = 'Receiving Address';
-    receivingAddressInput.className = 'styled-input styled-text';
+    receivingAddressInput.className = 'styled-input';
     receivingAddressInput.required = true;
     receivingAddressInput.autocomplete = 'off';
     form.appendChild(receivingAddressInput);
 
-    // Create amount input
+    // Amount input
     const amountInput = document.createElement('input');
     amountInput.type = 'number';
     amountInput.id = 'amount';
     amountInput.placeholder = `Amount in ${walletData.ticker}`;
-    amountInput.className = 'styled-input styled-text no-spinner';
+    amountInput.className = 'styled-input';
     amountInput.required = true;
     amountInput.step = '0.00000001';
     amountInput.min = '0.00000001';
     amountInput.autocomplete = 'off';
     form.appendChild(amountInput);
 
-    // Add subtract fee checkbox
+    // Subtract fee checkbox
     const subtractFeeContainer = document.createElement('div');
-    subtractFeeContainer.className = 'subtract-fee-container';
+    subtractFeeContainer.className = 'checkbox-container';
     
     const subtractFeeCheckbox = document.createElement('input');
     subtractFeeCheckbox.type = 'checkbox';
@@ -106,28 +105,25 @@ export function sendTXUI(walletData) {
     
     const subtractFeeLabel = document.createElement('label');
     subtractFeeLabel.htmlFor = 'subtractFee';
-    subtractFeeLabel.className = 'styled-text';
     subtractFeeLabel.textContent = 'Subtract fee';
     
     subtractFeeContainer.appendChild(subtractFeeCheckbox);
     subtractFeeContainer.appendChild(subtractFeeLabel);
     form.appendChild(subtractFeeContainer);
 
-    // Create fee display and slider
+    // Fee slider container
     const feeContainer = document.createElement('div');
     feeContainer.className = 'fee-container';
     
     const feeLabel = document.createElement('div');
-    feeLabel.textContent = `Fee: `;
-    feeLabel.className = 'fee-label styled-text';
+    feeLabel.textContent = 'Fee: ';
+    feeLabel.className = 'fee-label';
     
     const feeDisplay = document.createElement('span');
     feeDisplay.id = 'feeDisplay';
-    feeDisplay.className = 'styled-text';
     
-    // Get network fee from coins configuration
     const networkFee = selectedCoin?.networkfee;
-    const defaultFee = networkFee ? networkFee : 1000000; // Default to 0.01 if not specified
+    const defaultFee = networkFee ? networkFee : 1000000;
     
     feeDisplay.textContent = (defaultFee / 100000000).toFixed(8);
     feeLabel.appendChild(feeDisplay);
@@ -136,9 +132,8 @@ export function sendTXUI(walletData) {
     const feeSlider = document.createElement('input');
     feeSlider.type = 'range';
     feeSlider.id = 'fee';
-    feeSlider.className = 'styled-input fee-slider';
-    feeSlider.min = networkFee ? networkFee.toString() : '100000';  // Use network fee as minimum if defined
-    // Set max fee based on network fee - if it's higher than 0.1, use that instead
+    feeSlider.className = 'styled-slider';
+    feeSlider.min = networkFee ? networkFee.toString() : '100000';
     feeSlider.max = networkFee && networkFee > 10000000 ? networkFee.toString() : '10000000';
     feeSlider.step = '100000';
     feeSlider.value = defaultFee.toString();
@@ -150,19 +145,20 @@ export function sendTXUI(walletData) {
     // Create submit button
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
-    submitButton.className = 'button styled-text';
+    submitButton.className = 'styled-button';
     submitButton.textContent = 'Send';
     form.appendChild(submitButton);
 
     // Add error message div
     const errorDiv = document.createElement('div');
     errorDiv.id = 'errorMessage';
-    errorDiv.className = 'error-message styled-text';
+    errorDiv.className = 'error-message';
     errorDiv.style.display = 'none';
     form.appendChild(errorDiv);
 
     // Append form to landing page
-    landingPage.appendChild(form);
+    formContainer.appendChild(form);
+    landingPage.appendChild(formContainer);
 
     // Add the coin icon at the bottom
     const coinIcon = document.createElement('img');

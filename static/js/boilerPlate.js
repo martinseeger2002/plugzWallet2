@@ -7,6 +7,7 @@ export function boilerPlateUI(selectedCoin) {
     landingPage.innerHTML = ''; // Clear existing content
     landingPage.style.backgroundColor = selectedCoin.color; // Set background color
 
+    // Header with back button
     const header = document.createElement('div');
     header.className = 'header';
 
@@ -21,15 +22,21 @@ export function boilerPlateUI(selectedCoin) {
     header.appendChild(backButton);
     landingPage.appendChild(header);
 
+    // Title
     const title = document.createElement('h1');
     title.textContent = 'Boilerplate Page';
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    const walletDropdown = document.createElement('select');
-    walletDropdown.className = 'wallet-selector';
+    // Main content container
+    const mainContent = document.createElement('div');
+    mainContent.className = 'main-content';
 
-    // Example wallets data
+    // Wallet selector
+    const walletDropdown = document.createElement('select');
+    walletDropdown.className = 'wallet-selector styled-text';
+
+    // Get wallets data and populate dropdown
     const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
     const walletsForCoin = walletsData.filter(wallet => wallet.ticker === selectedCoin.ticker);
 
@@ -37,51 +44,55 @@ export function boilerPlateUI(selectedCoin) {
         const option = document.createElement('option');
         option.value = wallet.label;
         option.textContent = wallet.label;
+        option.className = 'styled-text';
         walletDropdown.appendChild(option);
     });
-    landingPage.appendChild(walletDropdown);
+    mainContent.appendChild(walletDropdown);
 
-    const renameButton = document.createElement('button');
-    renameButton.className = 'styled-button';
-    renameButton.textContent = 'Rename Wallet';
-    renameButton.addEventListener('click', () => {
-        console.log('Rename Wallet button clicked');
+    // Button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'stacked-buttons';
+
+    // Create and add buttons
+    const buttons = [
+        {
+            text: 'Rename Wallet',
+            onClick: () => console.log('Rename Wallet clicked')
+        },
+        {
+            text: 'View Private Key',
+            onClick: () => console.log('View Private Key clicked')
+        },
+        {
+            text: 'Delete Wallet',
+            className: 'delete-button',
+            onClick: () => console.log('Delete Wallet clicked')
+        },
+        {
+            text: 'Add Wallet',
+            onClick: () => {
+                landingPage.innerHTML = '';
+                addWalletUI(selectedCoin);
+            }
+        },
+        {
+            text: 'Settings',
+            onClick: () => console.log('Settings clicked')
+        }
+    ];
+
+    buttons.forEach(button => {
+        const btn = document.createElement('button');
+        btn.className = `styled-button ${button.className || ''}`;
+        btn.textContent = button.text;
+        btn.addEventListener('click', button.onClick);
+        buttonContainer.appendChild(btn);
     });
-    landingPage.appendChild(renameButton);
 
-    const viewPrivateKeyButton = document.createElement('button');
-    viewPrivateKeyButton.className = 'styled-button';
-    viewPrivateKeyButton.textContent = 'View Private Key';
-    viewPrivateKeyButton.addEventListener('click', () => {
-        console.log('View Private Key button clicked');
-    });
-    landingPage.appendChild(viewPrivateKeyButton);
+    mainContent.appendChild(buttonContainer);
+    landingPage.appendChild(mainContent);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'styled-button delete-button';
-    deleteButton.textContent = 'Delete Wallet';
-    deleteButton.addEventListener('click', () => {
-        console.log('Delete Wallet button clicked');
-    });
-    landingPage.appendChild(deleteButton);
-
-    const addWalletButton = document.createElement('button');
-    addWalletButton.className = 'styled-button';
-    addWalletButton.textContent = 'Add Wallet';
-    addWalletButton.addEventListener('click', () => {
-        landingPage.innerHTML = ''; // Clear the UI
-        addWalletUI(selectedCoin); // Navigate to Add Wallet UI
-    });
-    landingPage.appendChild(addWalletButton);
-
-    const settingsButton = document.createElement('button');
-    settingsButton.className = 'styled-button';
-    settingsButton.textContent = 'Settings';
-    settingsButton.addEventListener('click', () => {
-        console.log('Settings button clicked');
-    });
-    landingPage.appendChild(settingsButton);
-
+    // Coin icon
     const coinIcon = document.createElement('img');
     coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
     coinIcon.alt = `${selectedCoin.name} Icon`;

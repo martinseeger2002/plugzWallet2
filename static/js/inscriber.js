@@ -29,21 +29,10 @@ export function inscribeUI(selectedWallet) {
     // Create main content container
     const mainContent = document.createElement('div');
     mainContent.className = 'main-content';
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.alignItems = 'center';
-    mainContent.style.gap = '20px';
-    mainContent.style.padding = '20px';
-    mainContent.style.maxWidth = '800px';
-    mainContent.style.margin = '0 auto';
-    mainContent.style.flex = '1';
 
     // Pending Transactions Counter
     const pendingTxDisplay = document.createElement('div');
     pendingTxDisplay.className = 'styled-text';
-    pendingTxDisplay.style.width = '100%';
-    pendingTxDisplay.style.maxWidth = '400px';
-    pendingTxDisplay.style.textAlign = 'center';
     mainContent.appendChild(pendingTxDisplay);
 
     // Inscription Name Input
@@ -51,18 +40,11 @@ export function inscribeUI(selectedWallet) {
     inscriptionNameInput.type = 'text';
     inscriptionNameInput.placeholder = 'Inscription name';
     inscriptionNameInput.className = 'styled-input styled-text';
-    inscriptionNameInput.style.width = '100%';
-    inscriptionNameInput.style.maxWidth = '400px';
     mainContent.appendChild(inscriptionNameInput);
 
     // Inscribe button
     const inscribeButton = document.createElement('button');
     inscribeButton.className = 'styled-button';
-    inscribeButton.style.width = '100%';
-    inscribeButton.style.maxWidth = '400px';
-    inscribeButton.style.fontSize = '16px';
-    inscribeButton.style.fontWeight = '500';
-    inscribeButton.style.textTransform = 'none';
     inscribeButton.textContent = 'Inscribe';
     mainContent.appendChild(inscribeButton);
 
@@ -96,9 +78,8 @@ export function inscribeUI(selectedWallet) {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                // Store the pending transactions
                 localStorage.setItem('pendingTransactions', JSON.stringify(data));
-                updatePendingTxCounter(1); // Update counter with pending tx
+                updatePendingTxCounter(1);
                 inscribeButton.disabled = false;
             })
             .catch(error => {

@@ -9,10 +9,8 @@ export function walletUI() {
 
 export function addWalletUI(selectedCoin) {
     const landingPage = document.getElementById('landing-page');
-    landingPage.innerHTML = ''; // Clear existing content
-
-    // Set the background color for the entire landing page
-    landingPage.style.backgroundColor = selectedCoin.color;
+    landingPage.innerHTML = '';
+    landingPage.style.backgroundColor = selectedCoin.color; // Keep dynamic color
 
     const header = document.createElement('div');
     header.className = 'header';
@@ -21,8 +19,8 @@ export function addWalletUI(selectedCoin) {
     backButton.className = 'back-button';
     backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
     backButton.addEventListener('click', () => {
-        landingPage.innerHTML = ''; // Clear the add wallet UI
-        walletSettingsUI(selectedCoin); // Navigate to the Wallet Settings page with the selected coin
+        landingPage.innerHTML = '';
+        walletSettingsUI(selectedCoin);
     });
 
     header.appendChild(backButton);
@@ -33,16 +31,11 @@ export function addWalletUI(selectedCoin) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    // Add warning text below title
     const warningText = document.createElement('p');
     warningText.textContent = 'Only import wallets created with Plugz';
-    warningText.className = 'warning-text'; // Add a class for styling
-    warningText.style.textAlign = 'center'; // Center the text
-    warningText.style.marginTop = '10px'; // Add some space below the title
+    warningText.className = 'warning-text';
     landingPage.appendChild(warningText);
 
-
-    // Create form elements
     const form = document.createElement('form');
     form.className = 'wallet-form';
 
@@ -74,13 +67,38 @@ export function addWalletUI(selectedCoin) {
 
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
-    addWalletButton.style.width = '100%';
-    addWalletButton.style.maxWidth = '200px';
-    addWalletButton.style.fontSize = '20px';
-    addWalletButton.style.fontWeight = '500';
-    addWalletButton.style.textTransform = 'none';
     addWalletButton.textContent = 'Add Wallet';
-    addWalletButton.disabled = true; // Initially disable the button
+    addWalletButton.disabled = true;
+    form.appendChild(addWalletButton);
+
+    const newWalletButton = document.createElement('button');
+    newWalletButton.className = 'styled-button';
+    newWalletButton.textContent = 'New Wallet';
+    form.appendChild(newWalletButton);
+
+    landingPage.appendChild(form);
+
+    const coinIcon = document.createElement('img');
+    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`;
+    coinIcon.alt = `${selectedCoin.name} Icon`;
+    coinIcon.className = 'coin-icon';
+    landingPage.appendChild(coinIcon);
+
+    // Function to check if all fields are filled
+    const checkFields = () => {
+        if (walletLabelInput.value && addressInput.value && privkeyInput.value) {
+            addWalletButton.disabled = false; // Enable the button if all fields are filled
+        } else {
+            addWalletButton.disabled = true; // Disable the button if any field is empty
+        }
+    };
+
+    // Add event listeners to check fields on input
+    walletLabelInput.addEventListener('input', checkFields);
+    addressInput.addEventListener('input', checkFields);
+    privkeyInput.addEventListener('input', checkFields);
+
+    // Add event listeners to handle button clicks
     addWalletButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
 
@@ -137,31 +155,6 @@ export function addWalletUI(selectedCoin) {
         });
     });
 
-    form.appendChild(addWalletButton);
-
-    // Function to check if all fields are filled
-    const checkFields = () => {
-        if (walletLabelInput.value && addressInput.value && privkeyInput.value) {
-            addWalletButton.disabled = false; // Enable the button if all fields are filled
-        } else {
-            addWalletButton.disabled = true; // Disable the button if any field is empty
-        }
-    };
-
-    // Add event listeners to check fields on input
-    walletLabelInput.addEventListener('input', checkFields);
-    addressInput.addEventListener('input', checkFields);
-    privkeyInput.addEventListener('input', checkFields);
-
-    // Add the "New Wallet" button
-    const newWalletButton = document.createElement('button');
-    newWalletButton.className = 'styled-button';
-    newWalletButton.style.width = '100%';
-    newWalletButton.style.maxWidth = '200px';
-    newWalletButton.style.fontSize = '20px';
-    newWalletButton.style.fontWeight = '500';
-    newWalletButton.style.textTransform = 'none';
-    newWalletButton.textContent = 'New Wallet';
     newWalletButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
 
@@ -182,17 +175,4 @@ export function addWalletUI(selectedCoin) {
                 console.error('Error fetching key:', error);
             });
     });
-
-    form.appendChild(newWalletButton);
-
-    landingPage.appendChild(form);
-
-    // Add the selected coin's icon below the add wallet button
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
-    coinIcon.alt = `${selectedCoin.name} Icon`;
-    coinIcon.className = 'coin-icon';
-    coinIcon.style.width = '150px';
-    coinIcon.style.height = '150px';
-    landingPage.appendChild(coinIcon);
 }

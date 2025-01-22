@@ -53,12 +53,10 @@ export function initializeWallet() {
     const header = document.createElement('div');
     header.className = 'header';
 
-    const maleIcon = document.createElement('img');
-    maleIcon.src = '/static/images/male-silhouette.png';
-    maleIcon.alt = 'Male Silhouette';
-    maleIcon.className = 'male-icon';
-    // Add click event to male icon for user settings
-    maleIcon.style.cursor = 'pointer'; // Add pointer cursor to indicate it's clickable
+    const maleIcon = document.createElement('button');  // Changed from img to button
+    maleIcon.className = 'back-button';  // Use the same class as back button
+    maleIcon.innerHTML = '<img src="/static/images/male-silhouette.png" alt="Male Silhouette" />';
+    maleIcon.style.cursor = 'pointer';
     maleIcon.addEventListener('click', () => {
         const selectedWallet = wallets.find(wallet => 
             wallet.ticker === coin.ticker && 

@@ -14,7 +14,7 @@ export function userSettingsUI(selectedWallet) {
         }
     } else {
         // Default background color when no wallet is selected
-        landingPage.style.backgroundColor = '#2c2c2c'; // Or any default color you prefer
+        landingPage.style.backgroundColor = '#000000'; // Or any default color you prefer
     }
 
     // Create header with back button
@@ -60,18 +60,18 @@ export function userSettingsUI(selectedWallet) {
         }
     ];
 
+    // Create buttons container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'stacked-buttons';
+    landingPage.appendChild(buttonContainer);
+
     // Create and append buttons
     settingsButtons.forEach(btn => {
         const button = document.createElement('button');
         button.className = 'styled-button';
-        button.style.width = '100%';
-        button.style.maxWidth = '200px';
-        button.style.fontSize = '20px';
-        button.style.fontWeight = '500';
-        button.style.textTransform = 'none';
         button.textContent = btn.text;
         button.addEventListener('click', btn.onClick);
-        landingPage.appendChild(button);
+        buttonContainer.appendChild(button);
     });
 
     // Add the coin icon only if a wallet is selected

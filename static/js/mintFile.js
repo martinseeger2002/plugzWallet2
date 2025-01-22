@@ -5,7 +5,7 @@ import { mintUI } from './mint.js';
 
 export function mintFileUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
-    landingPage.innerHTML = ''; // Clear existing content
+    landingPage.innerHTML = '';
 
     // Create header with back button
     const header = document.createElement('div');
@@ -31,44 +31,27 @@ export function mintFileUI(selectedWallet) {
     // Create main content container
     const mainContent = document.createElement('div');
     mainContent.className = 'main-content';
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.alignItems = 'center';
-    mainContent.style.gap = '20px';
-    mainContent.style.padding = '20px';
-    mainContent.style.maxWidth = '800px';
-    mainContent.style.margin = '0 auto';
-    mainContent.style.flex = '1';
 
     // Receiving address input
     const addressInput = document.createElement('input');
     addressInput.type = 'text';
     addressInput.placeholder = 'Enter receiving address (optional)';
     addressInput.className = 'styled-input styled-text';
-    addressInput.style.width = '100%';
-    addressInput.style.maxWidth = '400px';
     mainContent.appendChild(addressInput);
 
     // File selection container
     const fileContainer = document.createElement('div');
     fileContainer.className = 'file-container';
-    fileContainer.style.width = '100%';
-    fileContainer.style.maxWidth = '400px';
 
     // File selection input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.id = 'file-input';
-    fileInput.style.display = 'none';
-
+    fileInput.className = 'hidden-input';
+    
     // File selection button
     const fileButton = document.createElement('button');
     fileButton.className = 'styled-button';
-    fileButton.style.width = '100%';
-    fileButton.style.maxWidth = '200px';
-    fileButton.style.fontSize = '20px';
-    fileButton.style.fontWeight = '500';
-    fileButton.style.textTransform = 'none';
     fileButton.textContent = 'Choose File';
     fileButton.addEventListener('click', () => fileInput.click());
 
@@ -79,19 +62,11 @@ export function mintFileUI(selectedWallet) {
     // Selected file display
     const fileDisplay = document.createElement('div');
     fileDisplay.className = 'styled-text';
-    fileDisplay.style.width = '100%';
-    fileDisplay.style.maxWidth = '400px';
-    fileDisplay.style.textAlign = 'center';
     mainContent.appendChild(fileDisplay);
 
     // Next button
     const nextButton = document.createElement('button');
     nextButton.className = 'styled-button';
-    nextButton.style.width = '100%';
-    nextButton.style.maxWidth = '200px';
-    nextButton.style.fontSize = '20px';
-    nextButton.style.fontWeight = '500';
-    nextButton.style.textTransform = 'none';
     nextButton.textContent = 'Next';
     nextButton.disabled = true;
     mainContent.appendChild(nextButton);
@@ -125,17 +100,6 @@ export function mintFileUI(selectedWallet) {
             }
         }
     });
-
-    // Utility function to convert base64 to hex
-    function base64ToHex(base64) {
-        const raw = atob(base64);
-        let result = '';
-        for (let i = 0; i < raw.length; i++) {
-            const hex = raw.charCodeAt(i).toString(16);
-            result += (hex.length === 2 ? hex : '0' + hex);
-        }
-        return result.toUpperCase();
-    }
 
     // Handle next button click
     nextButton.addEventListener('click', () => {
@@ -252,4 +216,15 @@ export function mintFileUI(selectedWallet) {
             nextButton.textContent = 'Next';
         });
     });
+}
+
+// Utility function
+function base64ToHex(base64) {
+    const raw = atob(base64);
+    let result = '';
+    for (let i = 0; i < raw.length; i++) {
+        const hex = raw.charCodeAt(i).toString(16);
+        result += (hex.length === 2 ? hex : '0' + hex);
+    }
+    return result.toUpperCase();
 } 

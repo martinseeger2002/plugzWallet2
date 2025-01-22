@@ -28,18 +28,22 @@ export function settingsUI(selectedCoin) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
+    const mainContent = document.createElement('div');
+    mainContent.className = 'main-content';
+
     const form = document.createElement('form');
-    form.className = 'settings-form';
+    form.className = 'wallet-form';
 
     // Retrieve saved settings from local storage
     const savedSettings = JSON.parse(localStorage.getItem('coinSettings')) || {};
 
     coins.forEach(coin => {
         const label = document.createElement('label');
-        label.className = 'coin-label';
+        label.className = 'checkbox-container';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.className = 'styled-checkbox';
         checkbox.checked = savedSettings[coin.ticker] !== false; // Default to true if not set
         checkbox.addEventListener('change', () => {
             // Ensure at least one checkbox is checked
@@ -58,11 +62,6 @@ export function settingsUI(selectedCoin) {
     // Save Settings button
     const saveButton = document.createElement('button');
     saveButton.className = 'styled-button';
-    saveButton.style.width = '100%';
-    saveButton.style.maxWidth = '200px';
-    saveButton.style.fontSize = '20px';
-    saveButton.style.fontWeight = '500';
-    saveButton.style.textTransform = 'none';
     saveButton.textContent = 'Save Settings';
     saveButton.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent form submission
@@ -83,5 +82,6 @@ export function settingsUI(selectedCoin) {
     });
 
     form.appendChild(saveButton);
-    landingPage.appendChild(form);
+    mainContent.appendChild(form);
+    landingPage.appendChild(mainContent);
 } 

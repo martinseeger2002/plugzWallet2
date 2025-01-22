@@ -8,10 +8,10 @@ export function receiveUI(selectedWallet) {
     // Find the coin data for the selected wallet to get the color
     const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
     if (selectedCoin) {
-        landingPage.style.backgroundColor = selectedCoin.color; // Set background color
+        landingPage.style.backgroundColor = selectedCoin.color; // Keep dynamic color
     }
 
-    // Create a header for the back button
+    // Create header with back button
     const header = document.createElement('div');
     header.className = 'header';
 
@@ -27,19 +27,20 @@ export function receiveUI(selectedWallet) {
     header.appendChild(backButton);
     landingPage.appendChild(header);
 
+    // Create main content container
+    const mainContent = document.createElement('div');
+    mainContent.className = 'main-content';
+
     // Create a container for the QR code and address
     const container = document.createElement('div');
     container.className = 'receive-container';
-    container.style.position = 'relative'; // Set position to relative for absolute positioning of the icon
 
     // Create a canvas element for the QR code
     const qrCanvas = document.createElement('canvas');
-    qrCanvas.width = 325;
-    qrCanvas.height = 325;
-    qrCanvas.className = 'qr-code'; // Add class for styling
+    qrCanvas.className = 'qr-code';
     container.appendChild(qrCanvas);
 
-    // Generate the QR code with a blank center
+    // Generate the QR code
     QRCode.toCanvas(qrCanvas, selectedWallet.address, {
         width: 325,
         height: 325,
@@ -59,7 +60,7 @@ export function receiveUI(selectedWallet) {
     addressInput.type = 'text';
     addressInput.value = selectedWallet.address;
     addressInput.readOnly = true; // Make the input read-only
-    addressInput.className = 'address-input';
+    addressInput.className = 'address-input styled-text';
     container.appendChild(addressInput);
 
     // Create a button to copy the address to the clipboard
@@ -73,18 +74,13 @@ export function receiveUI(selectedWallet) {
     });
     container.appendChild(copyButton);
 
-    landingPage.appendChild(container);
+    mainContent.appendChild(container);
+    landingPage.appendChild(mainContent);
 
     // Add the selected coin's icon in the center of the QR code
     const coinIcon = document.createElement('img');
     coinIcon.src = `/static/images/${selectedWallet.ticker}icon.png`; // Ensure the correct property is used
     coinIcon.alt = `${selectedWallet.ticker} Icon`;
-    coinIcon.className = 'coin-icon';
-    coinIcon.style.position = 'absolute';
-    coinIcon.style.width = '60px'; // Set width to 25px
-    coinIcon.style.height = '60px'; // Set height to 25px
-    coinIcon.style.left = '50%';
-    coinIcon.style.top = '35%';
-    coinIcon.style.transform = 'translate(-50%, -50%)'; // Center the icon
+    coinIcon.className = 'qr-coin-icon';
     container.appendChild(coinIcon);
 } 
