@@ -128,8 +128,8 @@ def generate_tx():
             'error': str(e)
         }), 500 
 
-@bitcore_lib_bp.route('/inscribe/<ticker>', methods=['POST'])
-def inscribe(ticker):
+@bitcore_lib_bp.route('/generate_ord_hexs/<ticker>', methods=['POST'])
+def generate_ord_hexs(ticker):
     try:
         # Get JSON data from request
         data = request.get_json()

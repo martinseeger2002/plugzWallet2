@@ -92,9 +92,7 @@ export function initializeWallet() {
     const coinIcon = document.createElement('img');
     coinIcon.src = `/static/images/${coin.name}icon.png`; // Path to the coin icon
     coinIcon.alt = `${coin.name} Icon`;
-    coinIcon.style.width = '200px';
-    coinIcon.style.height = '200px';
-    coinIcon.style.margin = '20px 0';
+    coinIcon.className = 'coin-icon';
     slide.appendChild(coinIcon);
 
     // Wallet selector dropdown
@@ -131,50 +129,52 @@ export function initializeWallet() {
     const buttons = document.createElement('div');
     buttons.className = 'buttons';
 
-    const sendButton = document.createElement('div');
-    sendButton.className = 'button';
-    sendButton.textContent = 'Send';
-    sendButton.addEventListener('click', () => {
-        const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
-        if (selectedWallet) {
-            landingPage.innerHTML = ''; // Clear the current UI
-            sendTXUI(selectedWallet); // Call the sendTXUI function with the selected wallet
-        }
-    });
-    buttons.appendChild(sendButton);
+    const buttonConfigs = [
+        { text: 'Send', onClick: () => {
+            const selectedWallet = wallets.find(wallet => 
+                wallet.ticker === coin.ticker && 
+                wallet.label === walletSelector.value
+            );
+            if (selectedWallet) {
+                landingPage.innerHTML = '';
+                sendTXUI(selectedWallet);
+            }
+        }},
+        { text: 'Receive', onClick: () => {
+            const selectedWallet = wallets.find(wallet => 
+                wallet.ticker === coin.ticker && 
+                wallet.label === walletSelector.value
+            );
+            if (selectedWallet) {
+                landingPage.innerHTML = '';
+                receiveUI(selectedWallet);
+            }
+        }},
+        { text: 'Mint', onClick: () => {
+            const selectedWallet = wallets.find(wallet => 
+                wallet.ticker === coin.ticker && 
+                wallet.label === walletSelector.value
+            );
+            if (selectedWallet) {
+                landingPage.innerHTML = '';
+                mintUI(selectedWallet);
+            }
+        }}
+    ];
 
-    const receiveButton = document.createElement('div');
-    receiveButton.className = 'button';
-    receiveButton.textContent = 'Receive';
-    receiveButton.addEventListener('click', () => {
-      const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
-      if (selectedWallet) {
-        landingPage.innerHTML = ''; // Clear the current UI
-        receiveUI(selectedWallet); // Call the receiveUI function with the selected wallet
-      }
+    buttonConfigs.forEach(config => {
+        const button = document.createElement('div');
+        button.className = 'button';
+        button.textContent = config.text;
+        button.addEventListener('click', config.onClick);
+        buttons.appendChild(button);
     });
-    buttons.appendChild(receiveButton);
-
-    const mintButton = document.createElement('div');
-    mintButton.className = 'button';
-    mintButton.textContent = 'Mint';
-    mintButton.addEventListener('click', () => {
-        const selectedWallet = wallets.find(wallet => wallet.ticker === coin.ticker && wallet.label === walletSelector.value);
-        if (selectedWallet) {
-            landingPage.innerHTML = ''; // Clear the current UI
-            mintUI(selectedWallet); // Call the mintUI function with the selected wallet
-        }
-    });
-    buttons.appendChild(mintButton);
 
     slide.appendChild(buttons); // Append buttons before transaction history
 
     // Transaction history
     const transactionHistory = document.createElement('div');
     transactionHistory.className = 'transaction-history';
-    transactionHistory.style.maxHeight = '250px';  // Set maximum height
-    transactionHistory.style.overflowY = 'auto';   // Enable vertical scrolling
-    transactionHistory.style.marginTop = '10px';   // Add some spacing from elements above
     slide.appendChild(transactionHistory);
 
     // Update balance and transaction history based on selected wallet
@@ -185,7 +185,7 @@ export function initializeWallet() {
         fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
         balance.textContent = `0.000 ${coin.name}`;
-        transactionHistory.innerHTML = '<div style="margin-left: 20px;">No recent transactions</div>';
+        transactionHistory.innerHTML = '<div class="transaction">No recent transactions</div>';
       }
     };
 
@@ -331,7 +331,6 @@ function fetchAndDisplayTransactions(ticker, address, transactionHistoryContaine
         transactions.forEach(tx => {
           const txElement = document.createElement('div');
           txElement.className = 'transaction';
-          txElement.style.marginLeft = '20px'; // Add left margin
 
           // Calculate time since transaction was sent
           const currentTime = Date.now();

@@ -51,13 +51,11 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
 
     landingPage.appendChild(walletDropdown);
 
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'stacked-buttons';
+
     const renameButton = document.createElement('button');
     renameButton.className = 'styled-button';
-    renameButton.style.width = '100%';
-    renameButton.style.maxWidth = '200px';
-    renameButton.style.fontSize = '20px';
-    renameButton.style.fontWeight = '500';
-    renameButton.style.textTransform = 'none';
     renameButton.textContent = 'Rename Wallet';
     renameButton.addEventListener('click', () => {
         const currentLabel = walletDropdown.value;
@@ -74,15 +72,10 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
             }
         }
     });
-    landingPage.appendChild(renameButton);
+    buttonContainer.appendChild(renameButton);
 
     const viewPrivateKeyButton = document.createElement('button');
     viewPrivateKeyButton.className = 'styled-button';
-    viewPrivateKeyButton.style.width = '100%';
-    viewPrivateKeyButton.style.maxWidth = '200px';
-    viewPrivateKeyButton.style.fontSize = '20px';
-    viewPrivateKeyButton.style.fontWeight = '500';
-    viewPrivateKeyButton.style.textTransform = 'none';
     viewPrivateKeyButton.textContent = 'View Private Key';
     viewPrivateKeyButton.addEventListener('click', () => {
         const currentLabel = walletDropdown.value;
@@ -96,49 +89,33 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
             privKeyInput.value = wallet.privkey;
             privKeyInput.readOnly = true;
             privKeyInput.className = 'styled-input styled-text';
-            privKeyInput.style.width = '100%';
-            dialog.appendChild(privKeyInput);
 
             const copyButton = document.createElement('button');
             copyButton.className = 'styled-button';
-            copyButton.style.width = '100%';
-            copyButton.style.maxWidth = '200px';
-            copyButton.style.fontSize = '20px';
-            copyButton.style.fontWeight = '500';
-            copyButton.style.textTransform = 'none';
             copyButton.textContent = 'Copy to Clipboard';
             copyButton.addEventListener('click', () => {
                 privKeyInput.select();
                 document.execCommand('copy');
                 alert('Private key copied to clipboard!');
             });
-            dialog.appendChild(copyButton);
 
             const closeButton = document.createElement('button');
             closeButton.className = 'styled-button';
-            closeButton.style.width = '100%';
-            closeButton.style.maxWidth = '200px';
-            closeButton.style.fontSize = '20px';
-            closeButton.style.fontWeight = '500';
-            closeButton.style.textTransform = 'none';
             closeButton.textContent = 'Close';
             closeButton.addEventListener('click', () => {
                 landingPage.removeChild(dialog);
             });
-            dialog.appendChild(closeButton);
 
+            dialog.appendChild(privKeyInput);
+            dialog.appendChild(copyButton);
+            dialog.appendChild(closeButton);
             landingPage.appendChild(dialog);
         }
     });
-    landingPage.appendChild(viewPrivateKeyButton);
+    buttonContainer.appendChild(viewPrivateKeyButton);
 
     const deleteButton = document.createElement('button');
     deleteButton.className = 'styled-button delete-button';
-    deleteButton.style.width = '100%';
-    deleteButton.style.maxWidth = '200px';
-    deleteButton.style.fontSize = '20px';
-    deleteButton.style.fontWeight = '500';
-    deleteButton.style.textTransform = 'none';
     deleteButton.textContent = 'Delete Wallet';
     deleteButton.addEventListener('click', () => {
         const currentLabel = walletDropdown.value;
@@ -157,40 +134,30 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
             }
         }
     });
-    landingPage.appendChild(deleteButton);
+    buttonContainer.appendChild(deleteButton);
 
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
-    addWalletButton.style.width = '100%';
-    addWalletButton.style.maxWidth = '200px';
-    addWalletButton.style.fontSize = '20px';
-    addWalletButton.style.fontWeight = '500';
-    addWalletButton.style.textTransform = 'none';
     addWalletButton.textContent = 'Add Wallet';
     addWalletButton.addEventListener('click', () => {
         landingPage.innerHTML = ''; // Clear the wallet settings UI
         addWalletUI(selectedCoin); // Pass the entire selectedCoin object
     });
-    landingPage.appendChild(addWalletButton);
+    buttonContainer.appendChild(addWalletButton);
 
-    // Add the "Settings" button below the "Add Wallet" button
     const settingsButton = document.createElement('button');
     settingsButton.className = 'styled-button';
-    settingsButton.style.width = '100%';
-    settingsButton.style.maxWidth = '200px';
-    settingsButton.style.fontSize = '20px';
-    settingsButton.style.fontWeight = '500';
-    settingsButton.style.textTransform = 'none';
     settingsButton.textContent = 'Settings';
     settingsButton.addEventListener('click', () => {
         landingPage.innerHTML = ''; // Clear the wallet settings UI
         settingsUI(selectedCoin); // Navigate to the Settings page
     });
-    landingPage.appendChild(settingsButton);
+    buttonContainer.appendChild(settingsButton);
 
-    // Add the selected coin's icon below the settings button
+    landingPage.appendChild(buttonContainer);
+
     const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`; // Ensure the correct property is used
+    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`;
     coinIcon.alt = `${selectedCoin.name} Icon`;
     coinIcon.className = 'coin-icon';
     landingPage.appendChild(coinIcon);
