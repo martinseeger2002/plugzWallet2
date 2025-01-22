@@ -123,8 +123,13 @@ export function sendTXUI(walletData) {
     
     const feeDisplay = document.createElement('span');
     feeDisplay.id = 'feeDisplay';
-    feeDisplay.textContent = '0.01';
     feeDisplay.className = 'styled-text';
+    
+    // Get network fee from coins configuration
+    const networkFee = selectedCoin?.networkfee;
+    const defaultFee = networkFee ? networkFee : 1000000; // Default to 0.01 if not specified
+    
+    feeDisplay.textContent = (defaultFee / 100000000).toFixed(8);
     feeLabel.appendChild(feeDisplay);
     feeLabel.appendChild(document.createTextNode(` ${walletData.ticker}`));
     
@@ -132,10 +137,11 @@ export function sendTXUI(walletData) {
     feeSlider.type = 'range';
     feeSlider.id = 'fee';
     feeSlider.className = 'styled-input fee-slider';
-    feeSlider.min = '100000';
-    feeSlider.max = '10000000';
+    feeSlider.min = networkFee ? networkFee.toString() : '100000';  // Use network fee as minimum if defined
+    // Set max fee based on network fee - if it's higher than 0.1, use that instead
+    feeSlider.max = networkFee && networkFee > 10000000 ? networkFee.toString() : '10000000';
     feeSlider.step = '100000';
-    feeSlider.value = '1000000';
+    feeSlider.value = defaultFee.toString();
 
     feeContainer.appendChild(feeLabel);
     feeContainer.appendChild(feeSlider);
@@ -207,7 +213,6 @@ export function sendTXUI(walletData) {
             submitButton.disabled = true;
             submitButton.textContent = 'Sending...';
 
-            // Get values
             const amountInputValue = parseFloat(document.getElementById('amount').value);
             const feeInSats = parseInt(document.getElementById('fee').value);
             const receivingAddress = document.getElementById('receivingAddress').value.trim();
@@ -221,8 +226,16 @@ export function sendTXUI(walletData) {
             if (amountInputValue < 0.00000001) {
                 throw new Error('Amount must be at least 0.00000001');
             }
-            if (isNaN(feeInSats) || feeInSats < 100000 || feeInSats > 10000000) {
-                throw new Error('Invalid fee (must be between 0.001 and 0.1 coins)');
+            
+            // Updated fee validation to allow higher network fees
+            if (networkFee && feeInSats < networkFee) {
+                throw new Error(`Fee must be at least ${(networkFee / 100000000).toFixed(8)} ${walletData.ticker}`);
+            }
+            // Only apply maximum fee check if network fee is not higher than standard max
+            if (!networkFee || networkFee <= 10000000) {
+                if (feeInSats > 10000000) {
+                    throw new Error('Fee must not exceed 0.1 coins');
+                }
             }
 
             // Filter out UTXOs less than or equal to 0.01

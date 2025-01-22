@@ -172,6 +172,9 @@ export function initializeWallet() {
     // Transaction history
     const transactionHistory = document.createElement('div');
     transactionHistory.className = 'transaction-history';
+    transactionHistory.style.maxHeight = '250px';  // Set maximum height
+    transactionHistory.style.overflowY = 'auto';   // Enable vertical scrolling
+    transactionHistory.style.marginTop = '10px';   // Add some spacing from elements above
     slide.appendChild(transactionHistory);
 
     // Update balance and transaction history based on selected wallet
@@ -182,7 +185,7 @@ export function initializeWallet() {
         fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
         balance.textContent = `0.000 ${coin.name}`;
-        transactionHistory.innerHTML = '<div style="margin-left: 20px;">No recent transactions</div>'; // Added margin
+        transactionHistory.innerHTML = '<div style="margin-left: 20px;">No recent transactions</div>';
       }
     };
 
