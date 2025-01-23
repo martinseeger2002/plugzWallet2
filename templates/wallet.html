@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Plugz Wallet</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -13,6 +13,13 @@
     <div id="landing-page" data-service-worker="{{ url_for('static', filename='js/service-worker.js') }}">
       <!-- Dynamic content will be inserted here -->
     </div>
+  </div>
+
+  <!-- Add to Home Screen Prompt -->
+  <div id="install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+    background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;">
+    <p id="install-message"></p>
+    <button onclick="closeInstallPrompt()" style="padding: 8px 15px; margin-top: 10px; border-radius: 5px;">Got it</button>
   </div>
 
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
@@ -30,6 +37,34 @@
             console.log('Service Worker registration failed:', error);
           });
       });
+    }
+
+    // Add to Home Screen detection and prompt
+    window.addEventListener('load', () => {
+      // Check if the app is in standalone mode
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      
+      if (!isInStandaloneMode) {
+        const installPrompt = document.getElementById('install-prompt');
+        const installMessage = document.getElementById('install-message');
+        
+        // Detect iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Detect Android
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS) {
+          installMessage.innerHTML = 'To install this app on your iPhone: tap the share button <img src="/static/images/ios-share.png" style="height: 20px; vertical-align: middle;"> and then "Add to Home Screen"';
+          installPrompt.style.display = 'block';
+        } else if (isAndroid) {
+          installMessage.innerHTML = 'To install this app on your Android device: tap the menu button and select "Add to Home Screen"';
+          installPrompt.style.display = 'block';
+        }
+      }
+    });
+
+    function closeInstallPrompt() {
+      document.getElementById('install-prompt').style.display = 'none';
     }
   </script>
 </body>
