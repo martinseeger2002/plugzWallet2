@@ -4,8 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Plugz Wallet</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Plugz Wallet">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Cryptocurrency Wallet">
+  
+  <!-- iOS Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Plugz Wallet">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" crossorigin="use-credentials">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
 <body>
@@ -57,7 +76,7 @@
           installMessage.innerHTML = 'To install this app on your iPhone: tap the share button <img src="/static/images/ios-share.png" style="height: 20px; vertical-align: middle;"> and then "Add to Home Screen"';
           installPrompt.style.display = 'block';
         } else if (isAndroid) {
-          installMessage.innerHTML = 'To install this app on your Android device: tap the menu button and select "Add to Home Screen"';
+          installMessage.innerHTML = 'To install this app on your Android device: tap the menu button <img src="/static/images/three-dots.png" style="height: 20px; vertical-align: middle;"> and select "Add to Home Screen"';
           installPrompt.style.display = 'block';
         }
       }
