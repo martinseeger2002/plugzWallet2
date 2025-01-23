@@ -281,7 +281,8 @@ export function sendTXUI(walletData) {
             submitButton.textContent = 'Sending...';
 
             const amountInputValue = parseFloat(document.getElementById('amount').value);
-            const feeInSats = parseInt(document.getElementById('fee').value);
+            // Get fee from the display text instead of slider value
+            const feeInSats = Math.floor(parseFloat(feeDisplay.textContent) * 100000000);
             const receivingAddress = document.getElementById('receivingAddress').value.trim();
             const subtractFee = document.getElementById('subtractFee').checked;
 
