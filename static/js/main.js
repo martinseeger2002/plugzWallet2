@@ -200,7 +200,7 @@ export function initializeWallet() {
         balance.style.cursor = 'default';
         balance.onclick = null;
       } else {
-        balance.textContent = 'Add a wallet';
+        balance.textContent = `Add ${coin.ticker} wallet`;
         balance.style.cursor = 'pointer';
         balance.onclick = () => {
           landingPage.innerHTML = '';
@@ -254,7 +254,7 @@ export function initializeWallet() {
             );
 
             if (!selectedWallet) {
-              balanceElement.textContent = 'Add a wallet';
+              balanceElement.textContent = `Add ${selectedCoin.ticker} wallet`;
               balanceElement.style.cursor = 'pointer';
               balanceElement.onclick = () => {
                 landingPage.innerHTML = '';

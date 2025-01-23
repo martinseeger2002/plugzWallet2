@@ -27,114 +27,129 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    const walletDropdown = document.createElement('select');
-    walletDropdown.className = 'wallet-selector styled-text';
-
     // Retrieve wallets from local storage
     const walletsData = JSON.parse(localStorage.getItem('wallets')) || [];
     // Filter wallets for the selected coin and exclude those without a label
     const walletsForCoin = walletsData.filter(wallet => wallet.ticker === selectedCoin.ticker && wallet.label);
 
-    // Populate dropdown with wallets for the selected coin
-    walletsForCoin.forEach(wallet => {
-        const option = document.createElement('option');
-        option.value = wallet.label;
-        option.textContent = wallet.label;
-        option.className = 'styled-text';
-        walletDropdown.appendChild(option);
-    });
+    if (walletsForCoin.length === 0) {
+        const noWalletMessage = document.createElement('div');
+        noWalletMessage.textContent = 'No wallets found';
+        noWalletMessage.className = 'styled-text';
+        noWalletMessage.style.textAlign = 'center';
+        noWalletMessage.style.margin = '20px 0';
+        landingPage.appendChild(noWalletMessage);
+    } else {
+        const walletDropdown = document.createElement('select');
+        walletDropdown.className = 'wallet-selector styled-text';
 
-    // Set the selected wallet if provided
-    if (currentWallet) {
-        walletDropdown.value = currentWallet.label;
+        // Populate dropdown with wallets for the selected coin
+        walletsForCoin.forEach(wallet => {
+            const option = document.createElement('option');
+            option.value = wallet.label;
+            option.textContent = wallet.label;
+            option.className = 'styled-text';
+            walletDropdown.appendChild(option);
+        });
+
+        // Set the selected wallet if provided
+        if (currentWallet) {
+            walletDropdown.value = currentWallet.label;
+        }
+
+        landingPage.appendChild(walletDropdown);
     }
-
-    landingPage.appendChild(walletDropdown);
 
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'stacked-buttons';
 
-    const renameButton = document.createElement('button');
-    renameButton.className = 'styled-button';
-    renameButton.textContent = 'Rename Wallet';
-    renameButton.addEventListener('click', () => {
-        const currentLabel = walletDropdown.value;
-        const newLabel = prompt('Enter new wallet label:', currentLabel);
-        if (newLabel && newLabel !== currentLabel) {
-            // Update the wallet label in local storage
-            const walletIndex = walletsData.findIndex(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
-            if (walletIndex !== -1) {
-                walletsData[walletIndex].label = newLabel;
-                localStorage.setItem('wallets', JSON.stringify(walletsData));
-                console.log('Wallet label updated:', newLabel);
-                // Update the dropdown option text
-                walletDropdown.options[walletDropdown.selectedIndex].textContent = newLabel;
+    // Only show these buttons if there are wallets
+    if (walletsForCoin.length > 0) {
+        const renameButton = document.createElement('button');
+        renameButton.className = 'styled-button';
+        renameButton.textContent = 'Rename Wallet';
+        renameButton.addEventListener('click', () => {
+            const walletDropdown = document.querySelector('.wallet-selector');
+            const currentLabel = walletDropdown.value;
+            const newLabel = prompt('Enter new wallet label:', currentLabel);
+            if (newLabel && newLabel !== currentLabel) {
+                // Update the wallet label in local storage
+                const walletIndex = walletsData.findIndex(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
+                if (walletIndex !== -1) {
+                    walletsData[walletIndex].label = newLabel;
+                    localStorage.setItem('wallets', JSON.stringify(walletsData));
+                    console.log('Wallet label updated:', newLabel);
+                    // Update the dropdown option text
+                    walletDropdown.options[walletDropdown.selectedIndex].textContent = newLabel;
+                }
             }
-        }
-    });
-    buttonContainer.appendChild(renameButton);
+        });
+        buttonContainer.appendChild(renameButton);
 
-    const viewPrivateKeyButton = document.createElement('button');
-    viewPrivateKeyButton.className = 'styled-button';
-    viewPrivateKeyButton.textContent = 'View Private Key';
-    viewPrivateKeyButton.addEventListener('click', () => {
-        const currentLabel = walletDropdown.value;
-        const wallet = walletsData.find(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
-        if (wallet) {
-            const dialog = document.createElement('div');
-            dialog.className = 'dialog';
+        const viewPrivateKeyButton = document.createElement('button');
+        viewPrivateKeyButton.className = 'styled-button';
+        viewPrivateKeyButton.textContent = 'View Private Key';
+        viewPrivateKeyButton.addEventListener('click', () => {
+            const walletDropdown = document.querySelector('.wallet-selector');
+            const currentLabel = walletDropdown.value;
+            const wallet = walletsData.find(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
+            if (wallet) {
+                const dialog = document.createElement('div');
+                dialog.className = 'dialog';
 
-            const privKeyInput = document.createElement('input');
-            privKeyInput.type = 'text';
-            privKeyInput.value = wallet.privkey;
-            privKeyInput.readOnly = true;
-            privKeyInput.className = 'styled-input styled-text';
+                const privKeyInput = document.createElement('input');
+                privKeyInput.type = 'text';
+                privKeyInput.value = wallet.privkey;
+                privKeyInput.readOnly = true;
+                privKeyInput.className = 'styled-input styled-text';
 
-            const copyButton = document.createElement('button');
-            copyButton.className = 'styled-button';
-            copyButton.textContent = 'Copy to Clipboard';
-            copyButton.addEventListener('click', () => {
-                privKeyInput.select();
-                document.execCommand('copy');
-                alert('Private key copied to clipboard!');
-            });
+                const copyButton = document.createElement('button');
+                copyButton.className = 'styled-button';
+                copyButton.textContent = 'Copy to Clipboard';
+                copyButton.addEventListener('click', () => {
+                    privKeyInput.select();
+                    document.execCommand('copy');
+                    alert('Private key copied to clipboard!');
+                });
 
-            const closeButton = document.createElement('button');
-            closeButton.className = 'styled-button';
-            closeButton.textContent = 'Close';
-            closeButton.addEventListener('click', () => {
-                landingPage.removeChild(dialog);
-            });
+                const closeButton = document.createElement('button');
+                closeButton.className = 'styled-button';
+                closeButton.textContent = 'Close';
+                closeButton.addEventListener('click', () => {
+                    landingPage.removeChild(dialog);
+                });
 
-            dialog.appendChild(privKeyInput);
-            dialog.appendChild(copyButton);
-            dialog.appendChild(closeButton);
-            landingPage.appendChild(dialog);
-        }
-    });
-    buttonContainer.appendChild(viewPrivateKeyButton);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'styled-button delete-button';
-    deleteButton.textContent = 'Delete Wallet';
-    deleteButton.addEventListener('click', () => {
-        const currentLabel = walletDropdown.value;
-        const confirmDelete = confirm('Are you sure? This action cannot be undone.');
-        if (confirmDelete) {
-            // Find the index of the wallet to delete
-            const walletIndex = walletsData.findIndex(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
-            if (walletIndex !== -1) {
-                // Remove the wallet from the array
-                walletsData.splice(walletIndex, 1);
-                // Update local storage
-                localStorage.setItem('wallets', JSON.stringify(walletsData));
-                console.log('Wallet deleted:', currentLabel);
-                // Remove the option from the dropdown
-                walletDropdown.remove(walletDropdown.selectedIndex);
+                dialog.appendChild(privKeyInput);
+                dialog.appendChild(copyButton);
+                dialog.appendChild(closeButton);
+                landingPage.appendChild(dialog);
             }
-        }
-    });
-    buttonContainer.appendChild(deleteButton);
+        });
+        buttonContainer.appendChild(viewPrivateKeyButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'styled-button delete-button';
+        deleteButton.textContent = 'Delete Wallet';
+        deleteButton.addEventListener('click', () => {
+            const walletDropdown = document.querySelector('.wallet-selector');
+            const currentLabel = walletDropdown.value;
+            const confirmDelete = confirm('Are you sure? This action cannot be undone.');
+            if (confirmDelete) {
+                // Find the index of the wallet to delete
+                const walletIndex = walletsData.findIndex(wallet => wallet.label === currentLabel && wallet.ticker === selectedCoin.ticker);
+                if (walletIndex !== -1) {
+                    // Remove the wallet from the array
+                    walletsData.splice(walletIndex, 1);
+                    // Update local storage
+                    localStorage.setItem('wallets', JSON.stringify(walletsData));
+                    console.log('Wallet deleted:', currentLabel);
+                    // Refresh the page to show updated wallet list
+                    walletSettingsUI(selectedCoin);
+                }
+            }
+        });
+        buttonContainer.appendChild(deleteButton);
+    }
 
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
