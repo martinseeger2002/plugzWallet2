@@ -4,6 +4,7 @@ import { receiveUI } from './receive.js'; // Import the receiveUI function
 import { sendTXUI } from './sendTX.js';
 import { mintUI } from './mint.js';
 import { userSettingsUI } from './userSettings.js';
+import { displayTransactionHistory } from './getHistory.js';
 
 // Initialize wallets variable
 let wallets = [];
@@ -173,6 +174,8 @@ export function initializeWallet() {
       const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
       if (selectedWallet) {
         balance.textContent = `${selectedWallet.balance} ${coin.name}`;
+        // Clear existing transaction history before fetching new ones
+        transactionHistory.innerHTML = '';
         fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
         balance.textContent = `0.000 ${coin.name}`;
@@ -180,19 +183,14 @@ export function initializeWallet() {
       }
     };
 
+    // Only call updateWalletInfo on change event
     walletSelector.addEventListener('change', () => {
-      updateWalletData(coin.ticker, walletSelector.value, balance); // Update wallet data on selection change
-      updateWalletInfo(); // Update transaction history
+      updateWalletData(coin.ticker, walletSelector.value, balance);
+      updateWalletInfo();
 
       // Save the selected wallet to local storage
       savedSelectedWallets[coin.ticker] = walletSelector.value;
       localStorage.setItem('selectedWallets', JSON.stringify(savedSelectedWallets));
-    });
-
-    // Trigger updateWalletData on dropdown click to ensure it runs even if the same wallet is selected
-    walletSelector.addEventListener('click', () => {
-      updateWalletData(coin.ticker, walletSelector.value, balance);
-      updateWalletInfo(); // Update transaction history
     });
 
     updateWalletInfo(); // Initialize balance and transaction history display
@@ -216,23 +214,28 @@ export function initializeWallet() {
       slideChange: function () {
         const activeIndex = this.realIndex;
         document.body.style.backgroundColor = activeCoins[activeIndex].color;
-        selectedCoin = activeCoins[activeIndex]; // Update selected coin
+        selectedCoin = activeCoins[activeIndex];
 
-        // Wait for half a second before proceeding with balance updatey
         setTimeout(() => {
           const activeSlide = document.querySelector('.swiper-slide-active');
           const walletSelector = activeSlide.querySelector('.wallet-selector');
           const balanceElement = activeSlide.querySelector('.balance');
 
           if (walletSelector && balanceElement) {
-            walletSelector.selectedIndex = 0; // Select the first wallet in the dropdown
-            
-            // Clear the balance display immediately to avoid showing the old balance
+            walletSelector.selectedIndex = 0;
             balanceElement.textContent = 'Loading...';
-
-            updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement);
+            
+            // Update wallet data and transaction history in sequence
+            updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement)
+              .then(() => {
+                const transactionHistory = activeSlide.querySelector('.transaction-history');
+                if (transactionHistory) {
+                  transactionHistory.innerHTML = '';
+                  fetchAndDisplayTransactions(selectedCoin.ticker, walletSelector.value, transactionHistory);
+                }
+              });
           }
-        }, 500); // 500 milliseconds delay
+        }, 500);
       }
     }
   });
@@ -309,50 +312,7 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
 }
 
 function fetchAndDisplayTransactions(ticker, address, transactionHistoryContainer) {
-  transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Loading transactions...</div>'; // Added margin
-
-  fetch(`/api/getlasttransactions/${ticker}/${address}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === 'success') {
-        const transactions = data.data.transactions;
-        transactionHistoryContainer.innerHTML = ''; // Clear the loading message
-
-        // Populate the transaction history with the fetched transactions
-        transactions.forEach(tx => {
-          const txElement = document.createElement('div');
-          txElement.className = 'transaction';
-
-          // Calculate time since transaction was sent
-          const currentTime = Date.now();
-          const txTime = new Date(tx.time * 1000);
-          const timeSince = Math.floor((currentTime - txTime) / 1000); // Time in seconds
-
-          // Format time since transaction
-          let timeSinceText;
-          if (timeSince < 60) {
-            timeSinceText = `${timeSince} seconds ago`;
-          } else if (timeSince < 3600) {
-            timeSinceText = `${Math.floor(timeSince / 60)} mins ago`;
-          } else if (timeSince < 86400) {
-            timeSinceText = `${Math.floor(timeSince / 3600)} hours ago`;
-          } else {
-            timeSinceText = `${Math.floor(timeSince / 86400)} days ago`;
-          }
-
-          // Display amount and time since transaction
-          txElement.textContent = `${tx.amount} ${timeSinceText}`;
-          transactionHistoryContainer.appendChild(txElement);
-        });
-      } else {
-        transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Failed to load transactions</div>'; // Added margin
-        console.error('Error fetching transactions:', data.message);
-      }
-    })
-    .catch(error => {
-      transactionHistoryContainer.innerHTML = '<div style="margin-left: 20px;">Error loading transactions</div>'; // Added margin
-      console.error('Error fetching transactions:', error);
-    });
+    displayTransactionHistory(ticker, address, transactionHistoryContainer);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

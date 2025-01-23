@@ -146,4 +146,54 @@ def import_address(ticker):
             "message": str(e)
         }), 500
 
+@bitcoin_rpc_bp.route('/gettransaction/<ticker>/<txid>', methods=['GET'])
+def get_transaction_details(ticker, txid):
+    try:
+        rpc_connection = get_rpc_connection(ticker)
+        # Get detailed transaction info with verbose=True (1)
+        tx_details = rpc_connection.getrawtransaction(txid, 1)
+        
+        # Format the response
+        formatted_tx = {
+            "txid": tx_details['txid'],
+            "size": tx_details['size'],
+            "vsize": tx_details.get('vsize', tx_details['size']),  # fallback for older versions
+            "version": tx_details['version'],
+            "locktime": tx_details['locktime'],
+            "vin": [{
+                "txid": vin.get('txid', ''),
+                "vout": vin.get('vout', ''),
+                "sequence": vin.get('sequence', 0)
+            } for vin in tx_details['vin']],
+            "vout": [{
+                "value": vout['value'],
+                "n": vout['n'],
+                "scriptPubKey": {
+                    "asm": vout['scriptPubKey'].get('asm', ''),
+                    "hex": vout['scriptPubKey'].get('hex', ''),
+                    "type": vout['scriptPubKey'].get('type', ''),
+                    "addresses": vout['scriptPubKey'].get('addresses', [])
+                }
+            } for vout in tx_details['vout']],
+            "confirmations": tx_details.get('confirmations', 0),
+            "time": tx_details.get('time', 0),
+            "blocktime": tx_details.get('blocktime', 0),
+            "blockhash": tx_details.get('blockhash', '')
+        }
+
+        return jsonify({
+            "status": "success",
+            "data": formatted_tx
+        })
+    except JSONRPCException as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}"
+        }), 500
+
 # Add other routes as needed 
