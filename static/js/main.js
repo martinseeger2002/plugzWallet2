@@ -95,20 +95,13 @@ export function initializeWallet() {
 
     // Wallet selector dropdown
     const walletSelector = document.createElement('select');
-    walletSelector.className = 'wallet-selector styled-text';
-    walletSelector.style.fontFamily = "'Press Start 2P', cursive"; // Match button font
-    walletSelector.style.fontSize = '16px'; // Increased font size
-    walletSelector.style.fontWeight = 'bold'; // Make text bold
+    walletSelector.className = 'wallet-selector';
     wallets
-      .filter(wallet => wallet.ticker === coin.ticker && wallet.label) // Filter by coin ticker and label
+      .filter(wallet => wallet.ticker === coin.ticker && wallet.label)
       .forEach(wallet => {
         const option = document.createElement('option');
         option.value = wallet.label;
         option.textContent = wallet.label;
-        option.className = 'styled-text';
-        option.style.fontFamily = "'Press Start 2P', cursive"; // Apply font to options
-        option.style.fontSize = '16px'; // Increased font size for options
-        option.style.fontWeight = 'bold'; // Make options bold
         walletSelector.appendChild(option);
       });
     slide.appendChild(walletSelector);

@@ -1,19 +1,26 @@
+/* Import the Poppins font family for all text */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Global Styles */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
+  /* Subtle gradient background for a modern look */
+  background: linear-gradient(135deg, #2b2c35, #121212);
 }
 
+/* Container Frame */
 .frame {
   width: 393px;
   height: 852px;
   overflow: hidden;
-  border: 0px solid black;
+  border: none;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -21,8 +28,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  background-color: #000;
+  border-radius: 40px;
 }
 
+/* Landing Page */
 #landing-page {
   width: 100%;
   height: 100%;
@@ -31,6 +42,7 @@ body {
   align-items: center;
 }
 
+/* Swiper Styles (unchanged to preserve functionality) */
 .swiper {
   width: 100%;
   height: 100%;
@@ -44,6 +56,10 @@ body {
   color: white;
   font-size: 24px;
 }
+
+/* -------------------------------- */
+/* Shared Button & Input Styles     */
+/* -------------------------------- */
 
 /* Shared button styles */
 .button,
@@ -60,9 +76,11 @@ body {
   border: none;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.3s;
+  /* Add a nice transition + slight scaling on active */
+  transition: background-color 0.3s, transform 0.1s;
 }
 
+/* Hover/active states */
 .button:hover,
 .styled-button:hover,
 .profile-button:hover,
@@ -74,10 +92,22 @@ body {
   background-color: #1b1b1b;
 }
 
+.button:active,
+.styled-button:active,
+.profile-button:active,
+.settings-button:active,
+.delete-button:active,
+.create-tx-button:active,
+.dialog button:active {
+  transform: scale(0.98);
+}
+
+/* Delete Button in red */
 .delete-button {
   background-color: red;
 }
 
+/* Styled inputs and textareas */
 .styled-input,
 .tx-hex-container textarea,
 .dialog input[type="text"] {
@@ -87,11 +117,11 @@ body {
   border: none;
   background-color: black;
   color: white;
-  font-family: 'Press Start 2P', cursive;
   font-size: 16px;
   font-weight: bold;
 }
 
+/* Handle autofill color */
 .styled-input:-webkit-autofill,
 .styled-input:-webkit-autofill:hover,
 .styled-input:-webkit-autofill:focus,
@@ -99,6 +129,10 @@ body {
   -webkit-box-shadow: 0 0 0 30px black inset !important;
   -webkit-text-fill-color: white !important;
 }
+
+/* -------------------------------- */
+/* Header & Icons                   */
+/* -------------------------------- */
 
 .header {
   display: flex;
@@ -110,13 +144,34 @@ body {
 .header img,
 .profile-button img,
 .settings-button img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
+
+.male-icon,
+.back-button,
+.settings-button {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 8px;
+}
+
+.male-icon img,
+.back-button img,
+.settings-button img {
+  width: 40px;
+  height: 40px;
+}
+
+/* -------------------------------- */
+/* Wallet Selector                  */
+/* -------------------------------- */
 
 .wallet-selector {
   display: block;
-  font-family: 'Press Start 2P', cursive;
   font-size: 16px;
   font-weight: bold;
   text-align: center;
@@ -130,6 +185,10 @@ body {
   max-width: 300px;
   margin: 10px auto;
 }
+
+/* -------------------------------- */
+/* Common Containers                */
+/* -------------------------------- */
 
 .wallet-info-container,
 .tx-form-container,
@@ -146,6 +205,7 @@ body {
   text-align: center;
 }
 
+/* Dialog */
 .dialog {
   position: fixed;
   top: 50%;
@@ -162,12 +222,18 @@ body {
   gap: 10px;
 }
 
+/* -------------------------------- */
+/* QR Code Styling                  */
+/* -------------------------------- */
 .qr-code {
   margin-bottom: 15px;
   border: 2px solid black;
   border-radius: 10px;
 }
 
+/* -------------------------------- */
+/* Fee Slider (unchanged)           */
+/* -------------------------------- */
 .fee-slider-container {
   width: 100%;
   padding: 10px 0;
@@ -189,74 +255,44 @@ body {
   cursor: pointer;
 }
 
-/* Responsive styles */
-@media (max-width: 375px) {
-  .swiper-slide {
-    font-size: 18px;
-  }
-  .dialog {
-    padding: 15px;
-  }
-  .header img {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* Update header icons to be consistent */
-.male-icon,
-.back-button,
-.settings-button {
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    padding: 5px;
-}
-
-.male-icon img,
-.back-button img,
-.settings-button img {
-    width: 32px;
-    height: 32px;
-}
-
+/* -------------------------------- */
+/* Stacked Buttons                  */
+/* -------------------------------- */
 .stacked-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 0;
 }
 
+/* Page Titles */
 .page-title {
-    text-align: center;
-    width: 100%;
-    margin: 20px auto;
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin: 20px auto;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* Center coin icon and wallet selector */
+/* Coin Icon, Balance & Buttons */
 .coin-icon {
-    width: 200px;
-    height: 200px;
-    margin: 20px auto;
-    display: block;
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  display: block;
 }
 
 .balance {
+  width: 300px;
   background-color: black;
-  padding: 20px;
   border-radius: 10px;
   color: white;
   margin: 0 auto 20px auto;
-  width: 80%;
   text-align: center;
 }
 
@@ -264,13 +300,20 @@ body {
   display: flex;
   gap: 10px;
   justify-content: center;
-  width: 90%;
+  width: 300px;
   margin: 0 auto;
 }
 
+.buttons .button {
+  flex: 1;
+  padding: 10px 0;
+  width: calc((300px - 20px) / 3);
+}
+
+/* Transaction History */
 .transaction-history {
+  width: 300px;
   background-color: black;
-  width: 90%;
   height: 300px;
   border-radius: 20px;
   margin: 10px auto;
@@ -279,285 +322,369 @@ body {
 }
 
 .transaction {
-    padding: 10px;
-    margin: 5px auto;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    width: 90%;
+  width: 280px;
+  padding: 10px;
+  margin: 5px auto;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
 }
 
+/* Styled Button */
 .styled-button {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 15px 30px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 90%;
-    max-width: 300px;
-    margin: 10px auto;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 30px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  width: 90%;
+  max-width: 300px;
+  margin: 10px auto;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  display: block;
+}
+
+.styled-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.styled-button:active {
+  transform: scale(0.98);
+}
+
+/* -------------------------------- */
+/* Responsive Styles                */
+/* -------------------------------- */
+
+/* Very small devices (< 320px) */
+@media screen and (max-width: 320px) {
+  .frame {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  .styled-button {
+    max-width: 220px;
+    font-size: 12px;
+  }
+  .wallet-selector {
+    max-width: 220px;
+    font-size: 12px;
+  }
+  .swiper-slide {
     font-size: 16px;
-    font-weight: 500;
-    text-align: center;
-    display: block;
+  }
+  .page-title {
+    font-size: 20px;
+  }
 }
 
-/* Mobile devices (portrait) */
+/* Up to 375px wide */
+@media (max-width: 375px) {
+  .swiper-slide {
+    font-size: 18px;
+  }
+  .dialog {
+    padding: 15px;
+  }
+  .header img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Up to 393px wide */
 @media screen and (max-width: 393px) {
-    .frame {
-        width: 100vw;
-        height: 100vh;
-    }
-
-    .styled-button {
-        max-width: 250px;
-        font-size: 14px;
-    }
-
-    .wallet-selector {
-        max-width: 250px;
-        font-size: 14px;
-    }
+  .frame {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  .styled-button {
+    max-width: 250px;
+    font-size: 14px;
+  }
+  .wallet-selector {
+    max-width: 250px;
+    font-size: 14px;
+  }
 }
 
-/* Mobile devices (landscape) */
+/* Up to 414px wide */
+@media (max-width: 414px) {
+  .frame {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* Up to 852px height (landscape) */
 @media screen and (max-height: 852px) {
-    .frame {
-        height: 100vh;
-    }
+  .frame {
+    height: 100vh;
+  }
 }
 
-/* Tablets */
+/* Tablets (>= 768px) */
 @media screen and (min-width: 768px) {
-    .frame {
-        width: 393px;
-        height: 852px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-    }
+  .frame {
+    width: 393px;
+    height: 852px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+  }
 }
 
-/* Large screens */
+/* Laptops/Desktops (>= 1024px) */
 @media screen and (min-width: 1024px) {
-    .frame {
-        width: 393px;
-        height: 852px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    }
+  .frame {
+    width: 393px;
+    height: 852px;
+    border: none;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-/* Extra large screens */
+/* Extra large screens (>= 1440px) */
 @media screen and (min-width: 1440px) {
-    .frame {
-        transform: translate(-50%, -50%) scale(1.2);
-    }
+  .frame {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-/* Add Wallet specific styles */
+/* -------------------------------- */
+/* Add Wallet Specific Styles       */
+/* -------------------------------- */
+
 .warning-text {
-    text-align: center;
-    color: white;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 300px;
+  text-align: center;
+  color: white;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 300px;
 }
 
 .wallet-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    gap: 10px;
-}
-
-.styled-input {
-    width: 90%;
-    max-width: 300px;
-    padding: 12px;
-    margin: 10px auto;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+  gap: 10px;
 }
 
 .info-text {
-    text-align: center;
-    color: white;
-    font-size: 14px;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 300px;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 300px;
 }
 
-/* Inscriber specific styles */
+/* -------------------------------- */
+/* Inscriber Specific Styles        */
+/* -------------------------------- */
+
 .main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: black;
+  border-radius: 0px;
 }
 
 .styled-text {
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    color: white;
-    margin: 10px auto;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: white;
+  margin: 10px auto;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* File input specific styles */
+/* File input hidden style */
 .hidden-input {
-    display: none;
+  display: none;
 }
 
 .file-container {
-    width: 90%;
-    max-width: 400px;
-    margin: 10px auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  width: 90%;
+  max-width: 400px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .scrollable-iframe {
-    width: 90%;
-    max-width: 400px;
-    height: 550px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    overflow: auto;
-    background-color: black;
-    margin: 10px auto;
+  width: 90%;
+  max-width: 400px;
+  height: 550px;
+  border: none;
+  border-radius: 10px;
+  overflow: auto;
+  background-color: black;
+  margin: 10px auto;
 }
 
+/* Receive Container */
 .receive-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+  position: relative;
 }
 
 .qr-code {
-    width: 325px;
-    height: 325px;
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin: 0 auto;
-    display: block;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+  width: 325px;
+  height: 325px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 0 auto;
+  display: block;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .qr-coin-icon {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    left: 50%;
-    top: 35%;
-    transform: translate(-50%, -50%);
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
 }
 
+/* Address input for receiving */
 .address-input {
-    width: 90%;
-    max-width: 300px;
-    padding: 12px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-    font-size: 14px;
-    margin: 0 auto;
+  width: 90%;
+  max-width: 300px;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  font-size: 14px;
+  margin: 0 auto;
 }
 
+/* Checkbox Container */
 .checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 300px;
+  color: white;
+  background-color: transparent;
 }
 
 .styled-checkbox {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #ffffff;
+  /* iOS specific styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 2px solid white;
+  border-radius: 4px;
+  position: relative;
 }
 
+.styled-checkbox:checked {
+  background-color: white;
+}
+
+.styled-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: black;
+  font-size: 14px;
+}
+
+/* Fee Container (unchanged) */
 .fee-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 300px;
 }
 
 .fee-label {
-    text-align: center;
-    width: 100%;
+  text-align: center;
+  width: 100%;
 }
 
-.styled-slider {
-    width: 100%;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.styled-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.styled-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-}
-
+/* Error Messages */
 .error-message {
-    color: #ff4444;
-    text-align: center;
-    margin: 10px auto;
-    display: none;
+  color: #ff4444;
+  text-align: center;
+  margin: 10px auto;
+  display: none;
 }
 
+/* Wallet Form */
 .wallet-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+/* Ensure all text-based elements use the Poppins font */
+.button,
+.styled-button,
+.profile-button,
+.settings-button,
+.delete-button,
+.create-tx-button,
+.dialog button,
+.styled-input,
+.tx-hex-container textarea,
+.dialog input[type="text"],
+.wallet-selector,
+.page-title,
+.warning-text,
+.info-text,
+.styled-text,
+.address-input,
+.checkbox-container,
+.fee-label,
+.error-message,
+.transaction,
+.balance,
+.swiper-slide {
+  font-family: 'Poppins', sans-serif;
 }
