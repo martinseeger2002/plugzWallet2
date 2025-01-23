@@ -58,15 +58,22 @@ export function initializeWallet() {
     const maleIcon = document.createElement('button');  // Changed from img to button
     maleIcon.className = 'back-button';  // Use the same class as back button
     maleIcon.innerHTML = '<img src="/static/images/male-silhouette.png" alt="Male Silhouette" />';
-    maleIcon.style.cursor = 'pointer';
-    maleIcon.addEventListener('click', () => {
-        const selectedWallet = wallets.find(wallet => 
-            wallet.ticker === coin.ticker && 
-            wallet.label === walletSelector.value
-        );
-        landingPage.innerHTML = '';
-        userSettingsUI(selectedWallet);
-    });
+    
+    // Check if there are any wallets for this coin
+    const hasWallets = wallets.some(wallet => wallet.ticker === coin.ticker);
+    
+    if (!hasWallets) {
+        maleIcon.disabled = true;
+    } else {
+        maleIcon.addEventListener('click', () => {
+            const selectedWallet = wallets.find(wallet => 
+                wallet.ticker === coin.ticker && 
+                wallet.label === walletSelector.value
+            );
+            landingPage.innerHTML = '';
+            userSettingsUI(selectedWallet);
+        });
+    }
 
     const settingsButton = document.createElement('button');
     settingsButton.className = 'settings-button';
@@ -98,14 +105,29 @@ export function initializeWallet() {
     // Wallet selector dropdown
     const walletSelector = document.createElement('select');
     walletSelector.className = 'wallet-selector';
-    wallets
-      .filter(wallet => wallet.ticker === coin.ticker && wallet.label)
-      .forEach(wallet => {
+    const walletList = wallets.filter(wallet => wallet.ticker === coin.ticker && wallet.label);
+    
+    if (walletList.length === 0) {
+        // If no wallets exist, show "Add a wallet" option
         const option = document.createElement('option');
-        option.value = wallet.label;
-        option.textContent = wallet.label;
+        option.value = '';
+        option.textContent = 'No wallet';
         walletSelector.appendChild(option);
-      });
+        
+        // Make the selector clickable to add a wallet
+        walletSelector.addEventListener('click', () => {
+            landingPage.innerHTML = '';
+            addWalletUI(coin);
+        });
+    } else {
+        // Add existing wallets to selector
+        walletList.forEach(wallet => {
+            const option = document.createElement('option');
+            option.value = wallet.label;
+            option.textContent = wallet.label;
+            walletSelector.appendChild(option);
+        });
+    }
     slide.appendChild(walletSelector);
 
     // Set the selected wallet from local storage if available
@@ -170,24 +192,20 @@ export function initializeWallet() {
     transactionHistory.className = 'transaction-history';
     slide.appendChild(transactionHistory);
 
-    // Update balance and transaction history based on selected wallet
+    // Update balance display based on selected wallet
     const updateWalletInfo = () => {
       const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
       if (selectedWallet) {
         balance.textContent = `${selectedWallet.balance} ${coin.name}`;
         balance.style.cursor = 'default';
         balance.onclick = null;
-        // Clear existing transaction history before fetching new ones
-        transactionHistory.innerHTML = '';
-        fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
-        balance.textContent = `Add a wallet`;
+        balance.textContent = 'Add a wallet';
         balance.style.cursor = 'pointer';
         balance.onclick = () => {
           landingPage.innerHTML = '';
           addWalletUI(coin);
         };
-        transactionHistory.innerHTML = '<div class="transaction">No recent transactions</div>';
       }
     };
 
@@ -201,7 +219,7 @@ export function initializeWallet() {
       localStorage.setItem('selectedWallets', JSON.stringify(savedSelectedWallets));
     });
 
-    updateWalletInfo(); // Initialize balance and transaction history display
+    updateWalletInfo(); // Initialize balance display
   });
 
   // Initialize Swiper
@@ -224,48 +242,34 @@ export function initializeWallet() {
         document.body.style.backgroundColor = activeCoins[activeIndex].color;
         selectedCoin = activeCoins[activeIndex];
 
-        // Wrap the DOM operations in a setTimeout to let the slide animation complete
         setTimeout(() => {
           const activeSlide = document.querySelector('.swiper-slide-active');
           const walletSelector = activeSlide.querySelector('.wallet-selector');
           const balanceElement = activeSlide.querySelector('.balance');
-          const transactionHistory = activeSlide.querySelector('.transaction-history');
 
           if (walletSelector && balanceElement) {
-            // Check if there are any wallets for this coin
-            const hasWallets = wallets.some(wallet => wallet.ticker === selectedCoin.ticker);
-            if (!hasWallets) {
+            const selectedWallet = wallets.find(wallet => 
+              wallet.ticker === selectedCoin.ticker && 
+              wallet.label === walletSelector.value
+            );
+
+            if (!selectedWallet) {
               balanceElement.textContent = 'Add a wallet';
               balanceElement.style.cursor = 'pointer';
               balanceElement.onclick = () => {
                 landingPage.innerHTML = '';
                 addWalletUI(selectedCoin);
               };
-              if (transactionHistory) {
-                transactionHistory.innerHTML = '<div class="transaction">No recent transactions</div>';
-              }
               return;
             }
-            
-            walletSelector.selectedIndex = 0;
+
             balanceElement.textContent = 'Loading...';
             balanceElement.style.cursor = 'default';
             balanceElement.onclick = null;
-            
-            if (transactionHistory) {
-              transactionHistory.innerHTML = '<div class="transaction">Loading transactions...</div>';
-            }
 
-            // Update wallet data first
-            updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement)
-              .then(() => {
-                if (transactionHistory) {
-                  transactionHistory.innerHTML = '';
-                  fetchAndDisplayTransactions(selectedCoin.ticker, walletSelector.value, transactionHistory);
-                }
-              });
+            updateWalletData(selectedCoin.ticker, selectedWallet.label, balanceElement);
           }
-        }, 100); // Small delay to ensure slide animation completes
+        }, 100);
       }
     }
   });
@@ -276,21 +280,11 @@ export function initializeWallet() {
   // Update initial wallet data for the first coin and wallet
   const initialWalletSelector = document.querySelector('.swiper-slide-active .wallet-selector');
   const initialBalanceElement = document.querySelector('.swiper-slide-active .balance');
-  const initialTransactionHistory = document.querySelector('.swiper-slide-active .transaction-history');
   
   if (initialWalletSelector && initialBalanceElement) {
     initialWalletSelector.selectedIndex = 0; // Select the first wallet initially
     initialBalanceElement.textContent = 'Loading...'; // Clear initial balance display
-    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement)
-      .then(() => {
-        // Add 250ms delay before loading transaction history
-        setTimeout(() => {
-          if (initialTransactionHistory) {
-            initialTransactionHistory.innerHTML = '';
-            fetchAndDisplayTransactions(activeCoins[0].ticker, initialWalletSelector.value, initialTransactionHistory);
-          }
-        }, 1000);
-      });
+    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement);
   }
 }
 
@@ -339,7 +333,16 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
                 // Update UI
                 setTimeout(() => {
                     balanceElement.textContent = `${totalBalance.toFixed(8)} ${ticker}`;
-                    console.log('Updated wallet data:', selectedWallet);
+                    
+                    // Find the transaction history container in the same slide
+                    const slide = balanceElement.closest('.swiper-slide');
+                    if (slide) {
+                        const transactionHistory = slide.querySelector('.transaction-history');
+                        if (transactionHistory) {
+                            transactionHistory.innerHTML = '<div class="transaction">Loading transactions...</div>';
+                            fetchAndDisplayTransactions(ticker, selectedWallet.address, transactionHistory);
+                        }
+                    }
                 }, 500);
             } else {
                 console.error('Failed to fetch unspent transactions:', data.message);

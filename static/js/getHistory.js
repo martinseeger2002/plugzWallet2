@@ -28,12 +28,11 @@ function createTransactionElement(netAmount, timestamp, txid) {
     const txElement = document.createElement('div');
     txElement.className = 'transaction';
 
-    // Format the net amount (2 decimals instead of 8)
     const absAmount = Math.abs(netAmount).toFixed(2);
     const timeSinceText = formatTimeSince(timestamp);
 
     let label;
-    let color = '#888888'; // Default color for "internal" or zero net
+    let color = '#888888';
 
     if (netAmount > 0) {
         label = `Sent ${absAmount}`;
@@ -49,41 +48,73 @@ function createTransactionElement(netAmount, timestamp, txid) {
     txElement.style.color = color;
     txElement.style.cursor = 'pointer';
 
-    // Add click handler
-    txElement.addEventListener('click', () => {
+    txElement.onclick = () => {
+        // Create dialog container
         const dialog = document.createElement('div');
         dialog.className = 'dialog';
 
-        const txIdInput = document.createElement('input');
-        txIdInput.type = 'text';
-        txIdInput.value = txid;
-        txIdInput.readOnly = true;
-        txIdInput.className = 'styled-input styled-text';
+        // Create title
+        const title = document.createElement('h2');
+        title.className = 'dialog-title';
+        title.textContent = 'Transaction ID';
 
+        // Format and create txid display
+        const shortTxid = `${txid.substring(0, 5)}....${txid.substring(txid.length - 5)}`;
+        const txidDisplay = document.createElement('div');
+        txidDisplay.className = 'styled-text';
+        txidDisplay.textContent = shortTxid;
+
+        // Create hidden input for copying
+        const hiddenInput = document.createElement('input');
+        hiddenInput.value = txid;
+        hiddenInput.style.position = 'absolute';
+        hiddenInput.style.left = '-9999px';
+        document.body.appendChild(hiddenInput);
+
+        // Create copy button
         const copyButton = document.createElement('button');
         copyButton.className = 'styled-button';
-        copyButton.textContent = 'Copy to Clipboard';
-        copyButton.addEventListener('click', () => {
-            txIdInput.select();
-            document.execCommand('copy');
-            copyButton.textContent = 'Copied!';
-            setTimeout(() => {
-                copyButton.textContent = 'Copy to Clipboard';
-            }, 2000);
-        });
+        copyButton.textContent = 'Copy Full TxID';
+        copyButton.onclick = () => {
+            hiddenInput.select();
+            try {
+                document.execCommand('copy');
+                copyButton.textContent = 'Copied!';
+                copyButton.disabled = true;
+                copyButton.style.backgroundColor = '#44ff44';
+                copyButton.style.color = '#000';
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                copyButton.textContent = 'Failed to copy';
+                copyButton.style.backgroundColor = '#ff4444';
+            }
+            document.body.removeChild(hiddenInput);
+        };
 
-        const closeButton = document.createElement('button');
-        closeButton.className = 'styled-button';
-        closeButton.textContent = 'Close';
-        closeButton.addEventListener('click', () => {
+        // Create OK button
+        const okButton = document.createElement('button');
+        okButton.className = 'styled-button';
+        okButton.textContent = 'OK';
+        okButton.onclick = () => {
             document.body.removeChild(dialog);
-        });
+        };
 
-        dialog.appendChild(txIdInput);
+        // Add all elements to dialog
+        dialog.appendChild(title);
+        dialog.appendChild(txidDisplay);
         dialog.appendChild(copyButton);
-        dialog.appendChild(closeButton);
+        dialog.appendChild(okButton);
+
+        // Add dialog to body
         document.body.appendChild(dialog);
-    });
+
+        // Add click outside to close
+        dialog.onclick = (e) => {
+            if (e.target === dialog) {
+                document.body.removeChild(dialog);
+            }
+        };
+    };
 
     return txElement;
 }
