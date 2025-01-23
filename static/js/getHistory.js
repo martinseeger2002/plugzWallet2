@@ -24,7 +24,7 @@ function formatTimeSince(timestamp) {
  * - netAmount < 0 => Received
  * - netAmount = 0 => Internal (no net effect)
  **********************************************************/
-function createTransactionElement(netAmount, timestamp) {
+function createTransactionElement(netAmount, timestamp, txid) {
     const txElement = document.createElement('div');
     txElement.className = 'transaction';
 
@@ -36,20 +36,54 @@ function createTransactionElement(netAmount, timestamp) {
     let color = '#888888'; // Default color for "internal" or zero net
 
     if (netAmount > 0) {
-        // Sent
         label = `Sent ${absAmount}`;
         color = '#ff4444';
     } else if (netAmount < 0) {
-        // Received
         label = `Received ${absAmount}`;
         color = '#44ff44';
     } else {
-        // net 0 => purely internal or exact in/out match
         label = `Internal 0.00`;
     }
 
     txElement.textContent = `${label} — ${timeSinceText}`;
     txElement.style.color = color;
+    txElement.style.cursor = 'pointer';
+
+    // Add click handler
+    txElement.addEventListener('click', () => {
+        const dialog = document.createElement('div');
+        dialog.className = 'dialog';
+
+        const txIdInput = document.createElement('input');
+        txIdInput.type = 'text';
+        txIdInput.value = txid;
+        txIdInput.readOnly = true;
+        txIdInput.className = 'styled-input styled-text';
+
+        const copyButton = document.createElement('button');
+        copyButton.className = 'styled-button';
+        copyButton.textContent = 'Copy to Clipboard';
+        copyButton.addEventListener('click', () => {
+            txIdInput.select();
+            document.execCommand('copy');
+            copyButton.textContent = 'Copied!';
+            setTimeout(() => {
+                copyButton.textContent = 'Copy to Clipboard';
+            }, 2000);
+        });
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'styled-button';
+        closeButton.textContent = 'Close';
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(dialog);
+        });
+
+        dialog.appendChild(txIdInput);
+        dialog.appendChild(copyButton);
+        dialog.appendChild(closeButton);
+        document.body.appendChild(dialog);
+    });
 
     return txElement;
 }
@@ -182,7 +216,7 @@ export async function displayTransactionHistory(ticker, address, container) {
             const finalTime = txInfo.time || tx.time;
 
             // 3) Create the element and append it
-            const txElement = createTransactionElement(txInfo.netAmount, finalTime);
+            const txElement = createTransactionElement(txInfo.netAmount, finalTime, tx.txid);
             container.appendChild(txElement);
         }
 

@@ -224,10 +224,12 @@ export function initializeWallet() {
         document.body.style.backgroundColor = activeCoins[activeIndex].color;
         selectedCoin = activeCoins[activeIndex];
 
+        // Wrap the DOM operations in a setTimeout to let the slide animation complete
         setTimeout(() => {
           const activeSlide = document.querySelector('.swiper-slide-active');
           const walletSelector = activeSlide.querySelector('.wallet-selector');
           const balanceElement = activeSlide.querySelector('.balance');
+          const transactionHistory = activeSlide.querySelector('.transaction-history');
 
           if (walletSelector && balanceElement) {
             // Check if there are any wallets for this coin
@@ -239,6 +241,9 @@ export function initializeWallet() {
                 landingPage.innerHTML = '';
                 addWalletUI(selectedCoin);
               };
+              if (transactionHistory) {
+                transactionHistory.innerHTML = '<div class="transaction">No recent transactions</div>';
+              }
               return;
             }
             
@@ -247,17 +252,20 @@ export function initializeWallet() {
             balanceElement.style.cursor = 'default';
             balanceElement.onclick = null;
             
-            // Update wallet data and transaction history in sequence
+            if (transactionHistory) {
+              transactionHistory.innerHTML = '<div class="transaction">Loading transactions...</div>';
+            }
+
+            // Update wallet data first
             updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement)
               .then(() => {
-                const transactionHistory = activeSlide.querySelector('.transaction-history');
                 if (transactionHistory) {
                   transactionHistory.innerHTML = '';
                   fetchAndDisplayTransactions(selectedCoin.ticker, walletSelector.value, transactionHistory);
                 }
               });
           }
-        }, 500);
+        }, 100); // Small delay to ensure slide animation completes
       }
     }
   });
@@ -265,13 +273,24 @@ export function initializeWallet() {
   // Set initial background color
   document.body.style.backgroundColor = selectedCoin ? selectedCoin.color : activeCoins[0].color;
 
-  // Update wallet data for the initial coin and wallet
+  // Update initial wallet data for the first coin and wallet
   const initialWalletSelector = document.querySelector('.swiper-slide-active .wallet-selector');
   const initialBalanceElement = document.querySelector('.swiper-slide-active .balance');
+  const initialTransactionHistory = document.querySelector('.swiper-slide-active .transaction-history');
+  
   if (initialWalletSelector && initialBalanceElement) {
     initialWalletSelector.selectedIndex = 0; // Select the first wallet initially
     initialBalanceElement.textContent = 'Loading...'; // Clear initial balance display
-    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement);
+    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement)
+      .then(() => {
+        // Add 250ms delay before loading transaction history
+        setTimeout(() => {
+          if (initialTransactionHistory) {
+            initialTransactionHistory.innerHTML = '';
+            fetchAndDisplayTransactions(activeCoins[0].ticker, initialWalletSelector.value, initialTransactionHistory);
+          }
+        }, 1000);
+      });
   }
 }
 
