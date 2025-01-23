@@ -5,5 +5,6 @@ export const coins = [
   { name: 'SHIC', ticker: 'SHIC', color: '#F93E3E', plugzfee: '2000000000', plugzfee_address: 'SaivTHkECMw583DVqVaJS89jUahMa93sRQ' },
   { name: 'BONC', ticker: 'BONC', color: '#FFB347', plugzfee: '2000000000', plugzfee_address: 'BJ5mDERYAmEtBhQuJxmvfjYqy2DCg1TzqV' },
   { name: 'FLOP', ticker: 'FLOP', color: '#6C6CFF', plugzfee: '4000000000', plugzfee_address: 'FDdDMBfxGG1mXTtpPfsShrYEHauZgb8yVo', networkfee: 100000000},
-  { name: 'DGB', ticker: 'DGB', color: '#3A80E0', plugzfee: '70000000', plugzfee_address: 'DQe94HDmbjFrDfVGB11CCmvXsF1mY6a4pT' }
+  { name: 'DGB', ticker: 'DGB', color: '#3A80E0', plugzfee: '70000000', plugzfee_address: 'DQe94HDmbjFrDfVGB11CCmvXsF1mY6a4pT' },
+  { name: 'DEV', ticker: 'DEV', color: '#f0c556', plugzfee: '100000000', plugzfee_address: 'putwalletNtKa8kj4JNFgZsS5P8dDi769' }
 ]; 

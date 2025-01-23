@@ -1,9 +1,11 @@
 {
   "name": "Plugz Wallet",
   "short_name": "Plugz",
-  "description": "Cryptocurrency Wallet",
+  "description": "Cryptocurrency Wallet Application",
   "start_url": "/wallet",
+  "id": "/wallet",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait",
@@ -23,13 +25,13 @@
       "purpose": "any maskable"
     }
   ],
-  "shortcuts": [
+  "categories": ["finance", "utilities"],
+  "screenshots": [
     {
-      "name": "Open Wallet",
-      "short_name": "Wallet",
-      "description": "Open your cryptocurrency wallet",
-      "url": "/wallet",
-      "icons": [{ "src": "/static/images/icon-192x192.png", "sizes": "192x192" }]
+      "src": "/static/images/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
-} 
+}

@@ -111,35 +111,121 @@ export function sendTXUI(walletData) {
     subtractFeeContainer.appendChild(subtractFeeLabel);
     form.appendChild(subtractFeeContainer);
 
-    // Fee slider container
+    // Fee container and label first
     const feeContainer = document.createElement('div');
     feeContainer.className = 'fee-container';
-    
+
     const feeLabel = document.createElement('div');
     feeLabel.textContent = 'Fee: ';
     feeLabel.className = 'fee-label';
-    
+
     const feeDisplay = document.createElement('span');
     feeDisplay.id = 'feeDisplay';
-    
+    feeDisplay.style.cursor = 'pointer';
+
     const networkFee = selectedCoin?.networkfee;
-    const defaultFee = networkFee ? networkFee : 1000000;
-    
+    const minFee = networkFee ? networkFee : 100000; // 0.001
+    const maxFee = 99000000; // 0.99
+    const defaultFee = networkFee ? networkFee : 1000000; // Use networkFee if defined, otherwise 0.01
+
     feeDisplay.textContent = (defaultFee / 100000000).toFixed(8);
+
+    // Add click handler for fee display only if no networkFee is defined
+    if (!networkFee) {
+        feeDisplay.addEventListener('click', () => {
+            const currentFee = parseFloat(feeDisplay.textContent);
+            const feeInput = document.createElement('input');
+            feeInput.type = 'number';
+            feeInput.value = currentFee;
+            feeInput.step = '0.00000001';
+            feeInput.style.width = '150px';
+            feeInput.className = 'styled-input';
+            
+            // Replace fee display with input
+            feeDisplay.style.display = 'none';
+            feeLabel.insertBefore(feeInput, feeDisplay);
+            feeInput.focus();
+            
+            // Handle input blur
+            feeInput.addEventListener('blur', () => {
+                const newFee = parseFloat(feeInput.value);
+                if (!isNaN(newFee)) {
+                    const feeInSats = Math.floor(newFee * 100000000);
+                    // Update slider value within its min/max bounds
+                    feeSlider.value = Math.min(Math.max(feeInSats, feeSlider.min), feeSlider.max);
+                    // Display can show any value
+                    feeDisplay.textContent = newFee.toFixed(8);
+                }
+                feeInput.remove();
+                feeDisplay.style.display = 'inline';
+            });
+            
+            // Handle enter key
+            feeInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    feeInput.blur();
+                }
+            });
+        });
+    }
+
+    // Append fee display to label and add to container first
     feeLabel.appendChild(feeDisplay);
     feeLabel.appendChild(document.createTextNode(` ${walletData.ticker}`));
-    
-    const feeSlider = document.createElement('input');
-    feeSlider.type = 'range';
-    feeSlider.id = 'fee';
-    feeSlider.className = 'styled-slider';
-    feeSlider.min = networkFee ? networkFee.toString() : '100000';
-    feeSlider.max = networkFee && networkFee > 10000000 ? networkFee.toString() : '10000000';
-    feeSlider.step = '100000';
-    feeSlider.value = defaultFee.toString();
-
     feeContainer.appendChild(feeLabel);
-    feeContainer.appendChild(feeSlider);
+
+    // Only create and append slider if no networkFee is defined
+    if (!networkFee) {
+        const feeSlider = document.createElement('input');
+        feeSlider.type = 'range';
+        feeSlider.id = 'fee';
+        feeSlider.className = 'styled-slider';
+
+        // Set exact middle value to represent 0.01
+        const totalSteps = 1000;
+        const middleStep = Math.floor(totalSteps / 2);
+
+        const stepsToValue = (step) => {
+            if (step <= middleStep) {
+                // Left side: 0.001 steps
+                const leftSteps = 9;
+                const stepValue = Math.floor((step / middleStep) * leftSteps);
+                return 100000 * (stepValue + 1);
+            } else {
+                // Right side: 0.01 steps
+                const rightSteps = Math.floor((step - middleStep) / ((totalSteps - middleStep) / 98));
+                return 1000000 + (rightSteps * 1000000);
+            }
+        };
+
+        feeSlider.min = "0";
+        feeSlider.max = totalSteps.toString();
+        feeSlider.value = middleStep.toString();
+
+        feeSlider.addEventListener('input', (e) => {
+            const step = parseInt(e.target.value);
+            const fee = stepsToValue(step);
+            
+            let displayValue;
+            if (step === middleStep) {
+                displayValue = "0.01";
+            } else {
+                displayValue = (fee / 100000000).toFixed(8);
+            }
+            
+            // Update the display and remove any fee input box if present
+            feeDisplay.textContent = parseFloat(displayValue).toString();
+            const feeInput = feeLabel.querySelector('input[type="number"]');
+            if (feeInput) {
+                feeInput.remove();
+                feeDisplay.style.display = 'inline';
+            }
+        });
+
+        feeContainer.appendChild(feeSlider);
+    }
+
+    // Append the entire fee container to the form
     form.appendChild(feeContainer);
 
     // Create submit button
@@ -160,14 +246,6 @@ export function sendTXUI(walletData) {
     formContainer.appendChild(form);
     landingPage.appendChild(formContainer);
 
-    // Add the coin icon at the bottom
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `./static/images/${walletData.ticker}icon.png`;
-    coinIcon.alt = `${walletData.ticker} Icon`;
-    coinIcon.className = 'coin-icon';
-    coinIcon.style.width = '100px';
-    coinIcon.style.height = '100px';
-    landingPage.appendChild(coinIcon);
 
     // Add wallet selector change handler
     walletSelector.addEventListener('change', () => {
@@ -179,13 +257,6 @@ export function sendTXUI(walletData) {
             walletData = selectedWallet;
             balance.textContent = `${selectedWallet.balance.toFixed(8)} ${selectedWallet.ticker}`;
         }
-    });
-
-    // Add fee slider event listener
-    feeSlider.addEventListener('input', (e) => {
-        const satoshiValue = parseInt(e.target.value);
-        const coinValue = (satoshiValue / 100000000).toFixed(8);
-        feeDisplay.textContent = parseFloat(coinValue).toString();
     });
 
     // Create result container
