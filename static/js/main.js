@@ -5,6 +5,7 @@ import { sendTXUI } from './sendTX.js';
 import { mintUI } from './mint.js';
 import { userSettingsUI } from './userSettings.js';
 import { displayTransactionHistory } from './getHistory.js';
+import { addWalletUI } from './addWallet.js';  // Add this import
 
 // Initialize wallets variable
 let wallets = [];
@@ -174,11 +175,18 @@ export function initializeWallet() {
       const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
       if (selectedWallet) {
         balance.textContent = `${selectedWallet.balance} ${coin.name}`;
+        balance.style.cursor = 'default';
+        balance.onclick = null;
         // Clear existing transaction history before fetching new ones
         transactionHistory.innerHTML = '';
         fetchAndDisplayTransactions(coin.ticker, selectedWallet.address, transactionHistory);
       } else {
-        balance.textContent = `0.000 ${coin.name}`;
+        balance.textContent = `Add a wallet`;
+        balance.style.cursor = 'pointer';
+        balance.onclick = () => {
+          landingPage.innerHTML = '';
+          addWalletUI(coin);
+        };
         transactionHistory.innerHTML = '<div class="transaction">No recent transactions</div>';
       }
     };
@@ -222,8 +230,22 @@ export function initializeWallet() {
           const balanceElement = activeSlide.querySelector('.balance');
 
           if (walletSelector && balanceElement) {
+            // Check if there are any wallets for this coin
+            const hasWallets = wallets.some(wallet => wallet.ticker === selectedCoin.ticker);
+            if (!hasWallets) {
+              balanceElement.textContent = 'Add a wallet';
+              balanceElement.style.cursor = 'pointer';
+              balanceElement.onclick = () => {
+                landingPage.innerHTML = '';
+                addWalletUI(selectedCoin);
+              };
+              return;
+            }
+            
             walletSelector.selectedIndex = 0;
             balanceElement.textContent = 'Loading...';
+            balanceElement.style.cursor = 'default';
+            balanceElement.onclick = null;
             
             // Update wallet data and transaction history in sequence
             updateWalletData(selectedCoin.ticker, walletSelector.value, balanceElement)

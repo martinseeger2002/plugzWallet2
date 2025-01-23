@@ -65,16 +65,16 @@ export function addWalletUI(selectedCoin) {
     infoText.textContent = 'Self-custodial wallet, It is very important to back up your wallet address and private key.';
     form.appendChild(infoText);
 
+    const newWalletButton = document.createElement('button');
+    newWalletButton.className = 'styled-button';
+    newWalletButton.textContent = 'New Wallet';
+    form.appendChild(newWalletButton);
+
     const addWalletButton = document.createElement('button');
     addWalletButton.className = 'styled-button';
     addWalletButton.textContent = 'Add Wallet';
     addWalletButton.disabled = true;
     form.appendChild(addWalletButton);
-
-    const newWalletButton = document.createElement('button');
-    newWalletButton.className = 'styled-button';
-    newWalletButton.textContent = 'New Wallet';
-    form.appendChild(newWalletButton);
 
     landingPage.appendChild(form);
 
