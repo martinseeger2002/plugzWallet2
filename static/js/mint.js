@@ -1,5 +1,6 @@
 import { initializeWallet } from './main.js';
 import { coins } from './networks.js';
+import { mintFileUI } from './mintFile.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -56,8 +57,12 @@ export function mintUI(selectedWallet) {
         button.className = 'styled-button';
         button.textContent = btn.text;
         button.addEventListener('click', () => {
-            console.log(`Mint ${btn.value} clicked for wallet:`, selectedWallet);
-            // Add mint functionality here
+            if (btn.value === 2) { // Mint File button
+                mintFileUI(selectedWallet);
+            } else {
+                console.log(`Mint ${btn.value} clicked for wallet:`, selectedWallet);
+                // Add other mint functionality here
+            }
         });
         buttonContainer.appendChild(button);
     });

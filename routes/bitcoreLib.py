@@ -129,93 +129,129 @@ def generate_tx():
         }), 500 
 
 @bitcore_lib_bp.route('/generate_ord_hexs/<ticker>', methods=['POST'])
-def generate_ord_hexs(ticker):
+def mint(ticker):
+    data = request.json
+
+    # Extract parameters
+    receiving_address = data.get('receiving_address')
+    meme_type = data.get('meme_type')
+    hex_data = data.get('hex_data')
+    sending_address = data.get('sending_address')
+    privkey = data.get('privkey')
+    utxo = data.get('utxo')
+    vout = data.get('vout')
+    script_hex = data.get('script_hex')
+    utxo_amount = data.get('utxo_amount')  # Ensure this is a string
+
+    # Log the extracted parameters for debugging
+    print(f"Received mint request with parameters: {data}")
+
+    # Convert 'vout' and 'utxo_amount' to strings for the command
+    vout_str = str(vout)
+    
     try:
-        # Get JSON data from request
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = [
-            'receiving_address', 'meme_type', 'hex_data', 
-            'sending_address', 'privkey', 'utxo', 
-            'vout', 'script_hex', 'utxo_amount'
-        ]
-        
-        for field in required_fields:
-            if field not in data:
-                return jsonify({
-                    'error': f'Missing required field: {field}'
-                }), 400
+        # Convert utxo_amount to a float, then to satoshis
+        utxo_amount_float = float(utxo_amount)
+        utxo_amount_satoshis = int(utxo_amount_float * 100000000)
+    except ValueError as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Invalid utxo_amount: {utxo_amount}. Error: {str(e)}"
+        }), 400
 
-        # Extract parameters
-        receiving_address = data['receiving_address']
-        meme_type = data['meme_type']
-        hex_data = data['hex_data']
-        sending_address = data['sending_address']
-        privkey = data['privkey']
-        utxo = data['utxo']
-        vout = str(data['vout'])  # Convert to string
-        script_hex = data['script_hex']
-        
-        # Convert utxo_amount to satoshis
-        try:
-            utxo_amount_float = float(data['utxo_amount'])
-            utxo_amount_satoshis = str(int(utxo_amount_float * 100000000))
-        except ValueError:
-            return jsonify({
-                'error': f'Invalid utxo_amount: {data["utxo_amount"]}'
-            }), 400
+    # Determine the command directory and script based on the ticker
+    if ticker.lower() == 'doge':
+        command_dir = './doge'
+        script = 'getOrdTxsDoge.js'
+    elif ticker.lower() == 'lky':
+        command_dir = './lky'
+        script = 'getOrdTxsLKY.js'
+    elif ticker.lower() == 'ltc':
+        command_dir = './ltc'
+        script = 'getOrdTxsLTC.js'
+    elif ticker.lower() in ('pepe', 'pep'):
+        command_dir = './bitcore-libs/pep'
+        script = 'getOrdTxsPepe.js'
+    elif ticker.lower() == 'shic':
+        command_dir = './shic'
+        script = 'getOrdTxsShic.js'
+    elif ticker.lower() in ('bonk', 'bonc'):
+        command_dir = './bonc'
+        script = 'getOrdTxsBonk.js'
+    elif ticker.lower() == 'flop':
+        command_dir = './flop'
+        script = 'getOrdTxsFlop.js'
+    elif ticker.lower() in ('digi', 'dgb'):
+        command_dir = './dgb'
+        script = 'getOrdTxsDigi.js'
+    else:
+        return jsonify({
+            "status": "error",
+            "message": "Unsupported ticker type."
+        }), 400
 
-        # Construct the absolute path to the Node.js script
-        script_path = f'/root/plugzWallet2/bitcore-libs/{ticker.lower()}/generateOrd.js'
-        logging.debug(f"Script path: {script_path}")
+    # Define the command to run
+    command = [
+        'node', script, 'mint',
+        receiving_address, meme_type, hex_data,
+        sending_address, privkey, utxo, vout_str,
+        script_hex, str(utxo_amount_satoshis)
+    ]
 
-        # Prepare the command
-        command = [
-            'node', script_path, 'mint',
-            receiving_address, meme_type, hex_data,
-            sending_address, privkey, utxo, vout,
-            script_hex, utxo_amount_satoshis
-        ]
-
-        # Log the command for debugging (mask private key)
-        safe_command = command.copy()
-        safe_command[7] = '***PRIVATE_KEY***'  # Mask private key
-        logging.debug(f"Executing command: {safe_command}")
-
-        # Execute the command
+    try:
+        # Run the command and capture the output
         result = subprocess.run(
             command,
+            cwd=command_dir,
             capture_output=True,
             text=True,
             check=True
         )
+        output = result.stdout.strip()
+        error_output = result.stderr.strip()
 
-        # Log the output
-        logging.debug(f"Script output: {result.stdout}")
+        # Print both stdout and stderr
+        print("Command output:", output)
+        print("Command error output:", error_output)
 
-        # Parse the output
-        try:
-            output_data = json.loads(result.stdout)
-            return jsonify(output_data)
-        except json.JSONDecodeError:
-            return jsonify({
-                'txid': result.stdout.strip()  # Fallback if not JSON
-            })
+        # Assume output format:
+        # Final transaction: <txid>
+        # {
+        #   "pendingTransactions": [...],
+        #   "instructions": "..."
+        # }
+
+        # Split the output into the final transaction line and the JSON part
+        final_tx_line, json_part = output.split('\n', 1)
+        final_tx_id = final_tx_line.replace("Final transaction: ", "").strip()
+        json_data = json.loads(json_part)
+
+        # Structure the response as desired
+        response = {
+            "finalTransaction": final_tx_id,
+            "pendingTransactions": json_data.get("pendingTransactions", []),
+            "instructions": json_data.get("instructions", "")
+        }
+
+        return jsonify(response)
 
     except subprocess.CalledProcessError as e:
-        logging.error(f"Script error: {e.stderr}")
         return jsonify({
-            'error': 'Failed to inscribe',
-            'details': e.stderr
+            "status": "error",
+            "message": f"Command failed with error: {e.stderr}"
         }), 500
-    except FileNotFoundError:
-        logging.error(f"Script not found for ticker: {ticker}")
+    except ValueError:
         return jsonify({
-            'error': f'Script not found for ticker: {ticker}'
-        }), 404
+            "status": "error",
+            "message": "Failed to parse command output."
+        }), 500
+    except json.JSONDecodeError:
+        return jsonify({
+            "status": "error",
+            "message": "Invalid JSON format in command output."
+        }), 500
     except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
         return jsonify({
-            'error': str(e)
-        }), 500 
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}"
+        }), 500

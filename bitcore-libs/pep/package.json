@@ -2,7 +2,7 @@
   "name": "getOrdTxsPepe",
   "version": "1.0.0",
   "description": "A minter and protocol for inscriptions on Dogecoin",
-  "main": "getOrdTxsDoge.js",
+  "main": "getOrdTxsPepe.js",
   "author": "apezord",
   "license": "MIT",
   "bin": {

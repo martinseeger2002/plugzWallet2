@@ -32,11 +32,33 @@ export function mintFileUI(selectedWallet) {
     const mainContent = document.createElement('div');
     mainContent.className = 'main-content';
 
+    // UTXO selection dropdown
+    const utxoDropdown = document.createElement('select');
+    utxoDropdown.className = 'styled-select';
+    
+    // Populate UTXO dropdown
+    if (selectedWallet.utxos && selectedWallet.utxos.length > 0) {
+        selectedWallet.utxos
+            .filter(utxo => parseFloat(utxo.value) > 0.01 && utxo.confirmations >= 1)
+            .forEach(utxo => {
+                const option = document.createElement('option');
+                option.value = `${utxo.txid}:${utxo.vout}`;
+                option.textContent = `${utxo.value} ${selectedWallet.ticker}`;
+                utxoDropdown.appendChild(option);
+            });
+        if (selectedWallet.utxos.filter(utxo => parseFloat(utxo.value) > 0.01 && utxo.confirmations >= 1).length === 0) {
+            utxoDropdown.innerHTML = '<option disabled selected>No UTXOs available above 0.01 with sufficient confirmations</option>';
+        }
+    } else {
+        utxoDropdown.innerHTML = '<option disabled selected>No UTXOs available</option>';
+    }
+    mainContent.appendChild(utxoDropdown);
+
     // Receiving address input
     const addressInput = document.createElement('input');
     addressInput.type = 'text';
     addressInput.placeholder = 'Enter receiving address (optional)';
-    addressInput.className = 'styled-input styled-text';
+    addressInput.className = 'styled-input';
     mainContent.appendChild(addressInput);
 
     // File selection container
@@ -77,7 +99,7 @@ export function mintFileUI(selectedWallet) {
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            if (file.size <= 65 * 1024) { // 65KB limit
+            if (file.size <= 65 * 1024) {
                 fileDisplay.textContent = `Selected: ${file.name}`;
                 nextButton.disabled = false;
                 
@@ -109,6 +131,11 @@ export function mintFileUI(selectedWallet) {
             return;
         }
 
+        if (!utxoDropdown.value) {
+            alert('Please select a UTXO');
+            return;
+        }
+
         // Check for pending transactions
         const pendingTransactions = JSON.parse(localStorage.getItem('mintResponse'))?.pendingTransactions || [];
         if (pendingTransactions.length > 0) {
@@ -118,15 +145,13 @@ export function mintFileUI(selectedWallet) {
             return;
         }
 
-        // Find suitable UTXO
-        const selectedUtxo = selectedWallet.utxos?.find(utxo => 
-            parseFloat(utxo.value) > 0.01 && 
-            utxo.confirmations >= 1 &&
-            utxo.script_hex
+        const [txid, vout] = utxoDropdown.value.split(':');
+        const selectedUtxo = selectedWallet.utxos.find(utxo => 
+            utxo.txid === txid && utxo.vout.toString() === vout
         );
 
-        if (!selectedUtxo) {
-            alert('No suitable UTXO found. UTXOs must be confirmed and greater than 0.01');
+        if (!selectedUtxo || !selectedUtxo.script_hex) {
+            alert('Invalid UTXO selection');
             return;
         }
 
@@ -148,7 +173,7 @@ export function mintFileUI(selectedWallet) {
 
         console.log('Request Body:', requestBody);
 
-        fetch(`/bitcore_lib/inscribe/${selectedWallet.ticker}`, {
+        fetch(`/bitcore_lib/generate_ord_hexs/${selectedWallet.ticker}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -163,8 +188,6 @@ export function mintFileUI(selectedWallet) {
             console.log('Response Data:', JSON.stringify(data, null, 2));
 
             if (data.pendingTransactions && Array.isArray(data.pendingTransactions) && data.pendingTransactions.length > 0) {
-                console.log('Pending Transactions:', data.pendingTransactions);
-
                 try {
                     // Save transaction hexes
                     let existingHexes = JSON.parse(localStorage.getItem('transactionHexes')) || [];
