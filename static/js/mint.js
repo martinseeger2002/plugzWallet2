@@ -6,6 +6,7 @@ import { mintTokenUI } from './mintToken.js';
 import { mintImageUI } from './mintImage.js';
 import { mintTextUI } from './mintText.js';
 import { mintFolderUI } from './mintFolder.js';
+import { dogeMintPadUI } from './dogeMintPad.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -57,6 +58,11 @@ export function mintUI(selectedWallet) {
         { text: 'Folder', handler: () => mintFolderUI(selectedWallet) },
         { text: 'Inscribe', handler: () => inscribeUI(selectedWallet) }
     ];
+
+    // Add Doge Mint Pad button if the ticker is DOGE
+    if (selectedWallet.ticker === 'DOGE') {
+        mintButtons.push({ text: 'Mint Pad', handler: () => dogeMintPadUI() });
+    }
 
     mintButtons.forEach(btn => {
         const button = document.createElement('button');
