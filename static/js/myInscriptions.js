@@ -22,7 +22,7 @@ export function myInscriptionsUI(selectedWallet) {
 
     // Title
     const title = document.createElement('h1');
-    title.textContent = 'My Inscriptions';
+    title.textContent = 'My Inscriptions Made';
     title.className = 'page-title';
     landingPage.appendChild(title);
 
@@ -103,7 +103,7 @@ export function myInscriptionsUI(selectedWallet) {
         if (walletInscriptions.length === 0) {
             const noInscriptions = doc.createElement('div');
             noInscriptions.className = 'inscription-item';
-            noInscriptions.textContent = 'No inscriptions found in this wallet';
+            noInscriptions.textContent = 'No inscriptions made with this wallet';
             body.appendChild(noInscriptions);
             return;
         }

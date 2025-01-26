@@ -41,7 +41,7 @@ export function userSettingsUI(selectedWallet) {
     // Create buttons array
     const settingsButtons = [
         {
-            text: 'My Inscriptions',
+            text: 'My Inscriptions Made',
             onClick: () => {
                 landingPage.innerHTML = ''; // Clear the UI
                 myInscriptionsUI(selectedWallet); // Navigate to My Inscriptions UI

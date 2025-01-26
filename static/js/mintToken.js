@@ -5,10 +5,9 @@ export function mintTokenUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = '';
 
-    // Create header with back button
+    // Header with back button
     const header = document.createElement('div');
     header.className = 'header';
-
     const backButton = document.createElement('button');
     backButton.className = 'back-button';
     backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
@@ -16,25 +15,38 @@ export function mintTokenUI(selectedWallet) {
         landingPage.innerHTML = '';
         mintUI(selectedWallet);
     });
-
     header.appendChild(backButton);
     landingPage.appendChild(header);
 
-    // Title
+    // Set token standard based on wallet ticker
+    const standardMap = {
+        'doge': 'drc-20',
+        'lky': 'lky-20',
+        'pep': 'prc-20',
+        'shic': 'shc-20',
+        'bonc': 'bnk-20',
+        'dgb': 'dgb-20'
+    };
+    
+    const ticker = selectedWallet.ticker.toLowerCase();
+    if (!standardMap[ticker]) {
+        // If no standard exists, only show the message
+        const title = document.createElement('h1');
+        title.textContent = 'No token standard available for this chain';
+        title.className = 'page-title';
+        landingPage.appendChild(title);
+        return;
+    }
+
+    // Rest of UI only renders if there is a standard
     const title = document.createElement('h1');
     title.textContent = 'Mint Token';
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    // Create main content container
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-
     // UTXO selection dropdown
     const utxoDropdown = document.createElement('select');
-    utxoDropdown.className = 'styled-select';
-    
-    // Populate UTXO dropdown
+    utxoDropdown.className = 'wallet-selector input-margin';
     if (selectedWallet.utxos && selectedWallet.utxos.length > 0) {
         selectedWallet.utxos
             .filter(utxo => parseFloat(utxo.value) > 0.01 && utxo.confirmations >= 1)
@@ -50,78 +62,88 @@ export function mintTokenUI(selectedWallet) {
     } else {
         utxoDropdown.innerHTML = '<option disabled selected>No UTXOs available</option>';
     }
-    mainContent.appendChild(utxoDropdown);
+    landingPage.appendChild(utxoDropdown);
+
+    // Token standard display
+    const standardDisplay = document.createElement('div');
+    standardDisplay.className = 'styled-text';
+    landingPage.appendChild(standardDisplay);
 
     // Token standard selector
     const tokenStandardDropdown = document.createElement('select');
-    tokenStandardDropdown.className = 'styled-select';
+    tokenStandardDropdown.className = 'wallet-selector input-margin';
     ['drc-20', 'lky-20', 'prc-20', 'shc-20', 'bnk-20', 'dgb-20'].forEach(standard => {
         const option = document.createElement('option');
         option.value = standard;
         option.textContent = standard;
         tokenStandardDropdown.appendChild(option);
     });
-    mainContent.appendChild(tokenStandardDropdown);
+    landingPage.appendChild(tokenStandardDropdown);
+
+    // Set initial token standard based on wallet ticker
+    if (standardMap[ticker]) {
+        tokenStandardDropdown.value = standardMap[ticker];
+        standardDisplay.textContent = `${standardMap[ticker]}`;
+        tokenStandardDropdown.style.display = 'none';
+    }
 
     // Operation selector
     const operationDropdown = document.createElement('select');
-    operationDropdown.className = 'styled-select';
+    operationDropdown.className = 'wallet-selector input-margin';
     ['mint', 'deploy', 'transfer'].forEach(op => {
         const option = document.createElement('option');
         option.value = op;
         option.textContent = op;
         operationDropdown.appendChild(option);
     });
-    mainContent.appendChild(operationDropdown);
+    landingPage.appendChild(operationDropdown);
 
     // Tick input
     const tickInput = document.createElement('input');
     tickInput.type = 'text';
     tickInput.placeholder = 'plgz';
-    tickInput.className = 'styled-input';
+    tickInput.className = 'styled-input input-margin';
     tickInput.autocapitalize = 'off';
-    mainContent.appendChild(tickInput);
+    landingPage.appendChild(tickInput);
 
     // Amount input
     const amountInput = document.createElement('input');
     amountInput.type = 'text';
     amountInput.placeholder = '420';
-    amountInput.className = 'styled-input';
+    amountInput.className = 'styled-input input-margin';
     amountInput.autocapitalize = 'off';
-    mainContent.appendChild(amountInput);
+    landingPage.appendChild(amountInput);
 
     // Max input
     const maxInput = document.createElement('input');
     maxInput.type = 'text';
     maxInput.placeholder = 'Enter max supply';
-    maxInput.className = 'styled-input';
+    maxInput.className = 'styled-input input-margin';
     maxInput.autocapitalize = 'off';
     maxInput.style.display = 'none';
-    mainContent.appendChild(maxInput);
+    landingPage.appendChild(maxInput);
 
     // Limit input
     const limitInput = document.createElement('input');
     limitInput.type = 'text';
     limitInput.placeholder = 'Enter limit';
-    limitInput.className = 'styled-input';
+    limitInput.className = 'styled-input input-margin';
     limitInput.autocapitalize = 'off';
     limitInput.style.display = 'none';
-    mainContent.appendChild(limitInput);
+    landingPage.appendChild(limitInput);
 
     // Receiving address input
     const addressInput = document.createElement('input');
     addressInput.type = 'text';
     addressInput.placeholder = selectedWallet.address;
-    addressInput.className = 'styled-input';
-    mainContent.appendChild(addressInput);
+    addressInput.className = 'styled-input input-margin';
+    landingPage.appendChild(addressInput);
 
     // Next button
     const nextButton = document.createElement('button');
     nextButton.textContent = 'Next';
-    nextButton.className = 'styled-button';
-    mainContent.appendChild(nextButton);
-
-    landingPage.appendChild(mainContent);
+    nextButton.className = 'styled-button input-margin';
+    landingPage.appendChild(nextButton);
 
     // Event Listeners
     operationDropdown.addEventListener('change', () => {
@@ -130,20 +152,6 @@ export function mintTokenUI(selectedWallet) {
         maxInput.style.display = op === 'deploy' ? 'block' : 'none';
         limitInput.style.display = op === 'deploy' ? 'block' : 'none';
     });
-
-    // Set initial token standard based on wallet ticker
-    const standardMap = {
-        'doge': 'drc-20',
-        'lky': 'lky-20',
-        'pepe': 'prc-20',
-        'shic': 'shc-20',
-        'bonk': 'bnk-20',
-        'digi': 'dgb-20'
-    };
-    const ticker = selectedWallet.ticker.toLowerCase();
-    if (standardMap[ticker]) {
-        tokenStandardDropdown.value = standardMap[ticker];
-    }
 
     nextButton.addEventListener('click', async () => {
         nextButton.disabled = true;
@@ -181,11 +189,10 @@ export function mintTokenUI(selectedWallet) {
         };
 
         try {
-            const response = await fetch(`/api/v1/mint/${selectedWallet.ticker}`, {
+            const response = await fetch(`/bitcore_lib/generate_ord_hexs/${selectedWallet.ticker}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-API-Key': apiKey
                 },
                 body: JSON.stringify(requestBody)
             });

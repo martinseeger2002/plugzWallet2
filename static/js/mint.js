@@ -3,6 +3,7 @@ import { coins } from './networks.js';
 import { mintFileUI } from './mintFile.js';
 import { inscribeUI } from './inscriber.js';
 import { mintTokenUI } from './mintToken.js';
+import { mintImageUI } from './mintImage.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -64,6 +65,8 @@ export function mintUI(selectedWallet) {
             landingPage.innerHTML = '';
             if (btn.value === 0) { // Mint Token button
                 mintTokenUI(selectedWallet);
+            } else if (btn.value === 1) { // Mint Image button
+                mintImageUI(selectedWallet);
             } else if (btn.value === 2) { // Mint File button
                 mintFileUI(selectedWallet);
             } else if (btn.value === 6) { // Inscribe button

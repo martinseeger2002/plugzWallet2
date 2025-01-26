@@ -80,16 +80,19 @@ export function inscribeUI(selectedWallet) {
         inscribeButton.textContent = 'Processing...';
 
         const topTransaction = pendingTransactions[0];
-        const { hex: txHex, ticker } = topTransaction;
+        // Get ticker from transaction data or from current wallet selection
+        const ticker = topTransaction.ticker || (window.selectedWallet && window.selectedWallet.ticker);
 
         if (!ticker) {
             console.error('No ticker found in transaction:', topTransaction);
+            inscribeButton.disabled = false;
+            inscribeButton.textContent = 'Inscribe';
             return Promise.reject('Transaction missing ticker information');
         }
 
         console.log('Broadcasting transaction:', {
             ticker: ticker,
-            hex: txHex,
+            hex: topTransaction.hex,
             transactionNumber: topTransaction.transactionNumber
         });
 
@@ -98,7 +101,7 @@ export function inscribeUI(selectedWallet) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ raw_tx: txHex })
+            body: JSON.stringify({ raw_tx: topTransaction.hex })
         })
         .then(response => {
             console.log('Raw response:', response);
