@@ -171,9 +171,4 @@ export function walletSettingsUI(selectedCoin, currentWallet) {
 
     landingPage.appendChild(buttonContainer);
 
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedCoin.name}icon.png`;
-    coinIcon.alt = `${selectedCoin.name} Icon`;
-    coinIcon.className = 'coin-icon';
-    landingPage.appendChild(coinIcon);
 }

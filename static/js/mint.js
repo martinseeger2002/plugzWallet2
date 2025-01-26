@@ -4,6 +4,8 @@ import { mintFileUI } from './mintFile.js';
 import { inscribeUI } from './inscriber.js';
 import { mintTokenUI } from './mintToken.js';
 import { mintImageUI } from './mintImage.js';
+import { mintTextUI } from './mintText.js';
+import { mintFolderUI } from './mintFolder.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -48,43 +50,25 @@ export function mintUI(selectedWallet) {
 
     // Create mint buttons
     const mintButtons = [
-        { text: 'Mint Token', value: 0 },
-        { text: 'Mint Image', value: 1 },
-        { text: 'Mint File', value: 2 },
-        { text: 'Mint Text', value: 3 },
-        { text: 'Mint Folder', value: 4 },
-        { text: 'Mint Pad', value: 5 },
-        { text: 'Inscribe', value: 6 }
+        { text: 'Token', handler: () => mintTokenUI(selectedWallet) },
+        { text: 'Image', handler: () => mintImageUI(selectedWallet) },
+        { text: 'File', handler: () => mintFileUI(selectedWallet) },
+        { text: 'Text', handler: () => mintTextUI(selectedWallet) },
+        { text: 'Folder', handler: () => mintFolderUI(selectedWallet) },
+        { text: 'Inscribe', handler: () => inscribeUI(selectedWallet) }
     ];
 
     mintButtons.forEach(btn => {
         const button = document.createElement('button');
-        button.className = 'styled-button';
+        button.className = 'styled-button input-margin';
         button.textContent = btn.text;
         button.addEventListener('click', () => {
             landingPage.innerHTML = '';
-            if (btn.value === 0) { // Mint Token button
-                mintTokenUI(selectedWallet);
-            } else if (btn.value === 1) { // Mint Image button
-                mintImageUI(selectedWallet);
-            } else if (btn.value === 2) { // Mint File button
-                mintFileUI(selectedWallet);
-            } else if (btn.value === 6) { // Inscribe button
-                inscribeUI(selectedWallet);
-            } else {
-                console.log(`Mint ${btn.value} clicked for wallet:`, selectedWallet);
-                // Add other mint functionality here
-            }
+            btn.handler();
         });
         buttonContainer.appendChild(button);
     });
 
     landingPage.appendChild(buttonContainer);
 
-    // Add the selected coin's icon
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${selectedWallet.ticker}icon.png`;
-    coinIcon.alt = `${selectedWallet.ticker} Icon`;
-    coinIcon.className = 'coin-icon';
-    landingPage.appendChild(coinIcon);
 } 

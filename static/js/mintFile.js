@@ -28,13 +28,9 @@ export function mintFileUI(selectedWallet) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    // Create main content container
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-
     // UTXO selection dropdown
     const utxoDropdown = document.createElement('select');
-    utxoDropdown.className = 'styled-select';
+    utxoDropdown.className = 'wallet-selector input-margin';
     
     // Populate UTXO dropdown
     if (selectedWallet.utxos && selectedWallet.utxos.length > 0) {
@@ -52,48 +48,40 @@ export function mintFileUI(selectedWallet) {
     } else {
         utxoDropdown.innerHTML = '<option disabled selected>No UTXOs available</option>';
     }
-    mainContent.appendChild(utxoDropdown);
+    landingPage.appendChild(utxoDropdown);
 
     // Receiving address input
     const addressInput = document.createElement('input');
     addressInput.type = 'text';
     addressInput.placeholder = 'Enter receiving address (optional)';
-    addressInput.className = 'styled-input';
-    mainContent.appendChild(addressInput);
-
-    // File selection container
-    const fileContainer = document.createElement('div');
-    fileContainer.className = 'file-container';
+    addressInput.className = 'styled-input input-margin';
+    landingPage.appendChild(addressInput);
 
     // File selection input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.id = 'file-input';
-    fileInput.className = 'hidden-input';
+    fileInput.style.display = 'none';
+    landingPage.appendChild(fileInput);
     
     // File selection button
     const fileButton = document.createElement('button');
-    fileButton.className = 'styled-button';
+    fileButton.className = 'styled-button input-margin';
     fileButton.textContent = 'Choose File';
     fileButton.addEventListener('click', () => fileInput.click());
-
-    fileContainer.appendChild(fileInput);
-    fileContainer.appendChild(fileButton);
-    mainContent.appendChild(fileContainer);
+    landingPage.appendChild(fileButton);
 
     // Selected file display
     const fileDisplay = document.createElement('div');
-    fileDisplay.className = 'styled-text';
-    mainContent.appendChild(fileDisplay);
+    fileDisplay.className = 'styled-text input-margin';
+    landingPage.appendChild(fileDisplay);
 
     // Next button
     const nextButton = document.createElement('button');
-    nextButton.className = 'styled-button';
+    nextButton.className = 'styled-button input-margin';
     nextButton.textContent = 'Next';
     nextButton.disabled = true;
-    mainContent.appendChild(nextButton);
-
-    landingPage.appendChild(mainContent);
+    landingPage.appendChild(nextButton);
 
     // Handle file selection
     fileInput.addEventListener('change', (event) => {

@@ -6,16 +6,9 @@ export function inscribeUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = '';
 
-    // Find the coin data for the selected wallet to get the color
-    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
-    if (selectedCoin) {
-        landingPage.style.backgroundColor = selectedCoin.color;
-    }
-
-    // Create header with back button
+    // Header with back button
     const header = document.createElement('div');
     header.className = 'header';
-
     const backButton = document.createElement('button');
     backButton.className = 'back-button';
     backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
@@ -23,9 +16,14 @@ export function inscribeUI(selectedWallet) {
         landingPage.innerHTML = '';
         mintUI(selectedWallet);
     });
-
     header.appendChild(backButton);
     landingPage.appendChild(header);
+
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color;
+    }
 
     // Title
     const title = document.createElement('h1');
@@ -33,14 +31,10 @@ export function inscribeUI(selectedWallet) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    // Create main content container
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-
     // Pending Transactions Counter
     const pendingTxDisplay = document.createElement('div');
-    pendingTxDisplay.className = 'styled-text';
-    mainContent.appendChild(pendingTxDisplay);
+    pendingTxDisplay.className = 'styled-text input-margin';
+    landingPage.appendChild(pendingTxDisplay);
 
     // Initialize Pending Transactions Counter
     const mintResponse = JSON.parse(localStorage.getItem('mintResponse')) || {};
@@ -51,17 +45,15 @@ export function inscribeUI(selectedWallet) {
     const inscriptionNameInput = document.createElement('input');
     inscriptionNameInput.type = 'text';
     inscriptionNameInput.placeholder = 'Inscription name';
-    inscriptionNameInput.className = 'styled-input';
-    mainContent.appendChild(inscriptionNameInput);
+    inscriptionNameInput.className = 'styled-input input-margin';
+    landingPage.appendChild(inscriptionNameInput);
 
     // Inscribe button
     const inscribeButton = document.createElement('button');
-    inscribeButton.className = 'styled-button';
+    inscribeButton.className = 'styled-button input-margin';
     inscribeButton.textContent = 'Inscribe';
     inscribeButton.addEventListener('click', inscribeAllTransactions);
-    mainContent.appendChild(inscribeButton);
-
-    landingPage.appendChild(mainContent);
+    landingPage.appendChild(inscribeButton);
 
     function updatePendingTxCounter(count) {
         pendingTxDisplay.textContent = `Pending Transactions: ${count}`;
@@ -80,7 +72,6 @@ export function inscribeUI(selectedWallet) {
         inscribeButton.textContent = 'Processing...';
 
         const topTransaction = pendingTransactions[0];
-        // Get ticker from transaction data or from current wallet selection
         const ticker = topTransaction.ticker || (window.selectedWallet && window.selectedWallet.ticker);
 
         if (!ticker) {
