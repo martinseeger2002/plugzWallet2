@@ -152,6 +152,19 @@ async function getTransactionDetails(ticker, txid, address) {
         const data = await response.json();
 
         if (data.status !== 'success') {
+            // Check for both mempool and blockchain transaction errors
+            if (data.message && (
+                data.message.includes('No such mempool transaction') ||
+                data.message.includes('Use -txindex to enable blockchain transaction queries')
+            )) {
+                // Get existing transactions from localStorage
+                const existingTxs = JSON.parse(localStorage.getItem('MyInscriptions')) || [];
+                // Remove the transaction that's no longer in mempool
+                const updatedTxs = existingTxs.filter(tx => tx.txid !== txid);
+                localStorage.setItem('MyInscriptions', JSON.stringify(updatedTxs));
+                console.log(`Removed transaction ${txid} from history as it's no longer accessible`);
+                return null;
+            }
             throw new Error(data.message || 'Failed to get transaction details');
         }
 
@@ -207,6 +220,17 @@ async function getTransactionDetails(ticker, txid, address) {
             time: txTime
         };
     } catch (error) {
+        // If the error is about mempool or blockchain access, remove the transaction
+        if (error.message && (
+            error.message.includes('No such mempool transaction') ||
+            error.message.includes('Use -txindex to enable blockchain transaction queries')
+        )) {
+            const existingTxs = JSON.parse(localStorage.getItem('MyInscriptions')) || [];
+            const updatedTxs = existingTxs.filter(tx => tx.txid !== txid);
+            localStorage.setItem('MyInscriptions', JSON.stringify(updatedTxs));
+            console.log(`Removed transaction ${txid} from history due to error: ${error.message}`);
+            return null;
+        }
         console.error('Error getting transaction details:', error);
         return null;
     }

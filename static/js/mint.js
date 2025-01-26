@@ -1,6 +1,8 @@
 import { initializeWallet } from './main.js';
 import { coins } from './networks.js';
 import { mintFileUI } from './mintFile.js';
+import { inscribeUI } from './inscriber.js';
+import { mintTokenUI } from './mintToken.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -45,11 +47,13 @@ export function mintUI(selectedWallet) {
 
     // Create mint buttons
     const mintButtons = [
+        { text: 'Mint Token', value: 0 },
         { text: 'Mint Image', value: 1 },
         { text: 'Mint File', value: 2 },
         { text: 'Mint Text', value: 3 },
         { text: 'Mint Folder', value: 4 },
-        { text: 'Mint Pad', value: 5 }
+        { text: 'Mint Pad', value: 5 },
+        { text: 'Inscribe', value: 6 }
     ];
 
     mintButtons.forEach(btn => {
@@ -57,8 +61,13 @@ export function mintUI(selectedWallet) {
         button.className = 'styled-button';
         button.textContent = btn.text;
         button.addEventListener('click', () => {
-            if (btn.value === 2) { // Mint File button
+            landingPage.innerHTML = '';
+            if (btn.value === 0) { // Mint Token button
+                mintTokenUI(selectedWallet);
+            } else if (btn.value === 2) { // Mint File button
                 mintFileUI(selectedWallet);
+            } else if (btn.value === 6) { // Inscribe button
+                inscribeUI(selectedWallet);
             } else {
                 console.log(`Mint ${btn.value} clicked for wallet:`, selectedWallet);
                 // Add other mint functionality here

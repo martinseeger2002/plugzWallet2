@@ -448,10 +448,10 @@ input[type="number"]::-webkit-inner-spin-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 2px;
   width: 90%;
   max-width: 400px;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 0;
 }
 

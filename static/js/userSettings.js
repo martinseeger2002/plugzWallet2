@@ -48,13 +48,15 @@ export function userSettingsUI(selectedWallet) {
             }
         },
         {
-            text: 'Clear Mint Cache',
+            text: 'Clear Pending Transactions',
             onClick: () => {
-                const confirmClear = confirm('Are you sure you want to clear the mint cache?');
+                const confirmClear = confirm('Are you sure you want to clear the pending transactions?');
                 if (confirmClear) {
                     localStorage.removeItem('mintCache');
-                    console.log('Mint cache cleared');
-                    alert('Mint cache has been cleared');
+                    // Clear pending transactions by setting them to an empty array
+                    localStorage.setItem('mintResponse', JSON.stringify({ pendingTransactions: [] }));
+                    console.log('Pending transactions cleared');
+                    alert('Pending transactions have been cleared');
                 }
             }
         }

@@ -6,6 +6,12 @@ export function inscribeUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = '';
 
+    // Find the coin data for the selected wallet to get the color
+    const selectedCoin = coins.find(coin => coin.ticker === selectedWallet.ticker);
+    if (selectedCoin) {
+        landingPage.style.backgroundColor = selectedCoin.color;
+    }
+
     // Create header with back button
     const header = document.createElement('div');
     header.className = 'header';
@@ -74,25 +80,43 @@ export function inscribeUI(selectedWallet) {
         inscribeButton.textContent = 'Processing...';
 
         const topTransaction = pendingTransactions[0];
-        const txHex = topTransaction.hex;
+        const { hex: txHex, ticker } = topTransaction;
 
-        return fetch(`/api/sendrawtransaction/${selectedWallet.ticker}`, {
+        if (!ticker) {
+            console.error('No ticker found in transaction:', topTransaction);
+            return Promise.reject('Transaction missing ticker information');
+        }
+
+        console.log('Broadcasting transaction:', {
+            ticker: ticker,
+            hex: txHex,
+            transactionNumber: topTransaction.transactionNumber
+        });
+
+        return fetch(`/api/sendrawtransaction/${ticker}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ tx_hex: txHex })
+            body: JSON.stringify({ raw_tx: txHex })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Raw response:', response);
+            return response.json();
+        })
         .then(data => {
-            if (data.status === 'success') {
+            console.log('Response data:', data);
+            
+            if (data.status === 'success' || data.txid) {
                 const inscriptionName = inscriptionNameInput.value.trim();
                 const myInscriptions = JSON.parse(localStorage.getItem('MyInscriptions')) || [];
 
                 if (topTransaction.transactionNumber === 2) {
+                    const txid = data.txid || data.data?.txid;
                     myInscriptions.push({
                         name: inscriptionName || 'Unnamed Inscription',
-                        txid: data.txid,
+                        txid: txid,
+                        inscriptionId: `${txid}i0`,
                         sendingaddress: selectedWallet.address
                     });
                     localStorage.setItem('MyInscriptions', JSON.stringify(myInscriptions));
@@ -103,25 +127,21 @@ export function inscribeUI(selectedWallet) {
                 updatePendingTxCounter(pendingTransactions.length);
 
                 if (showAlert) {
-                    alert(`Transaction sent successfully! TXID: ${data.txid}`);
+                    const txid = data.txid || data.data?.txid;
+                    alert(`Transaction broadcast successfully!\nTXID: ${txid}\nInscription ID: ${txid}i0`);
                 }
             } else {
-                if (data.message?.includes('mandatory-script-verify-flag-failed')) {
-                    console.log('Signature verification failed. Removing transaction from the list.');
-                    pendingTransactions.shift();
-                    localStorage.setItem('mintResponse', JSON.stringify({ pendingTransactions }));
-                    updatePendingTxCounter(pendingTransactions.length);
-                } else {
-                    throw new Error(data.message || 'Failed to send transaction');
-                }
+                const errorMessage = data.message || data.error || 'Failed to broadcast transaction';
+                console.error('Transaction error:', errorMessage, data);
+                throw new Error(errorMessage);
             }
         })
         .catch(error => {
-            console.error('Error sending transaction:', error);
+            console.error('Full error details:', error);
             if (showAlert) {
-                alert('Error sending transaction: ' + error.message);
+                alert('Error broadcasting transaction: ' + (error.message || error));
             }
-            return Promise.reject(error);
+            return Promise.reject(error.message || error);
         })
         .finally(() => {
             inscribeButton.disabled = false;
@@ -143,7 +163,7 @@ export function inscribeUI(selectedWallet) {
                 })
                 .catch(error => {
                     console.error('Error processing transactions:', error);
-                    alert('Error processing transactions: ' + error.message);
+                    alert('Error processing transactions: ' + error);
                 });
         }
 

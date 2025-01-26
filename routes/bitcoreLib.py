@@ -161,28 +161,28 @@ def mint(ticker):
 
     # Determine the command directory and script based on the ticker
     if ticker.lower() == 'doge':
-        command_dir = './doge'
+        command_dir = './bitcore-libs/doge'
         script = 'getOrdTxsDoge.js'
     elif ticker.lower() == 'lky':
-        command_dir = './lky'
+        command_dir = './bitcore-libs/lky'
         script = 'getOrdTxsLKY.js'
     elif ticker.lower() == 'ltc':
-        command_dir = './ltc'
+        command_dir = './bitcore-libs/ltc'
         script = 'getOrdTxsLTC.js'
     elif ticker.lower() in ('pepe', 'pep'):
         command_dir = './bitcore-libs/pep'
         script = 'getOrdTxsPepe.js'
     elif ticker.lower() == 'shic':
-        command_dir = './shic'
+        command_dir = './bitcore-libs/shic'
         script = 'getOrdTxsShic.js'
     elif ticker.lower() in ('bonk', 'bonc'):
-        command_dir = './bonc'
+        command_dir = './bitcore-libs/bonc'
         script = 'getOrdTxsBonk.js'
     elif ticker.lower() == 'flop':
-        command_dir = './flop'
+        command_dir = './bitcore-libs/flop'
         script = 'getOrdTxsFlop.js'
     elif ticker.lower() in ('digi', 'dgb'):
-        command_dir = './dgb'
+        command_dir = './bitcore-libs/dgb'
         script = 'getOrdTxsDigi.js'
     else:
         return jsonify({
