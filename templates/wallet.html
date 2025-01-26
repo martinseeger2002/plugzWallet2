@@ -57,10 +57,10 @@
 <body>
   <div class="frame">
     <div id="landing-page">
-      <!-- Add this button somewhere visible -->
-      <button id="installButton" style="display: none;" class="styled-button">
+      <!-- Remove the install button -->
+      <!-- <button id="installButton" style="display: none;" class="styled-button">
         Install App
-      </button>
+      </button> -->
       <!-- Dynamic content will be inserted here -->
     </div>
   </div>
@@ -94,41 +94,6 @@
     } else {
       console.log('Service workers are not supported');
     }
-  </script>
-
-  <!-- Add this script before the closing body tag -->
-  <script>
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault();
-      // Stash the event so it can be triggered later
-      deferredPrompt = e;
-      // Show the install button
-      installButton.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        // Show the install prompt
-        deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to install prompt: ${outcome}`);
-        // Clear the deferredPrompt variable
-        deferredPrompt = null;
-        // Hide the install button
-        installButton.style.display = 'none';
-      }
-    });
-
-    // Handle successful installation
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('App was successfully installed');
-      installButton.style.display = 'none';
-    });
   </script>
 </body>
 </html>

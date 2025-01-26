@@ -24,7 +24,7 @@ function formatTimeSince(timestamp) {
  * - netAmount < 0 => Received
  * - netAmount = 0 => Internal (no net effect)
  **********************************************************/
-function createTransactionElement(netAmount, timestamp, txid) {
+function createTransactionElement(netAmount, timestamp, txid, confirmations) {
     const txElement = document.createElement('div');
     txElement.className = 'transaction';
 
@@ -44,7 +44,10 @@ function createTransactionElement(netAmount, timestamp, txid) {
         label = `Internal 0.00`;
     }
 
-    txElement.textContent = `${label} — ${timeSinceText}`;
+    // Add confirmation status
+    const confirmationStatus = confirmations > 0 ? 'Confirmed' : 'Unconfirmed';
+
+    txElement.textContent = `${label} — ${timeSinceText} (${confirmationStatus})`;
     txElement.style.color = color;
     txElement.style.cursor = 'pointer';
 
@@ -214,10 +217,12 @@ async function getTransactionDetails(ticker, txid, address) {
 
         // Transaction time (fall back to blocktime or something else if missing)
         const txTime = txDetails.time || txDetails.blocktime || 0;
+        const confirmations = txDetails.confirmations || 0;
 
         return {
             netAmount,
-            time: txTime
+            time: txTime,
+            confirmations
         };
     } catch (error) {
         // If the error is about mempool or blockchain access, remove the transaction
@@ -271,7 +276,7 @@ export async function displayTransactionHistory(ticker, address, container) {
             const finalTime = txInfo.time || tx.time;
 
             // 3) Create the element and append it
-            const txElement = createTransactionElement(txInfo.netAmount, finalTime, tx.txid);
+            const txElement = createTransactionElement(txInfo.netAmount, finalTime, tx.txid, txInfo.confirmations);
             container.appendChild(txElement);
         }
 

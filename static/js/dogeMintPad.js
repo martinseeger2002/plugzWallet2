@@ -1,9 +1,9 @@
 import { landingPageUI } from './landingPageUI.js';
 import { mintPadScreen2UI } from './mintPadScreen2.js';
 import { mintPadBulkUI } from './mintPadBulk.js';
-import { mintPadUI } from './mintPadUI.js';
-import { inscribeUI } from './inscribeUI.js';
-import { mintSelectionUI } from './mintSelectionUI.js';
+import { dogeMintPadUI } from './dogeMintPad.js';
+import { inscribeUI } from './inscriber.js';
+import { mintSelectionUI } from './mintSelection.js';
 
 export function dogeMintPadUI() {
     const landingPage = document.getElementById('landing-page');

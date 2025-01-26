@@ -23,10 +23,7 @@ def generate_key(ticker):
             text=True,
             check=True
         )
-        
-        # Log the output
-        logging.debug(f"Script output: {result.stdout}")
-        
+                
         # Parse the output from the Node.js script
         output_lines = result.stdout.splitlines()
         wif_key = output_lines[0].split(': ')[1]
@@ -142,9 +139,6 @@ def mint(ticker):
     vout = data.get('vout')
     script_hex = data.get('script_hex')
     utxo_amount = data.get('utxo_amount')  # Ensure this is a string
-
-    # Log the extracted parameters for debugging
-    print(f"Received mint request with parameters: {data}")
 
     # Convert 'vout' and 'utxo_amount' to strings for the command
     vout_str = str(vout)

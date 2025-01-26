@@ -1,4 +1,4 @@
-import { mintPadUI } from './dogeMintPad.js';
+import { dogeMintPadUI } from './dogeMintPad.js';
 import { inscribeUI } from './inscriber.js';
 
 export function mintPadBulkUI(selectedWalletLabel = localStorage.getItem('selectedWalletLabel') || null) {
@@ -96,7 +96,7 @@ export function mintPadBulkUI(selectedWalletLabel = localStorage.getItem('select
     backButton.textContent = 'Back';
     backButton.className = 'styled-button back-button';
     backButton.addEventListener('click', () => {
-        mintPadUI();
+        dogeMintPadUI();
     });
     landingPage.appendChild(backButton);
 
