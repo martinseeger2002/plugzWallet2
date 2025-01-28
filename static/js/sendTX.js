@@ -82,7 +82,7 @@ export function sendTXUI(walletData) {
     receivingAddressInput.autocomplete = 'off';
     form.appendChild(receivingAddressInput);
 
-    // Amount input
+    // Amount input in coins
     const amountInput = document.createElement('input');
     amountInput.type = 'number';
     amountInput.id = 'amount';
@@ -93,6 +93,63 @@ export function sendTXUI(walletData) {
     amountInput.min = '0.00000001';
     amountInput.autocomplete = 'off';
     form.appendChild(amountInput);
+
+    // Amount input in USD
+    const usdAmountContainer = document.createElement('div');
+    usdAmountContainer.className = 'usd-amount-container';
+
+    const usdLabel = document.createElement('span');
+    usdLabel.textContent = '$';
+    usdLabel.className = 'usd-label';
+
+    const usdAmountInput = document.createElement('input');
+    usdAmountInput.type = 'number';
+    usdAmountInput.id = 'usdAmount';
+    usdAmountInput.placeholder = 'Amount in USD';
+    usdAmountInput.className = 'styled-input';
+    usdAmountInput.step = '0.01';
+    usdAmountInput.autocomplete = 'off';
+
+    usdAmountContainer.appendChild(usdLabel);
+    usdAmountContainer.appendChild(usdAmountInput);
+    form.appendChild(usdAmountContainer);
+
+    // Fetch prices and set up event listeners
+    fetch('/prices/prices')
+        .then(response => response.json())
+        .then(pricesData => {
+            const coinPriceInUSD = parseFloat(pricesData[walletData.ticker]?.aggregated);
+
+            if (!coinPriceInUSD) {
+                console.error('Price data not available for the selected coin.');
+                return;
+            }
+
+            // Update USD amount when coin amount is entered
+            amountInput.addEventListener('input', () => {
+                const coinAmount = parseFloat(amountInput.value);
+                if (!isNaN(coinAmount)) {
+                    const usdAmount = coinAmount * coinPriceInUSD;
+                    usdAmountInput.value = usdAmount.toFixed(2);
+                } else {
+                    usdAmountInput.value = '';
+                }
+            });
+
+            // Update coin amount when USD amount is entered
+            usdAmountInput.addEventListener('input', () => {
+                const usdAmount = parseFloat(usdAmountInput.value);
+                if (!isNaN(usdAmount)) {
+                    const coinAmount = usdAmount / coinPriceInUSD;
+                    amountInput.value = coinAmount.toFixed(8); // Adjust precision as needed
+                } else {
+                    amountInput.value = '';
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching prices:', error);
+        });
 
     // Subtract fee checkbox
     const subtractFeeContainer = document.createElement('div');
@@ -245,7 +302,6 @@ export function sendTXUI(walletData) {
     // Append form to landing page
     formContainer.appendChild(form);
     landingPage.appendChild(formContainer);
-
 
     // Add wallet selector change handler
     walletSelector.addEventListener('change', () => {

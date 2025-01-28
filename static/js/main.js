@@ -21,271 +21,307 @@ export function initializeWallet() {
 
   // Retrieve saved settings from local storage
   const savedSettings = JSON.parse(localStorage.getItem('coinSettings')) || {};
+  const priceView = savedSettings['priceView'] || 'pounds_of_wildrice';
+  const wildricePrice = parseFloat(savedSettings['wildricePrice']) || 20.00;
 
-  // Then, read selected wallets after wallets are loaded
-  const savedSelectedWallets = JSON.parse(localStorage.getItem('selectedWallets')) || {};
+  // Fetch prices from the /prices/prices route
+  fetch('/prices/prices')
+    .then(response => response.json())
+    .then(pricesData => {
+      // Then, read selected wallets after wallets are loaded
+      const savedSelectedWallets = JSON.parse(localStorage.getItem('selectedWallets')) || {};
 
-  // Filter coins based on saved settings
-  const activeCoins = coins.filter(coin => savedSettings[coin.ticker] !== false);
+      // Filter coins based on saved settings
+      const activeCoins = coins.filter(coin => savedSettings[coin.ticker] !== false);
 
-  // Create the frame for the wallet UI
-  const frame = document.createElement('div');
-  frame.className = 'frame';
-  frame.style.border = 'none'; // Ensure no border is applied to the frame
-  landingPage.appendChild(frame);
+      // Create the frame for the wallet UI
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+      frame.style.border = 'none'; // Ensure no border is applied to the frame
+      landingPage.appendChild(frame);
 
-  // Create the swiper container
-  const swiperContainer = document.createElement('div');
-  swiperContainer.className = 'swiper';
-  frame.appendChild(swiperContainer);
+      // Create the swiper container
+      const swiperContainer = document.createElement('div');
+      swiperContainer.className = 'swiper';
+      frame.appendChild(swiperContainer);
 
-  // Create the swiper wrapper
-  const swiperWrapper = document.createElement('div');
-  swiperWrapper.className = 'swiper-wrapper';
-  swiperContainer.appendChild(swiperWrapper);
+      // Create the swiper wrapper
+      const swiperWrapper = document.createElement('div');
+      swiperWrapper.className = 'swiper-wrapper';
+      swiperContainer.appendChild(swiperWrapper);
 
-  // Create a slide for each active coin
-  activeCoins.forEach((coin, index) => {
-    const slide = document.createElement('div');
-    slide.className = 'swiper-slide';
-    slide.style.backgroundColor = coin.color; // Set the background color
-    swiperWrapper.appendChild(slide);
+      // Create a slide for each active coin
+      activeCoins.forEach((coin, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        slide.style.backgroundColor = coin.color; // Set the background color
+        swiperWrapper.appendChild(slide);
 
-    // Header with settings button and male silhouette
-    const header = document.createElement('div');
-    header.className = 'header';
+        // Header with settings button and male silhouette
+        const header = document.createElement('div');
+        header.className = 'header';
 
-    const maleIcon = document.createElement('button');  // Changed from img to button
-    maleIcon.className = 'back-button';  // Use the same class as back button
-    maleIcon.innerHTML = '<img src="/static/images/male-silhouette.png" alt="Male Silhouette" />';
-    
-    // Check if there are any wallets for this coin
-    const hasWallets = wallets.some(wallet => wallet.ticker === coin.ticker);
-    
-    if (!hasWallets) {
-        maleIcon.disabled = true;
-    } else {
-        maleIcon.addEventListener('click', () => {
+        const maleIcon = document.createElement('button');  // Changed from img to button
+        maleIcon.className = 'back-button';  // Use the same class as back button
+        maleIcon.innerHTML = '<img src="/static/images/male-silhouette.png" alt="Male Silhouette" />';
+        
+        // Check if there are any wallets for this coin
+        const hasWallets = wallets.some(wallet => wallet.ticker === coin.ticker);
+        
+        if (!hasWallets) {
+            maleIcon.disabled = true;
+        } else {
+            maleIcon.addEventListener('click', () => {
+                const selectedWallet = wallets.find(wallet => 
+                    wallet.ticker === coin.ticker && 
+                    wallet.label === walletSelector.value
+                );
+                landingPage.innerHTML = '';
+                userSettingsUI(selectedWallet);
+            });
+        }
+
+        const settingsButton = document.createElement('button');
+        settingsButton.className = 'settings-button';
+        settingsButton.innerHTML = '<img src="/static/images/settings-icon.png" alt="Settings Icon" />';
+        settingsButton.style.backgroundColor = 'transparent';
+        settingsButton.style.border = 'none';
+        settingsButton.addEventListener('click', () => {
+            // Get the currently selected wallet
             const selectedWallet = wallets.find(wallet => 
                 wallet.ticker === coin.ticker && 
                 wallet.label === walletSelector.value
             );
+            
             landingPage.innerHTML = '';
-            userSettingsUI(selectedWallet);
+            walletSettingsUI(coin, selectedWallet); // Pass both coin and selected wallet
         });
-    }
 
-    const settingsButton = document.createElement('button');
-    settingsButton.className = 'settings-button';
-    settingsButton.innerHTML = '<img src="/static/images/settings-icon.png" alt="Settings Icon" />';
-    settingsButton.style.backgroundColor = 'transparent';
-    settingsButton.style.border = 'none';
-    settingsButton.addEventListener('click', () => {
-        // Get the currently selected wallet
-        const selectedWallet = wallets.find(wallet => 
-            wallet.ticker === coin.ticker && 
-            wallet.label === walletSelector.value
-        );
+        header.appendChild(maleIcon);
+        header.appendChild(settingsButton);
+        slide.appendChild(header);
+
+        // Coin icon
+        const coinIcon = document.createElement('img');
+        coinIcon.src = `/static/images/${coin.name}icon.png`; // Path to the coin icon
+        coinIcon.alt = `${coin.name} Icon`;
+        coinIcon.className = 'coin-icon';
+        slide.appendChild(coinIcon);
+
+        // Wallet selector dropdown
+        const walletSelector = document.createElement('select');
+        walletSelector.className = 'wallet-selector';
+        const walletList = wallets.filter(wallet => wallet.ticker === coin.ticker && wallet.label);
         
-        landingPage.innerHTML = '';
-        walletSettingsUI(coin, selectedWallet); // Pass both coin and selected wallet
-    });
-
-    header.appendChild(maleIcon);
-    header.appendChild(settingsButton);
-    slide.appendChild(header);
-
-    // Coin icon
-    const coinIcon = document.createElement('img');
-    coinIcon.src = `/static/images/${coin.name}icon.png`; // Path to the coin icon
-    coinIcon.alt = `${coin.name} Icon`;
-    coinIcon.className = 'coin-icon';
-    slide.appendChild(coinIcon);
-
-    // Wallet selector dropdown
-    const walletSelector = document.createElement('select');
-    walletSelector.className = 'wallet-selector';
-    const walletList = wallets.filter(wallet => wallet.ticker === coin.ticker && wallet.label);
-    
-    if (walletList.length === 0) {
-        // If no wallets exist, show "Add a wallet" option
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'No wallet';
-        walletSelector.appendChild(option);
-        
-        // Make the selector clickable to add a wallet
-        walletSelector.addEventListener('click', () => {
-            landingPage.innerHTML = '';
-            addWalletUI(coin);
-        });
-    } else {
-        // Add existing wallets to selector
-        walletList.forEach(wallet => {
+        if (walletList.length === 0) {
+            // If no wallets exist, show "Add a wallet" option
             const option = document.createElement('option');
-            option.value = wallet.label;
-            option.textContent = wallet.label;
+            option.value = '';
+            option.textContent = 'No wallet';
             walletSelector.appendChild(option);
+            
+            // Make the selector clickable to add a wallet
+            walletSelector.addEventListener('click', () => {
+                landingPage.innerHTML = '';
+                addWalletUI(coin);
+            });
+        } else {
+            // Add existing wallets to selector
+            walletList.forEach(wallet => {
+                const option = document.createElement('option');
+                option.value = wallet.label;
+                option.textContent = wallet.label;
+                walletSelector.appendChild(option);
+            });
+        }
+        slide.appendChild(walletSelector);
+
+        // Balance and price display container
+        const balanceContainer = document.createElement('div');
+        balanceContainer.className = 'balance-container';
+        slide.appendChild(balanceContainer);
+
+        // Balance display
+        const balance = document.createElement('div');
+        balance.className = 'balance styled-text';
+        balanceContainer.appendChild(balance);
+
+        // Price display
+        const priceDisplay = document.createElement('div');
+        priceDisplay.className = 'price-display';
+        balanceContainer.appendChild(priceDisplay);
+
+        // Buttons
+        const buttons = document.createElement('div');
+        buttons.className = 'buttons';
+
+        const buttonConfigs = [
+            { text: 'Send', onClick: () => {
+                const selectedWallet = wallets.find(wallet => 
+                    wallet.ticker === coin.ticker && 
+                    wallet.label === walletSelector.value
+                );
+                if (selectedWallet) {
+                    landingPage.innerHTML = '';
+                    sendTXUI(selectedWallet);
+                }
+            }},
+            { text: 'Receive', onClick: () => {
+                const selectedWallet = wallets.find(wallet => 
+                    wallet.ticker === coin.ticker && 
+                    wallet.label === walletSelector.value
+                );
+                if (selectedWallet) {
+                    landingPage.innerHTML = '';
+                    receiveUI(selectedWallet);
+                }
+            }},
+            { text: 'Mint', onClick: () => {
+                const selectedWallet = wallets.find(wallet => 
+                    wallet.ticker === coin.ticker && 
+                    wallet.label === walletSelector.value
+                );
+                if (selectedWallet) {
+                    landingPage.innerHTML = '';
+                    mintUI(selectedWallet);
+                }
+            }}
+        ];
+
+        buttonConfigs.forEach(config => {
+            const button = document.createElement('div');
+            button.className = 'button';
+            button.textContent = config.text;
+            button.addEventListener('click', config.onClick);
+            buttons.appendChild(button);
         });
-    }
-    slide.appendChild(walletSelector);
 
-    // Set the selected wallet from local storage if available
-    if (savedSelectedWallets[coin.ticker]) {
-      walletSelector.value = savedSelectedWallets[coin.ticker];
-    }
+        slide.appendChild(buttons); // Append buttons before transaction history
 
-    // Balance display
-    const balance = document.createElement('div');
-    balance.className = 'balance styled-text';
-    slide.appendChild(balance);
+        // Transaction history
+        const transactionHistory = document.createElement('div');
+        transactionHistory.className = 'transaction-history';
+        slide.appendChild(transactionHistory);
 
-    // Buttons
-    const buttons = document.createElement('div');
-    buttons.className = 'buttons';
+        // Update balance display based on selected wallet
+        const updateWalletInfo = () => {
+          const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
+          if (selectedWallet) {
+            balance.textContent = `${selectedWallet.balance} ${coin.name}`;
+            balance.style.cursor = 'default';
+            balance.onclick = null;
 
-    const buttonConfigs = [
-        { text: 'Send', onClick: () => {
-            const selectedWallet = wallets.find(wallet => 
-                wallet.ticker === coin.ticker && 
-                wallet.label === walletSelector.value
-            );
-            if (selectedWallet) {
-                landingPage.innerHTML = '';
-                sendTXUI(selectedWallet);
+            // Calculate and display the price
+            if (priceView !== 'none') {
+              const coinPrice = pricesData[coin.ticker]?.aggregated;
+              if (coinPrice) {
+                const usdValue = selectedWallet.balance * parseFloat(coinPrice);
+                let displayValue;
+                if (priceView === 'usd') {
+                  displayValue = `USD: $${usdValue.toFixed(2)}`;
+                } else if (priceView === 'pounds_of_wildrice') {
+                  const wildriceValue = usdValue / wildricePrice;
+                  displayValue = `Wildrice: ${wildriceValue.toFixed(2)} lbs`;
+                }
+                priceDisplay.textContent = displayValue;
+              } else {
+                priceDisplay.textContent = 'Price not available';
+              }
+            } else {
+              priceDisplay.textContent = '';
             }
-        }},
-        { text: 'Receive', onClick: () => {
-            const selectedWallet = wallets.find(wallet => 
-                wallet.ticker === coin.ticker && 
-                wallet.label === walletSelector.value
-            );
-            if (selectedWallet) {
-                landingPage.innerHTML = '';
-                receiveUI(selectedWallet);
-            }
-        }},
-        { text: 'Mint', onClick: () => {
-            const selectedWallet = wallets.find(wallet => 
-                wallet.ticker === coin.ticker && 
-                wallet.label === walletSelector.value
-            );
-            if (selectedWallet) {
-                landingPage.innerHTML = '';
-                mintUI(selectedWallet);
-            }
-        }}
-    ];
-
-    buttonConfigs.forEach(config => {
-        const button = document.createElement('div');
-        button.className = 'button';
-        button.textContent = config.text;
-        button.addEventListener('click', config.onClick);
-        buttons.appendChild(button);
-    });
-
-    slide.appendChild(buttons); // Append buttons before transaction history
-
-    // Transaction history
-    const transactionHistory = document.createElement('div');
-    transactionHistory.className = 'transaction-history';
-    slide.appendChild(transactionHistory);
-
-    // Update balance display based on selected wallet
-    const updateWalletInfo = () => {
-      const selectedWallet = wallets.find(wallet => wallet.label === walletSelector.value && wallet.ticker === coin.ticker);
-      if (selectedWallet) {
-        balance.textContent = `${selectedWallet.balance} ${coin.name}`;
-        balance.style.cursor = 'default';
-        balance.onclick = null;
-      } else {
-        balance.textContent = `Add ${coin.ticker} wallet`;
-        balance.style.cursor = 'pointer';
-        balance.onclick = () => {
-          landingPage.innerHTML = '';
-          addWalletUI(coin);
-        };
-      }
-    };
-
-    // Only call updateWalletInfo on change event
-    walletSelector.addEventListener('change', () => {
-      updateWalletData(coin.ticker, walletSelector.value, balance);
-      updateWalletInfo();
-
-      // Save the selected wallet to local storage
-      savedSelectedWallets[coin.ticker] = walletSelector.value;
-      localStorage.setItem('selectedWallets', JSON.stringify(savedSelectedWallets));
-    });
-
-    updateWalletInfo(); // Initialize balance display
-  });
-
-  // Initialize Swiper
-  const swiper = new Swiper('.swiper', {
-    direction: 'horizontal',
-    loop: true,
-    pagination: {
-      el: '.swiper-pagination',
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    slidesPerView: 1,
-    slidesPerGroup: 1,
-    initialSlide: selectedCoin ? activeCoins.findIndex(c => c.name === selectedCoin.name) : 0,
-    on: {
-      slideChange: function () {
-        const activeIndex = this.realIndex;
-        document.body.style.backgroundColor = activeCoins[activeIndex].color;
-        selectedCoin = activeCoins[activeIndex];
-
-        setTimeout(() => {
-          const activeSlide = document.querySelector('.swiper-slide-active');
-          const walletSelector = activeSlide.querySelector('.wallet-selector');
-          const balanceElement = activeSlide.querySelector('.balance');
-
-          if (walletSelector && balanceElement) {
-            const selectedWallet = wallets.find(wallet => 
-              wallet.ticker === selectedCoin.ticker && 
-              wallet.label === walletSelector.value
-            );
-
-            if (!selectedWallet) {
-              balanceElement.textContent = `Add ${selectedCoin.ticker} wallet`;
-              balanceElement.style.cursor = 'pointer';
-              balanceElement.onclick = () => {
-                landingPage.innerHTML = '';
-                addWalletUI(selectedCoin);
-              };
-              return;
-            }
-
-            balanceElement.textContent = 'Loading...';
-            balanceElement.style.cursor = 'default';
-            balanceElement.onclick = null;
-
-            updateWalletData(selectedCoin.ticker, selectedWallet.label, balanceElement);
+          } else {
+            balance.textContent = `Add ${coin.ticker} wallet`;
+            balance.style.cursor = 'pointer';
+            balance.onclick = () => {
+              landingPage.innerHTML = '';
+              addWalletUI(coin);
+            };
+            priceDisplay.textContent = '';
           }
-        }, 100);
+        };
+
+        // Only call updateWalletInfo on change event
+        walletSelector.addEventListener('change', () => {
+          updateWalletData(coin.ticker, walletSelector.value, balance);
+          updateWalletInfo();
+
+          // Save the selected wallet to local storage
+          savedSelectedWallets[coin.ticker] = walletSelector.value;
+          localStorage.setItem('selectedWallets', JSON.stringify(savedSelectedWallets));
+        });
+
+        updateWalletInfo(); // Initialize balance display
+      });
+
+      // Initialize Swiper
+      const swiper = new Swiper('.swiper', {
+        direction: 'horizontal',
+        loop: true,
+        pagination: {
+          el: '.swiper-pagination',
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        initialSlide: selectedCoin ? activeCoins.findIndex(c => c.name === selectedCoin.name) : 0,
+        on: {
+          slideChange: function () {
+            const activeIndex = this.realIndex;
+            document.body.style.backgroundColor = activeCoins[activeIndex].color;
+            selectedCoin = activeCoins[activeIndex];
+
+            setTimeout(() => {
+              const activeSlide = document.querySelector('.swiper-slide-active');
+              const walletSelector = activeSlide.querySelector('.wallet-selector');
+              const balanceElement = activeSlide.querySelector('.balance');
+
+              if (walletSelector && balanceElement) {
+                const selectedWallet = wallets.find(wallet => 
+                  wallet.ticker === selectedCoin.ticker && 
+                  wallet.label === walletSelector.value
+                );
+
+                if (!selectedWallet) {
+                  balanceElement.textContent = `Add ${selectedCoin.ticker} wallet`;
+                  balanceElement.style.cursor = 'pointer';
+                  balanceElement.onclick = () => {
+                    landingPage.innerHTML = '';
+                    addWalletUI(selectedCoin);
+                  };
+                  return;
+                }
+
+                balanceElement.textContent = 'Loading...';
+                balanceElement.style.cursor = 'default';
+                balanceElement.onclick = null;
+
+                updateWalletData(selectedCoin.ticker, selectedWallet.label, balanceElement);
+              }
+            }, 100);
+          }
+        }
+      });
+
+      // Set initial background color
+      document.body.style.backgroundColor = selectedCoin ? selectedCoin.color : activeCoins[0].color;
+
+      // Update initial wallet data for the first coin and wallet
+      const initialWalletSelector = document.querySelector('.swiper-slide-active .wallet-selector');
+      const initialBalanceElement = document.querySelector('.swiper-slide-active .balance');
+      
+      if (initialWalletSelector && initialBalanceElement) {
+        initialWalletSelector.selectedIndex = 0; // Select the first wallet initially
+        initialBalanceElement.textContent = 'Loading...'; // Clear initial balance display
+        updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement);
       }
-    }
-  });
-
-  // Set initial background color
-  document.body.style.backgroundColor = selectedCoin ? selectedCoin.color : activeCoins[0].color;
-
-  // Update initial wallet data for the first coin and wallet
-  const initialWalletSelector = document.querySelector('.swiper-slide-active .wallet-selector');
-  const initialBalanceElement = document.querySelector('.swiper-slide-active .balance');
-  
-  if (initialWalletSelector && initialBalanceElement) {
-    initialWalletSelector.selectedIndex = 0; // Select the first wallet initially
-    initialBalanceElement.textContent = 'Loading...'; // Clear initial balance display
-    updateWalletData(activeCoins[0].ticker, initialWalletSelector.value, initialBalanceElement);
-  }
+    })
+    .catch(error => {
+      console.error('Error fetching prices:', error);
+    });
 }
 
 function updateWalletData(ticker, walletLabel, balanceElement) {

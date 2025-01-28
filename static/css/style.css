@@ -508,7 +508,7 @@ input[type="number"]::-webkit-inner-spin-button {
   height: 300px;
   border-radius: 20px;
   margin: 10px auto;
-  max-height: 250px;
+  max-height: 220px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1117,4 +1117,34 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-top: calc(var(--original-margin-top) * 0.25);
     margin-bottom: calc(var(--original-margin-bottom) * 0.25);
   }
+}
+
+.balance-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  margin: 10px 0; /* Add some margin for spacing */
+}
+
+.balance {
+  font-size: 1em; /* Adjust as needed */
+  text-align: center;
+}
+
+.price-display {
+  font-size: 0.5em; /* Half the size of the balance text */
+  text-align: center;
+  margin-top: 5px; /* Add some space between balance and price */
+}
+
+.usd-amount-container {
+    display: flex;
+    align-items: center;
+}
+
+.usd-label {
+    margin-right: 5px;
+    font-size: 1em;
+    color: white; /* Adjust color as needed */
 }

@@ -34,6 +34,9 @@ MECACEX_API_URL = "https://mecacex.com/api/v2/trade/coinmarketcap/ticker"
 # Global cache for storing prices
 cached_prices = {}
 
+# Global variable to track if the data collection process is running
+is_fetching_prices = False
+
 def requests_retry_session(
     retries=3,
     backoff_factor=0.3,
@@ -55,53 +58,71 @@ def requests_retry_session(
     return session
 
 def fetch_prices():
-    global cached_prices
-    prices = {}
-    mecacex_data = fetch_mecacex_data()
-    if not mecacex_data:
-        print("Mecacex data is empty. Skipping price fetching.")
-        cached_prices = prices
+    global cached_prices, is_fetching_prices
+
+    # Check if prices are already cached
+    if cached_prices:
+        print("Prices are already cached.")
         return
 
-    print("Fetched Mecacex data successfully.")
+    # Check if the data collection process is already running
+    if is_fetching_prices:
+        print("Price fetching process is already running.")
+        return
 
-    for coin in coins:
-        tickers = [ticker.strip().upper() for ticker in coin['ticker'].split(',')]
-        print(f"\nProcessing coin: {coin['name']} with tickers: {tickers}")
+    # Set the flag to indicate the process is running
+    is_fetching_prices = True
 
-        price_nonkyc = get_price_from_sources(tickers, get_price_from_nonkyc)
-        price_xeggex = get_price_from_sources(tickers, get_price_from_xeggex)
-        price_mecacex = get_price_from_mecacex(tickers, mecacex_data)
+    try:
+        prices = {}
+        mecacex_data = fetch_mecacex_data()
+        if not mecacex_data:
+            print("Mecacex data is empty. Skipping price fetching.")
+            cached_prices = prices
+            return
 
-        # Round prices to 8 decimal places using Decimal
-        price_nonkyc_rounded = round_decimal(price_nonkyc, 10)
-        price_xeggex_rounded = round_decimal(price_xeggex, 10)
-        price_mecacex_rounded = round_decimal(price_mecacex, 10)
+        print("Fetched Mecacex data successfully.")
 
-        # Calculate the aggregated price
-        price_list = [price for price in [price_nonkyc_rounded, price_xeggex_rounded, price_mecacex_rounded] if price is not None]
+        for coin in coins:
+            tickers = [ticker.strip().upper() for ticker in coin['ticker'].split(',')]
+            print(f"\nProcessing coin: {coin['name']} with tickers: {tickers}")
 
-        if price_list:
-            try:
-                aggregated_price = round_decimal(sum(price_list) / Decimal(len(price_list)), 10)
-                print(f"Aggregated price for {coin['name']}: {aggregated_price}")
-            except (InvalidOperation, ZeroDivisionError) as e:
-                print(f"Error calculating aggregated price for {coin['name']}: {e}")
+            price_nonkyc = get_price_from_sources(tickers, get_price_from_nonkyc)
+            price_xeggex = get_price_from_sources(tickers, get_price_from_xeggex)
+            price_mecacex = get_price_from_mecacex(tickers, mecacex_data)
+
+            # Round prices to 8 decimal places using Decimal
+            price_nonkyc_rounded = round_decimal(price_nonkyc, 10)
+            price_xeggex_rounded = round_decimal(price_xeggex, 10)
+            price_mecacex_rounded = round_decimal(price_mecacex, 10)
+
+            # Calculate the aggregated price
+            price_list = [price for price in [price_nonkyc_rounded, price_xeggex_rounded, price_mecacex_rounded] if price is not None]
+
+            if price_list:
+                try:
+                    aggregated_price = round_decimal(sum(price_list) / Decimal(len(price_list)), 10)
+                    print(f"Aggregated price for {coin['name']}: {aggregated_price}")
+                except (InvalidOperation, ZeroDivisionError) as e:
+                    print(f"Error calculating aggregated price for {coin['name']}: {e}")
+                    aggregated_price = None
+            else:
                 aggregated_price = None
-        else:
-            aggregated_price = None
-            print(f"No valid prices available to aggregate for {coin['name']}.")
+                print(f"No valid prices available to aggregate for {coin['name']}.")
 
-        # Return prices as strings to preserve precision
-        prices[coin['name']] = {
-            'nonkyc': f"{price_nonkyc_rounded}" if price_nonkyc_rounded is not None else None,
-            'xeggex': f"{price_xeggex_rounded}" if price_xeggex_rounded is not None else None,
-            'mecacex': f"{price_mecacex_rounded}" if price_mecacex_rounded is not None else None,
-            'aggregated': f"{aggregated_price}" if aggregated_price is not None else None
-        }
+            # Return prices as strings to preserve precision
+            prices[coin['name']] = {
+                'nonkyc': f"{price_nonkyc_rounded}" if price_nonkyc_rounded is not None else None,
+                'xeggex': f"{price_xeggex_rounded}" if price_xeggex_rounded is not None else None,
+                'mecacex': f"{price_mecacex_rounded}" if price_mecacex_rounded is not None else None,
+                'aggregated': f"{aggregated_price}" if aggregated_price is not None else None
+            }
 
-    cached_prices = prices
-    print("\nUpdated cached_prices successfully.")
+        cached_prices = prices
+        print("\nUpdated cached_prices successfully.")
+    finally:
+        # Reset the flag to indicate the process is no longer running
+        is_fetching_prices = False
 
 def round_decimal(value, places):
     if value is None:
