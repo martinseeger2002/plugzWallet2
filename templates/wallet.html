@@ -56,13 +56,20 @@
 </head>
 <body>
   <div class="frame">
-    <div id="landing-page">
-      <!-- Remove the install button -->
-      <!-- <button id="installButton" style="display: none;" class="styled-button">
-        Install App
-      </button> -->
+    <div id="landing-page" data-service-worker="{{ url_for('static', filename='js/service-worker.js') }}">
+      <!-- Add the install prompt container -->
+      <div id="install-prompt" style="display: none; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; text-align: center; margin: 10px;">
+        <p id="install-message"></p>
+      </div>
       <!-- Dynamic content will be inserted here -->
     </div>
+  </div>
+
+  <!-- Add to Home Screen Prompt -->
+  <div id="install-prompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+    background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000;">
+    <p id="install-message"></p>
+    <button onclick="closeInstallPrompt()" style="padding: 8px 15px; margin-top: 10px; border-radius: 5px;">Got it</button>
   </div>
 
   <!-- Scripts -->
@@ -73,26 +80,67 @@
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('/static/sw.js', {
-            scope: '/wallet'
+      window.addEventListener('load', () => {
+        const serviceWorkerUrl = document.getElementById('landing-page').dataset.serviceWorker;
+        navigator.serviceWorker.register(serviceWorkerUrl)
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Service Worker registration failed:', error);
           });
-          console.log('ServiceWorker registration successful with scope:', registration.scope);
-          
-          // Check if the app can be installed
-          if (registration.waiting) {
-            console.log('New service worker waiting');
-          }
-          if (registration.active) {
-            console.log('Service worker active');
-          }
-        } catch (err) {
-          console.error('ServiceWorker registration failed:', err);
-        }
       });
-    } else {
-      console.log('Service workers are not supported');
+    }
+
+    // Add to Home Screen detection and prompt
+    window.addEventListener('load', () => {
+      let deferredPrompt;
+      const installPrompt = document.getElementById('install-prompt');
+      const installMessage = document.getElementById('install-message');
+
+      // Listen for the beforeinstallprompt event
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('beforeinstallprompt event fired');
+        
+        // Show the install prompt
+        installPrompt.style.display = 'block';
+      });
+
+      // Check if the app is in standalone mode
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      
+      if (!isInStandaloneMode) {
+        // Detect iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Detect Android
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS) {
+          installMessage.innerHTML = `
+            To install this app on your iPhone: tap the share button 
+            <img src="/static/images/ios-share.png" style="height: 20px; vertical-align: middle;"> 
+            and then "Add to Home Screen".<br><br>
+            Reminder: Your keys are stored in the browser cache and will not transfer to the app automatically. 
+            Please ensure you back them up manually.
+          `;
+          installPrompt.style.display = 'block';
+        } else if (isAndroid) {
+          installMessage.innerHTML = `
+            To install this app on your Android device: tap the menu button 
+            <img src="/static/images/three-dots.png" style="height: 20px; vertical-align: middle;"> 
+            and select "Add to Home Screen".<br><br>
+            Reminder: Your keys are stored in the browser cache and will not transfer to the app automatically. 
+            Please ensure you back them up manually.
+          `;
+          installPrompt.style.display = 'block';
+        }
+      }
+    });
+
+    function closeInstallPrompt() {
+      document.getElementById('install-prompt').style.display = 'none';
     }
   </script>
 </body>

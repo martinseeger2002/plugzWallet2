@@ -361,4 +361,45 @@ function fetchAndDisplayTransactions(ticker, address, transactionHistoryContaine
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeWallet();
-}); 
+
+  let deferredPrompt;
+  const installPrompt = document.getElementById('install-prompt');
+  const installMessage = document.getElementById('install-message');
+
+  // Listen for the beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('beforeinstallprompt event fired');
+
+    // Show the install prompt
+    installPrompt.style.display = 'block';
+  });
+
+  // Check if the app is in standalone mode
+  const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  
+  if (!isInStandaloneMode) {
+    console.log('App is not in standalone mode');
+    // Detect iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Detect Android
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      console.log('iOS device detected');
+      installMessage.innerHTML = 'To install this app on your iPhone: tap the share button <img src="/static/images/ios-share.png" style="height: 20px; vertical-align: middle;"> and then "Add to Home Screen"';
+      installPrompt.style.display = 'block';
+    } else if (isAndroid) {
+      console.log('Android device detected');
+      installMessage.innerHTML = 'To install this app on your Android device: tap the menu button <img src="/static/images/three-dots.png" style="height: 20px; vertical-align: middle;"> and select "Add to Home Screen"';
+      installPrompt.style.display = 'block';
+    }
+  } else {
+    console.log('App is in standalone mode');
+  }
+});
+
+function closeInstallPrompt() {
+  document.getElementById('install-prompt').style.display = 'none';
+} 
