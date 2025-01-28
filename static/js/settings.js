@@ -28,9 +28,6 @@ export function settingsUI(selectedCoin) {
     title.className = 'page-title';
     landingPage.appendChild(title);
 
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-
     const form = document.createElement('form');
     form.className = 'wallet-form';
 
@@ -59,6 +56,47 @@ export function settingsUI(selectedCoin) {
         form.appendChild(label);
     });
 
+    // Create a dropdown for price view settings
+    const priceViewLabel = document.createElement('label');
+    priceViewLabel.textContent = 'Price View:';
+    priceViewLabel.className = 'dropdown-label';
+
+    const priceViewSelect = document.createElement('select');
+    priceViewSelect.className = 'dropdown-select';
+
+    const options = [
+        { value: 'usd', text: 'USD' },
+        { value: 'pounds_of_wildrice', text: 'Pounds of Wildrice' },
+        { value: 'none', text: 'None' }
+    ];
+
+    options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.textContent = option.text;
+        priceViewSelect.appendChild(opt);
+    });
+
+    // Set default value to Pounds of Wildrice
+    priceViewSelect.value = 'pounds_of_wildrice';
+
+    // Append the dropdown to the form
+    priceViewLabel.appendChild(priceViewSelect);
+    form.appendChild(priceViewLabel);
+
+    // Add a text box for the price of wildrice
+    const wildricePriceLabel = document.createElement('label');
+    wildricePriceLabel.textContent = 'Wildrice (USD):';
+    wildricePriceLabel.className = 'text-label';
+
+    const wildricePriceInput = document.createElement('input');
+    wildricePriceInput.type = 'text';
+    wildricePriceInput.className = 'text-input';
+    wildricePriceInput.value = '25.00'; // Default value
+
+    wildricePriceLabel.appendChild(wildricePriceInput);
+    form.appendChild(wildricePriceLabel);
+
     // Save Settings button
     const saveButton = document.createElement('button');
     saveButton.className = 'styled-button';
@@ -72,6 +110,12 @@ export function settingsUI(selectedCoin) {
             newSettings[coins[index].ticker] = checkbox.checked;
         });
 
+        // Save the selected price view
+        newSettings['priceView'] = priceViewSelect.value;
+
+        // Save the price of wildrice
+        newSettings['wildricePrice'] = wildricePriceInput.value;
+
         localStorage.setItem('coinSettings', JSON.stringify(newSettings));
         console.log('Settings saved:', newSettings);
         
@@ -82,6 +126,5 @@ export function settingsUI(selectedCoin) {
     });
 
     form.appendChild(saveButton);
-    mainContent.appendChild(form);
-    landingPage.appendChild(mainContent);
+    landingPage.appendChild(form);
 } 
