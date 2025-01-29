@@ -1148,3 +1148,71 @@ input[type="number"]::-webkit-inner-spin-button {
     font-size: 1em;
     color: white; /* Adjust color as needed */
 }
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #2b2c35, #121212);
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    text-align: center;
+    color: white;
+}
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.wallet-button, .github-button {
+    background-color: black;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    margin: 10px; /* Add margin for spacing */
+}
+
+.wallet-button:hover, .github-button:hover {
+    background-color: #1a1a1a;
+    transform: scale(1.05);
+}
+
+.wallet-button:active, .github-button:active {
+    transform: scale(0.98);
+}
+
+.explorer-button {
+    background-color: black;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    margin: 10px; /* Add margin for spacing */
+}
+
+.explorer-button:hover {
+    background-color: #1a1a1a;
+    transform: scale(1.05);
+}
+
+.explorer-button:active {
+    transform: scale(0.98);
+}

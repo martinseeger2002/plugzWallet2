@@ -379,6 +379,25 @@ function updateWalletData(ticker, walletLabel, balanceElement) {
                             fetchAndDisplayTransactions(ticker, selectedWallet.address, transactionHistory);
                         }
                     }
+
+                    // Refresh price display
+                    const priceDisplay = slide.querySelector('.price-display');
+                    if (priceDisplay) {
+                        const coinPrice = pricesData[ticker]?.aggregated;
+                        if (coinPrice) {
+                            const usdValue = totalBalance * parseFloat(coinPrice);
+                            let displayValue;
+                            if (priceView === 'usd') {
+                                displayValue = `USD: $${usdValue.toFixed(2)}`;
+                            } else if (priceView === 'pounds_of_wildrice') {
+                                const wildriceValue = usdValue / wildricePrice;
+                                displayValue = `Wildrice: ${wildriceValue.toFixed(2)} lbs`;
+                            }
+                            priceDisplay.textContent = displayValue;
+                        } else {
+                            priceDisplay.textContent = 'Price not available';
+                        }
+                    }
                 }, 500);
             } else {
                 console.error('Failed to fetch unspent transactions:', data.message);

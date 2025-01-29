@@ -21,3 +21,11 @@ def manifest():
 @main_bp.route('/service-worker.js')
 def service_worker():
     return send_from_directory('static/js', 'service-worker.js')
+
+@main_bp.route('/block_explorers')
+def block_explorers():
+    return render_template('block_explorers.html')
+
+@main_bp.route('/ord_explorers')
+def ord_explorers():
+    return render_template('ord_explorers.html')

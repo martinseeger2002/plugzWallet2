@@ -37,6 +37,9 @@ cached_prices = {}
 # Global variable to track if the data collection process is running
 is_fetching_prices = False
 
+# Global variable to track the last time prices were updated
+lastTimeUpdated = None
+
 def requests_retry_session(
     retries=3,
     backoff_factor=0.3,
@@ -58,12 +61,7 @@ def requests_retry_session(
     return session
 
 def fetch_prices():
-    global cached_prices, is_fetching_prices
-
-    # Check if prices are already cached
-    if cached_prices:
-        print("Prices are already cached.")
-        return
+    global cached_prices, is_fetching_prices, lastTimeUpdated
 
     # Check if the data collection process is already running
     if is_fetching_prices:
@@ -119,6 +117,7 @@ def fetch_prices():
             }
 
         cached_prices = prices
+        lastTimeUpdated = time.time()  # Update the last time prices were fetched
         print("\nUpdated cached_prices successfully.")
     finally:
         # Reset the flag to indicate the process is no longer running
@@ -237,18 +236,17 @@ def get_price_from_mecacex(tickers, mecacex_data):
     print(f"No valid Mecacex price found for tickers: {tickers}")
     return None
 
-def refresh_prices_periodically():
-    while True:
-        print("\nFetching prices...")
-        fetch_prices()
-        print("Prices fetched and cached. Sleeping for 15 minutes.")
-        time.sleep(900)  # Sleep for 15 minutes
-
-# Start the background thread to refresh prices
-threading.Thread(target=refresh_prices_periodically, daemon=True).start()
-
 @prices_bp.route('/prices', methods=['GET'])
 def get_prices_route():
+    global lastTimeUpdated
+
+    # Check if prices need to be updated
+    if lastTimeUpdated is None or (time.time() - lastTimeUpdated) > 900:  # 900 seconds = 15 minutes
+        print("Prices are outdated or not fetched yet. Fetching new prices.")
+        fetch_prices()
+    else:
+        print("Prices are up-to-date.")
+
     return jsonify(cached_prices)
 
 class TestPriceFetching(unittest.TestCase):
