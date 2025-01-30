@@ -23,7 +23,8 @@ coins = [
     { "name": "SHIC", "ticker": "SHIC", "color": "#F93E3E", "plugzfee": "2000000000", "plugzfee_address": "SaivTHkECMw583DVqVaJS89jUahMa93sRQ" },
     { "name": "BONC", "ticker": "BONC", "color": "#FFB347", "plugzfee": "2000000000", "plugzfee_address": "BJ5mDERYAmEtBhQuJxmvfjYqy2DCg1TzqV" },
     { "name": "FLOP", "ticker": "FLOP", "color": "#6C6CFF", "plugzfee": "4000000000", "plugzfee_address": "FDdDMBfxGG1mXTtpPfsShrYEHauZgb8yVo", "networkfee": 100000000 },
-    { "name": "DGB", "ticker": "DGB, DIGI", "color": "#3A80E0", "plugzfee": "70000000", "plugzfee_address": "DQe94HDmbjFrDfVGB11CCmvXsF1mY6a4pT" }
+    { "name": "DGB", "ticker": "DGB, DIGI", "color": "#3A80E0", "plugzfee": "70000000", "plugzfee_address": "DQe94HDmbjFrDfVGB11CCmvXsF1mY6a4pT" },
+    { "name": "DEV", "ticker": "DEV", "color": "#", "plugzfee": "", "plugzfee_address": "" }
 ]
 
 # Define the API endpoints for NonKYC, Xeggex, and Mecacex
@@ -72,12 +73,11 @@ def fetch_prices():
     is_fetching_prices = True
 
     try:
-        prices = {}
+        new_prices = {}
         mecacex_data = fetch_mecacex_data()
         if not mecacex_data:
             print("Mecacex data is empty. Skipping price fetching.")
-            cached_prices = prices
-            return
+            return  # Do not update cached_prices if fetching fails
 
         print("Fetched Mecacex data successfully.")
 
@@ -109,14 +109,15 @@ def fetch_prices():
                 print(f"No valid prices available to aggregate for {coin['name']}.")
 
             # Return prices as strings to preserve precision
-            prices[coin['name']] = {
+            new_prices[coin['name']] = {
                 'nonkyc': f"{price_nonkyc_rounded}" if price_nonkyc_rounded is not None else None,
                 'xeggex': f"{price_xeggex_rounded}" if price_xeggex_rounded is not None else None,
                 'mecacex': f"{price_mecacex_rounded}" if price_mecacex_rounded is not None else None,
                 'aggregated': f"{aggregated_price}" if aggregated_price is not None else None
             }
 
-        cached_prices = prices
+        # Update cached_prices only after all new prices are fetched
+        cached_prices = new_prices
         lastTimeUpdated = time.time()  # Update the last time prices were fetched
         print("\nUpdated cached_prices successfully.")
     finally:
@@ -241,7 +242,7 @@ def get_prices_route():
     global lastTimeUpdated
 
     # Check if prices need to be updated
-    if lastTimeUpdated is None or (time.time() - lastTimeUpdated) > 900:  # 900 seconds = 15 minutes
+    if lastTimeUpdated is None or (time.time() - lastTimeUpdated) > 7200:  # 900 seconds = 15 minutes
         print("Prices are outdated or not fetched yet. Fetching new prices.")
         fetch_prices()
     else:

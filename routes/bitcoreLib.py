@@ -178,6 +178,9 @@ def mint(ticker):
     elif ticker.lower() in ('digi', 'dgb'):
         command_dir = './bitcore-libs/dgb'
         script = 'getOrdTxsDigi.js'
+    elif ticker.lower() in ('dev', 'bonc'):
+        command_dir = './bitcore-libs/dev'
+        script = 'getOrdTxsDev.js'
     else:
         return jsonify({
             "status": "error",

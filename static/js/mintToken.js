@@ -25,7 +25,8 @@ export function mintTokenUI(selectedWallet) {
         'pep': 'prc-20',
         'shic': 'shc-20',
         'bonc': 'bnk-20',
-        'dgb': 'dgb-20'
+        'dgb': 'dgb-20',
+        'dev': 'dev-20'
     };
     
     const ticker = selectedWallet.ticker.toLowerCase();
