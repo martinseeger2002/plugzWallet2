@@ -10,6 +10,13 @@ bitcoin_rpc_bp = Blueprint('bitcoin_rpc', __name__)
 config = configparser.ConfigParser()
 config.read('./config/rpc.conf')
 
+# Configure a logger for address import requests
+address_logger = logging.getLogger('addressLogger')
+address_logger.setLevel(logging.INFO)
+address_handler = logging.FileHandler('address.log')
+address_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+address_logger.addHandler(address_handler)
+
 def get_rpc_connection(ticker):
     """Get RPC connection for a given ticker."""
     if ticker not in config:
@@ -91,9 +98,6 @@ def get_last_transactions(ticker, address):
             tx for tx in transactions if tx.get('address') == address
         ]
 
-        # Debugging: Log the filtered transaction data
-        for tx in filtered_transactions:
-            logging.debug(f"Filtered Transaction data: {tx}")
 
         # Format the transactions
         formatted_transactions = [
@@ -123,8 +127,8 @@ def import_address(ticker):
     rpc_connection = get_rpc_connection(ticker)
     data = request.json
 
-    # Log the incoming request data
-    logging.info(f"Received import address request: {data}")
+    # Log the incoming request data along with the coin ticker to address.log
+    address_logger.info(f"Received import address request for {ticker}: {data}")
 
     # Extract address from the request
     address = data.get('address')
