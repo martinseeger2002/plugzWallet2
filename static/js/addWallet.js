@@ -51,6 +51,7 @@ export function addWalletUI(selectedCoin) {
     addressInput.placeholder = 'Address';
     addressInput.className = 'styled-input styled-text';
     addressInput.autocomplete = 'off';
+    addressInput.disabled = true; // Initially disabled
     form.appendChild(addressInput);
 
     const privkeyInput = document.createElement('input');
@@ -58,6 +59,7 @@ export function addWalletUI(selectedCoin) {
     privkeyInput.placeholder = 'WIF Private key';
     privkeyInput.className = 'styled-input styled-text';
     privkeyInput.autocomplete = 'off';
+    privkeyInput.disabled = true; // Initially disabled
     form.appendChild(privkeyInput);
 
     const infoText = document.createElement('p');
@@ -75,6 +77,17 @@ export function addWalletUI(selectedCoin) {
     addWalletButton.textContent = 'Add Wallet';
     addWalletButton.disabled = true;
     form.appendChild(addWalletButton);
+
+    // Move the checkbox and label here, below the Add Wallet button
+    const importKeysCheckbox = document.createElement('input');
+    importKeysCheckbox.type = 'checkbox';
+    importKeysCheckbox.id = 'import-keys-checkbox';
+    form.appendChild(importKeysCheckbox);
+
+    const importKeysLabel = document.createElement('label');
+    importKeysLabel.htmlFor = 'import-keys-checkbox';
+    importKeysLabel.textContent = 'Import Keys';
+    form.appendChild(importKeysLabel);
 
     landingPage.appendChild(form);
 
@@ -97,6 +110,13 @@ export function addWalletUI(selectedCoin) {
     walletLabelInput.addEventListener('input', checkFields);
     addressInput.addEventListener('input', checkFields);
     privkeyInput.addEventListener('input', checkFields);
+
+    // Add event listener to the checkbox to toggle input fields
+    importKeysCheckbox.addEventListener('change', () => {
+        const isChecked = importKeysCheckbox.checked;
+        addressInput.disabled = !isChecked;
+        privkeyInput.disabled = !isChecked;
+    });
 
     // Add event listeners to handle button clicks
     addWalletButton.addEventListener('click', (event) => {

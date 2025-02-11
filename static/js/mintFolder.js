@@ -86,7 +86,7 @@ export function mintFolderUI(selectedWallet) {
     folderInput.addEventListener('change', (event) => {
         const files = Array.from(event.target.files);
         const fileDataArray = files
-            .filter(file => file.size <= 65 * 1024)
+            .filter(file => file.size <= 65 * 1024 && !file.webkitRelativePath.includes('/'))
             .map(file => ({
                 name: file.name.split('.').slice(0, -1).join('.'),
                 file_path: file.webkitRelativePath,
@@ -94,9 +94,22 @@ export function mintFolderUI(selectedWallet) {
                 mime_type: file.type || 'application/octet-stream'
             }))
             .sort((a, b) => {
-                const numA = parseInt(a.name.match(/\d+/) || 0);
-                const numB = parseInt(b.name.match(/\d+/) || 0);
-                return numA - numB;
+                const numA = a.name.match(/\d+/);
+                const numB = b.name.match(/\d+/);
+
+                if (numA && numB) {
+                    // Both names contain numbers, sort numerically
+                    return parseInt(numA[0], 10) - parseInt(numB[0], 10);
+                } else if (numA) {
+                    // Only 'a' contains a number, it should come first
+                    return -1;
+                } else if (numB) {
+                    // Only 'b' contains a number, it should come first
+                    return 1;
+                } else {
+                    // Neither name contains a number, sort alphabetically
+                    return a.name.localeCompare(b.name);
+                }
             });
 
         if (fileDataArray.length > 0) {
@@ -105,14 +118,14 @@ export function mintFolderUI(selectedWallet) {
             nextButton.disabled = false;
 
             // Alert for any skipped files
-            const skippedFiles = files.filter(file => file.size > 65 * 1024);
+            const skippedFiles = files.filter(file => file.size > 65 * 1024 || file.webkitRelativePath.includes('/'));
             if (skippedFiles.length > 0) {
-                alert(`Skipped ${skippedFiles.length} files larger than 65KB:\n${skippedFiles.map(f => f.name).join('\n')}`);
+                alert(`Skipped ${skippedFiles.length} files larger than 65KB or in subfolders:\n${skippedFiles.map(f => f.name).join('\n')}`);
             }
         } else {
             folderDisplay.textContent = '';
             nextButton.disabled = true;
-            alert('No valid files found in folder (all files must be under 65KB)');
+            alert('No valid files found in folder (all files must be under 65KB and not in subfolders)');
         }
     });
 

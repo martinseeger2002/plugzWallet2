@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const dogecore = require('./bitcore-lib-dev');
+const dogecore = require('./bitcore-lib-pepe');
 const { PrivateKey, Address } = dogecore;
 
 // Generate a new private key
