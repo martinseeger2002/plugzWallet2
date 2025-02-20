@@ -91,11 +91,28 @@ def list_collections():
                     ('minted', minted),
                     ('left_to_mint', left_to_mint),
                     ('percent_minted', percent_minted),
+                    # Add block height information
+                    ('block_height', row['created_at']),  # Assuming 'created_at' now stores block height
                 ])
 
                 # Add serial ranges
                 for i, (range_value,) in enumerate(ranges):
                     ordered_collection_data[f'sn_index_{i}'] = range_value
+
+                # Fetch items with sequence numbers
+                cursor.execute("SELECT sn, inscription_id, inscription_status, inscription_address, sequence_number FROM items WHERE collection_id = ? ORDER BY sequence_number", 
+                             (collection_id,))
+                items = cursor.fetchall()
+                ordered_collection_data['items'] = [
+                    {
+                        'sn': item['sn'],
+                        'inscription_id': item['inscription_id'],
+                        'inscription_status': item['inscription_status'],
+                        'inscription_address': item['inscription_address'],
+                        'sequence_number': item['sequence_number']
+                    }
+                    for item in items
+                ]
 
                 collections[sanitized_name] = ordered_collection_data
 

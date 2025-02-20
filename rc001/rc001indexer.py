@@ -81,6 +81,7 @@ class BlockchainScanner:
                         inscription_status TEXT,
                         inscription_address TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        sequence_number INTEGER,
                         UNIQUE(collection_id, sn),
                         FOREIGN KEY (collection_id) REFERENCES collections(collection_id)
                         )''')
@@ -279,7 +280,7 @@ class BlockchainScanner:
             logger.error(f"Error extracting inscription data: {e}")
             return None, None
 
-    def process_transaction(self, coin_ticker: str, tx: Dict[str, Any], rpc_connection: AuthServiceProxy) -> None:
+    def process_transaction(self, coin_ticker: str, tx: Dict[str, Any], rpc_connection: AuthServiceProxy, block: Dict[str, Any]) -> None:
         """Process a single transaction"""
         try:
             if not tx.get('vin') or not tx['vin'][0].get('scriptSig', {}).get('asm'):
@@ -304,7 +305,7 @@ class BlockchainScanner:
             if operation == 'deploy':
                 self.handle_deploy_operation(coin_ticker, soup, tx['txid'], tx)
             elif operation == 'mint':
-                self.handle_mint_operation(coin_ticker, soup, tx['txid'], tx)
+                self.handle_mint_operation(coin_ticker, soup, tx['txid'], tx, block)
         except Exception as e:
             logger.error(f"Error processing transaction {tx['txid']} on coin {coin_ticker}: {e}")
 
@@ -351,7 +352,7 @@ class BlockchainScanner:
         except Exception as e:
             logger.error(f"Error handling deploy operation on coin {coin_ticker} with txid {txid}: {e}")
 
-    def handle_mint_operation(self, coin_ticker: str, soup: BeautifulSoup, txid: str, tx: Dict[str, Any]) -> None:
+    def handle_mint_operation(self, coin_ticker: str, soup: BeautifulSoup, txid: str, tx: Dict[str, Any], block: Dict[str, Any]) -> None:
         """Handle mint operation"""
         try:
             title = soup.find('title').string if soup.find('title') else 'Untitled'
@@ -386,6 +387,13 @@ class BlockchainScanner:
                 if not valid_payment:
                     logger.warning(f"Invalid payment for mint: {mint_price_btc} to {mint_address} on {coin_ticker}")
                     return
+
+            # Retrieve the block height from the block data
+            block_height = block.get('height', None)
+            if block_height is None:
+                logger.error(f"Block height not found for transaction {txid} on coin {coin_ticker}")
+                return
+
             with self.get_db_connection() as conn:
                 c = conn.cursor()
                 c.execute('SELECT item_id FROM items WHERE collection_id = ? AND sn = ?', (collection_id, sn))
@@ -396,10 +404,15 @@ class BlockchainScanner:
                 inscription_address = None
                 if tx['vout'] and tx['vout'][0].get('scriptPubKey', {}).get('addresses'):
                     inscription_address = tx['vout'][0]['scriptPubKey']['addresses'][0]
+
+                # Calculate the next sequence number
+                c.execute('SELECT COUNT(*) FROM items WHERE collection_id = ?', (collection_id,))
+                sequence_number = c.fetchone()[0] + 1
+
                 c.execute('''INSERT INTO items (
-                            collection_id, inscription_id, sn, inscription_status, inscription_address
-                            ) VALUES (?, ?, ?, ?, ?)''',
-                         (collection_id, inscription_id, sn, 'minted', inscription_address))
+                            collection_id, inscription_id, sn, inscription_status, inscription_address, created_at, sequence_number
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                         (collection_id, inscription_id, sn, 'minted', inscription_address, block_height, sequence_number))
                 conn.commit()
             logger.info(f"Minted item with SN {sn} for collection {sanitized_title} on coin {coin_ticker} with txid {txid}")
         except Exception as e:
@@ -428,7 +441,7 @@ class BlockchainScanner:
                                 block_hash = rpc.getblockhash(block_height)
                                 block = rpc.getblock(block_hash, 2)
                                 for tx in block['tx']:
-                                    self.process_transaction(coin_ticker, tx, rpc)
+                                    self.process_transaction(coin_ticker, tx, rpc, block)
                                 block_heights[coin_ticker]["last_block_height"] = block_height
                                 self.update_last_block_heights(block_heights)
                             except Exception as e:

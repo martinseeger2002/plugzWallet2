@@ -23,3 +23,66 @@ Found 28 items for DOGE/PNUTDoge
 Request for coin_ticker=DOGE, collection_name=WheresBoris, sanitized_name=WheresBoris
 Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
 Found 182 items for DOGE/WheresBoris
+Request for coin_ticker=DOGE, collection_name=RC001v3, sanitized_name=RC001v3
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 121 items for DOGE/RC001v3
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 17 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 17 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 17 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 26 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 41 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=BigChiefEnergyToken, sanitized_name=BigChiefEnergyToken
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 6 items for DOGE/BigChiefEnergyToken
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 42 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 42 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 6 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'RC001v2')]
+Found 17 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 45 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 47 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=BigChiefEnergyToken, sanitized_name=BigChiefEnergyToken
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2')]
+Found 7 items for DOGE/BigChiefEnergyToken
+Request for coin_ticker=DOGE, collection_name=BigChiefEnergyToken, sanitized_name=BigChiefEnergyToken
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3')]
+Found 21 items for DOGE/BigChiefEnergyToken
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3')]
+Found 193 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3')]
+Found 193 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3')]
+Found 193 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=BC-Plugz, sanitized_name=BC-Plugz
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 28 items for DOGE/BC-Plugz
+Request for coin_ticker=DOGE, collection_name=WheresBoris, sanitized_name=WheresBoris
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 51 items for DOGE/WheresBoris
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 216 items for DOGE/RC001v2
