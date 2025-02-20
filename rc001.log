@@ -1,0 +1,25 @@
+Database error in list_collections: unable to open database file
+Request for coin_ticker=DOGE, collection_name=BC-Plugz, sanitized_name=BC-Plugz
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 33 items for DOGE/BC-Plugz
+Request for coin_ticker=DOGE, collection_name=WheresBoris, sanitized_name=WheresBoris
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 182 items for DOGE/WheresBoris
+Request for coin_ticker=DOGE, collection_name=RC001v2, sanitized_name=RC001v2
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 216 items for DOGE/RC001v2
+Request for coin_ticker=DOGE, collection_name=PixelBosu, sanitized_name=PixelBosu
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 386 items for DOGE/PixelBosu
+Request for coin_ticker=DOGE, collection_name=PixelBosu, sanitized_name=PixelBosu
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 386 items for DOGE/PixelBosu
+Request for coin_ticker=DOGE, collection_name=BigChiefEnergyToken, sanitized_name=BigChiefEnergyToken
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 37 items for DOGE/BigChiefEnergyToken
+Request for coin_ticker=DOGE, collection_name=PNUTDoge, sanitized_name=PNUTDoge
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 28 items for DOGE/PNUTDoge
+Request for coin_ticker=DOGE, collection_name=WheresBoris, sanitized_name=WheresBoris
+Available collections: [('DOGE', 'BC-Plugz'), ('DOGE', 'BigChiefEnergyToken'), ('DOGE', 'PNUTDoge'), ('DOGE', 'PixelBosu'), ('DOGE', 'RC001v2'), ('DOGE', 'RC001v3'), ('DOGE', 'WheresBoris')]
+Found 182 items for DOGE/WheresBoris

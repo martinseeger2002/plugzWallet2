@@ -29,3 +29,11 @@ def block_explorers():
 @main_bp.route('/ord_explorers')
 def ord_explorers():
     return render_template('ord_explorers.html')
+
+@main_bp.route('/faucets')
+def faucets():
+    return render_template('faucets.html')
+
+@main_bp.route('/rc001')
+def rc001():
+    return render_template('rc001.html')
