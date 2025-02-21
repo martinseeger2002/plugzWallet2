@@ -6,6 +6,7 @@ import { mintTokenUI } from './mintToken.js';
 import { mintImageUI } from './mintImage.js';
 import { mintTextUI } from './mintText.js';
 import { mintFolderUI } from './mintFolder.js';
+import { mintPadUI } from './mintpad.js';
 
 export function mintUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
@@ -50,15 +51,13 @@ export function mintUI(selectedWallet) {
 
     // Create mint buttons
     const mintButtons = [
+        { text: 'Mint Pad', handler: () => mintPadUI(selectedWallet) },
         { text: 'Token', handler: () => mintTokenUI(selectedWallet) },
         { text: 'Image', handler: () => mintImageUI(selectedWallet) },
         { text: 'File', handler: () => mintFileUI(selectedWallet) },
         { text: 'Text', handler: () => mintTextUI(selectedWallet) },
-        { text: 'Folder', handler: () => mintFolderUI(selectedWallet) },
-        { text: 'Inscribe', handler: () => inscribeUI(selectedWallet) }
+        { text: 'Inscriber', handler: () => inscribeUI(selectedWallet) }
     ];
-
-
 
     mintButtons.forEach(btn => {
         const button = document.createElement('button');
@@ -72,5 +71,4 @@ export function mintUI(selectedWallet) {
     });
 
     landingPage.appendChild(buttonContainer);
-
 } 

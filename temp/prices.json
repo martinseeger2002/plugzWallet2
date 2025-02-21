@@ -1,58 +1,58 @@
 {
     "DOGE": {
-        "nonkyc": "0.253385050000",
+        "nonkyc": "0.254313725000",
         "xeggex": null,
-        "mecacex": "0.25242",
+        "mecacex": "0.25218",
         "exbitron": "0.22721",
-        "bitcointry": "0.25192",
-        "aggregated": "0.2462337625"
+        "bitcointry": "0.25320",
+        "aggregated": "0.2467259312"
     },
     "PEP": {
         "nonkyc": "0.000413",
         "xeggex": null,
-        "mecacex": "0.00038",
+        "mecacex": "0.000331",
         "exbitron": null,
         "bitcointry": null,
-        "aggregated": "0.0003965000"
+        "aggregated": "0.0003720000"
     },
     "SHIC": {
-        "nonkyc": "0.000007478000",
+        "nonkyc": "0.000008120000",
         "xeggex": null,
-        "mecacex": "0.0000089",
+        "mecacex": "0.00000736",
         "exbitron": "0.0000088998",
         "bitcointry": null,
-        "aggregated": "0.0000084259"
+        "aggregated": "0.0000081266"
     },
     "BONC": {
-        "nonkyc": "0.000005997307",
+        "nonkyc": "0.000007000100",
         "xeggex": null,
         "mecacex": null,
-        "exbitron": "0.00000302",
+        "exbitron": "0.00002955",
         "bitcointry": null,
-        "aggregated": "0.0000045087"
+        "aggregated": "0.0000182750"
     },
     "FLOP": {
         "nonkyc": null,
         "xeggex": null,
         "mecacex": "5.09E-7",
         "exbitron": "4.54E-7",
-        "bitcointry": "6.063E-7",
-        "aggregated": "5.231E-7"
+        "bitcointry": "6.288E-7",
+        "aggregated": "5.306E-7"
     },
     "DGB": {
-        "nonkyc": "0.008269000000",
+        "nonkyc": "0.008211000000",
         "xeggex": null,
         "mecacex": null,
         "exbitron": "0.007129",
-        "bitcointry": "0.00827",
-        "aggregated": "0.0078893333"
+        "bitcointry": "0.00823",
+        "aggregated": "0.0078566667"
     },
     "DEV": {
         "nonkyc": null,
         "xeggex": null,
-        "mecacex": "5.7E-7",
-        "exbitron": "6.9E-7",
+        "mecacex": "6.226E-7",
+        "exbitron": "6.1E-7",
         "bitcointry": null,
-        "aggregated": "6.300E-7"
+        "aggregated": "6.163E-7"
     }
 }

@@ -131,7 +131,6 @@ class BlockchainScanner:
                 "SHIC": {"start_block_height": 0, "last_block_height": 0},
                 "DEV": {"start_block_height": 0, "last_block_height": 0},
                 "BONC": {"start_block_height": 0, "last_block_height": 0},
-                "FLOP": {"start_block_height": 0, "last_block_height": 0},
                 "DGB": {"start_block_height": 5455286, "last_block_height": 5455285}
             }
 

@@ -8,6 +8,8 @@ from flask import Blueprint, jsonify, make_response, request
 from collections import OrderedDict
 import logging
 from logging.handlers import RotatingFileHandler
+import subprocess
+import json
 
 # Configure logging
 logging.basicConfig(
@@ -191,7 +193,7 @@ def generate_html(coin_ticker, collection_name):
             # Construct HTML content
             html_content = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="p" content="rc001"><meta name="op" content="mint"><meta name="sn" content="{sn}"><title>{collection_name}</title></head><body><script src="/content/{collection['parent_inscription_id']}"></script></body></html>"""
             response = make_response(html_content)
-            response.headers['Content-Type'] = 'text/html'
+            response.headers['Content-Type'] = 'text/html;charset=utf-8'
             return response
 
     except sqlite3.Error as e:
@@ -394,4 +396,144 @@ def generate_hex(coin_ticker, collection_name):
         return jsonify({
             "status": "error",
             "message": str(e)
+        }), 500
+    
+@rc001_bp.route('/mint_rc001/<ticker>', methods=['POST'])
+def mint_rc001(ticker):
+    data = request.json
+
+    # Extract parameters
+    receiving_address = data.get('receiving_address')
+    meme_type = data.get('meme_type')
+    hex_data = data.get('hex_data')
+    sending_address = data.get('sending_address')
+    privkey = data.get('privkey')
+    utxo = data.get('utxo')
+    vout = data.get('vout')
+    script_hex = data.get('script_hex')
+    utxo_amount = data.get('utxo_amount')  # Ensure this is a string
+    mint_address = data.get('mint_address')  # Optional parameter
+    mint_price_satoshis = data.get('mint_price')  # Already in satoshis
+
+    # Log the extracted parameters for debugging
+    print(f"Received mint request with parameters: {data}")
+
+    # Convert 'vout' and 'utxo_amount' to strings for the command
+    vout_str = str(vout)
+    
+    try:
+        # Convert utxo_amount to a float, then to satoshis
+        utxo_amount_float = float(utxo_amount)
+        utxo_amount_satoshis = int(utxo_amount_float * 100000000)
+        
+        # Log mint price in satoshis
+        print(f"Mint Address: {mint_address}, Mint Price (satoshis): {mint_price_satoshis}")
+    except ValueError as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Invalid amount: {utxo_amount}. Error: {str(e)}"
+        }), 400
+
+    # Determine the command directory and script based on the ticker
+    if ticker.lower() == 'doge':
+        command_dir = './bitcore-libs/doge'
+        script = 'getRc001tx.js'
+    elif ticker.lower() == 'lky':
+        command_dir = './bitcore-libs/lky'
+        script = 'getRc001tx.js'
+    elif ticker.lower() == 'ltc':
+        command_dir = './bitcore-libs/ltc'
+        script = 'getRc001tx.js'
+    elif ticker.lower() in ('pepe', 'pep'):
+        command_dir = './bitcore-libs/pep'
+        script = 'getRc001tx.js'
+    elif ticker.lower() == 'shic':
+        command_dir = './bitcore-libs/shic'
+        script = 'getRc001tx.js'
+    elif ticker.lower() in ('bonk', 'bonc'):
+        command_dir = './bitcore-libs/bonk'
+        script = 'getRc001tx.js'
+    elif ticker.lower() == 'flop':
+        command_dir = './bitcore-libs/flop'
+        script = 'getRc001tx.js'
+    elif ticker.lower() in ('digi', 'dgb'):
+        command_dir = './bitcore-libs/dgb'
+        script = 'getRc001tx.js'
+    elif ticker.lower() == 'dev':
+        command_dir = './bitcore-libs/dev'
+        script = 'getRc001tx.js'
+    else:
+        return jsonify({
+            "status": "error",
+            "message": "Unsupported ticker type."
+        }), 400
+
+    # Define the command to run
+    command = [
+        'node', script, 'mint',
+        receiving_address, meme_type, hex_data,
+        sending_address, privkey, utxo, vout_str,
+        script_hex, str(utxo_amount_satoshis)
+    ]
+
+    # Add mint_address and mint_price to the command if they are provided
+    if mint_address and mint_price_satoshis is not None:
+        command.extend([mint_address, str(mint_price_satoshis)])
+
+    try:
+        # Run the command and capture the output
+        result = subprocess.run(
+            command,
+            cwd=command_dir,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        output = result.stdout.strip()
+        error_output = result.stderr.strip()
+
+        # Print both stdout and stderr
+        print("Command output:", output)
+        print("Command error output:", error_output)
+
+        # Assume output format:
+        # Final transaction: <txid>
+        # {
+        #   "pendingTransactions": [...],
+        #   "instructions": "..."
+        # }
+
+        # Split the output into the final transaction line and the JSON part
+        final_tx_line, json_part = output.split('\n', 1)
+        final_tx_id = final_tx_line.replace("Final transaction: ", "").strip()
+        json_data = json.loads(json_part)
+
+        # Structure the response as desired
+        response = {
+            "finalTransaction": final_tx_id,
+            "pendingTransactions": json_data.get("pendingTransactions", []),
+            "instructions": json_data.get("instructions", "")
+        }
+
+        return jsonify(response)
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Command failed with error: {e.stderr}"
+        }), 500
+    except ValueError:
+        return jsonify({
+            "status": "error",
+            "message": "Failed to parse command output."
+        }), 500
+    except json.JSONDecodeError:
+        return jsonify({
+            "status": "error",
+            "message": "Invalid JSON format in command output."
+        }), 500
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}"
         }), 500
