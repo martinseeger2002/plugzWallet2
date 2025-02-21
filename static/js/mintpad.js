@@ -17,13 +17,26 @@ export function mintPadUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
 
+    // Preload images with onload and onerror handlers
+    const imagesToPreload = [
+        './static/images/back.png',
+        // Add other images you need to preload here
+    ];
+
+    imagesToPreload.forEach(src => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => console.log(`Image loaded successfully: ${src}`);
+        img.onerror = () => console.error(`Failed to load image: ${src}`);
+    });
+
     // Create header with back button
     const header = document.createElement('div');
     header.className = 'header';
 
     const backButton = document.createElement('button');
     backButton.className = 'back-button';
-    backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" />';
+    backButton.innerHTML = '<img src="./static/images/back.png" alt="Back Icon" width="24" height="24" />';
     backButton.addEventListener('click', () => {
         landingPage.innerHTML = '';
         mintUI(selectedWallet); // Navigate back to mint UI
@@ -96,6 +109,7 @@ export function mintPadUI(selectedWallet) {
                                     height: 100px;
                                     border: none;
                                     margin-bottom: 10px;
+                                    background-color: #333; /* Reserve space */
                                 }
                                 .button-container {
                                     display: flex;

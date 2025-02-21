@@ -22,7 +22,7 @@ export function mintPadScreen2UI(selectedWallet) {
 
     // Title
     const title = document.createElement('h1');
-    title.textContent = 'Mint Pad';
+    title.textContent = 'Mint Pad Screen 2';
     title.className = 'page-title';
     landingPage.appendChild(title);
 
@@ -34,67 +34,17 @@ export function mintPadScreen2UI(selectedWallet) {
     collectionNameDisplay.className = 'collection-name';
     landingPage.appendChild(collectionNameDisplay);
 
-    // Wallet dropdown
-    const walletDropdown = document.createElement('select');
-    walletDropdown.className = 'styled-select';
-    const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+    // Automatically select the UTXO with the largest amount
+    const mintPriceInCoins = parseFloat(pendingCollectionDetails.mint_price) / 100000000;
+    const minUtxoValue = mintPriceInCoins + 0.30;
 
-    const defaultOption = document.createElement('option');
-    defaultOption.textContent = 'Select a Wallet';
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    walletDropdown.appendChild(defaultOption);
+    const selectedUtxo = selectedWallet.utxos
+        .filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1)
+        .sort((a, b) => parseFloat(b.value) - parseFloat(a.value))[0];
 
-    wallets.forEach(wallet => {
-        const option = document.createElement('option');
-        option.value = wallet.label;
-        option.textContent = wallet.label;
-        if (wallet.label === selectedWallet.label) {
-            option.selected = true;
-        }
-        walletDropdown.appendChild(option);
-    });
-    landingPage.appendChild(walletDropdown);
-
-    // UTXO dropdown
-    const utxoDropdown = document.createElement('select');
-    utxoDropdown.className = 'styled-select';
-    landingPage.appendChild(utxoDropdown);
-
-    // Update UTXO dropdown based on selected wallet
-    walletDropdown.addEventListener('change', () => {
-        const selectedWallet = wallets.find(wallet => wallet.label === walletDropdown.value);
-        const pendingCollectionDetails = JSON.parse(localStorage.getItem('pendingCollectionDetails'));
-        const mintPriceInCoins = parseFloat(pendingCollectionDetails.mint_price) / 100000000;
-        const minUtxoValue = mintPriceInCoins + 0.30;
-
-        if (selectedWallet && selectedWallet.utxos && selectedWallet.utxos.length > 0) {
-            utxoDropdown.innerHTML = '';
-            selectedWallet.utxos
-                .filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1)
-                .forEach(utxo => {
-                    const option = document.createElement('option');
-                    option.value = `${utxo.txid}:${utxo.vout}`;
-                    option.textContent = utxo.value;
-                    utxoDropdown.appendChild(option);
-                });
-            if (selectedWallet.utxos.filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1).length === 0) {
-                utxoDropdown.innerHTML = '<option disabled>No UTXOs available above the required amount with sufficient confirmations</option>';
-            }
-        } else {
-            utxoDropdown.innerHTML = '<option disabled>No UTXOs available</option>';
-        }
-
-        if (selectedWallet) {
-            localStorage.setItem('selectedWalletLabel', selectedWallet.label);
-        } else {
-            localStorage.removeItem('selectedWalletLabel');
-        }
-    });
-
-    if (selectedWallet.label) {
-        walletDropdown.value = selectedWallet.label;
-        walletDropdown.dispatchEvent(new Event('change'));
+    if (!selectedUtxo) {
+        alert('No suitable UTXO found. Please ensure your wallet has sufficient funds.');
+        return;
     }
 
     // Receiving address input
@@ -109,7 +59,7 @@ export function mintPadScreen2UI(selectedWallet) {
     inscribeButton.textContent = 'Inscribe';
     inscribeButton.className = 'styled-button';
     inscribeButton.addEventListener('click', () => {
-        generateTransactions().then(() => {
+        generateTransactions(selectedUtxo).then(() => {
             landingPage.innerHTML = '';
             inscribeUI(selectedWallet);
         }).catch(error => {
@@ -119,24 +69,8 @@ export function mintPadScreen2UI(selectedWallet) {
     });
     landingPage.appendChild(inscribeButton);
 
-    function generateTransactions() {
+    function generateTransactions(selectedUtxo) {
         return new Promise((resolve, reject) => {
-            const selectedWallet = wallets.find(wallet => wallet.label === walletDropdown.value);
-            if (!selectedWallet) {
-                alert('Please select a wallet.');
-                return reject('No wallet selected');
-            }
-
-            if (!utxoDropdown.value) {
-                alert('Please select a UTXO.');
-                return reject('No UTXO selected');
-            }
-
-            const [txid, vout] = utxoDropdown.value.split(':');
-            const selectedUtxo = selectedWallet.utxos.find(utxo => utxo.txid === txid && utxo.vout == vout);
-
-            console.log('Selected UTXO for Transaction:', selectedUtxo);
-
             const pendingHexData = JSON.parse(localStorage.getItem('pendingHexData'));
             if (!pendingHexData) {
                 alert('No pending hex data found. Please ensure the data is available.');
@@ -146,7 +80,6 @@ export function mintPadScreen2UI(selectedWallet) {
             const receivingAddressInput = addressInput.value.trim();
             const receivingAddress = receivingAddressInput || selectedWallet.address;
 
-            const pendingCollectionDetails = JSON.parse(localStorage.getItem('pendingCollectionDetails'));
             const mintPrice = parseFloat(pendingCollectionDetails.mint_price);
             const mintAddress = pendingCollectionDetails.mint_address;
 

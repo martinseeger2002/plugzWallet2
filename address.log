@@ -241,3 +241,5 @@
 2025-02-20 09:47:33,945 - Received import address request for FLOP: {'address': 'FNmMHMAWbWsp5PL7CwSKFaBv9e5MmL3eBn', 'label': 'Marafa', 'rescan': False}
 2025-02-20 09:47:47,422 - Received import address request for DGB: {'address': 'DACbp4YKiqKKzZxmB15qHsPaVvecjMsXYx', 'label': 'Marafa ', 'rescan': False}
 2025-02-20 13:52:56,111 - Received import address request for FLOP: {'address': 'FEuPvNMz45brhpfH5ghdbqK1wLiLaoTjJ3', 'label': 'chris-22', 'rescan': False}
+2025-02-20 21:37:49,111 - Received import address request for DOGE: {'address': 'DMEPB9rQjAkP5r7xyz5LAYJgV5EV9Wxegc', 'label': 'Newteast', 'rescan': False}
+2025-02-20 21:40:28,589 - Received import address request for DOGE: {'address': 'D5RDna2mtFgukcpZCRnsUXxvspf8joyb76', 'label': 'Blank', 'rescan': False}

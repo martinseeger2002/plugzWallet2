@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_cors import CORS  # Import Flask-CORS
 from routes.bitcoinRPC import bitcoin_rpc_bp
 from routes.bitcoreLib import bitcore_lib_bp
 from routes.main import main_bp
@@ -7,6 +8,9 @@ from routes.prices import prices_bp
 from routes.task import start_scheduler
 
 app = Flask(__name__, static_folder='static')
+
+# Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Register the blueprints
 app.register_blueprint(bitcoin_rpc_bp, url_prefix='/api')

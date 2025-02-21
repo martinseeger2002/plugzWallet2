@@ -34,69 +34,29 @@ export function mintPadBulkUI(selectedWallet) {
     collectionNameDisplay.className = 'collection-name';
     landingPage.appendChild(collectionNameDisplay);
 
-    // Wallet dropdown
-    const walletDropdown = document.createElement('select');
-    walletDropdown.className = 'styled-select';
-    const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
-
-    const defaultOption = document.createElement('option');
-    defaultOption.textContent = 'Select a Wallet';
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    walletDropdown.appendChild(defaultOption);
-
-    wallets.forEach(wallet => {
-        const option = document.createElement('option');
-        option.value = wallet.label;
-        option.textContent = wallet.label;
-        if (wallet.label === selectedWallet.label) {
-            option.selected = true;
-        }
-        walletDropdown.appendChild(option);
-    });
-    landingPage.appendChild(walletDropdown);
-
     // Number of mints selector
     const numMintsDropdown = document.createElement('select');
     numMintsDropdown.className = 'styled-select';
     landingPage.appendChild(numMintsDropdown);
 
-    // Update UTXO dropdown based on selected wallet
-    walletDropdown.addEventListener('change', () => {
-        const selectedWallet = wallets.find(wallet => wallet.label === walletDropdown.value);
-        const pendingCollectionDetails = JSON.parse(localStorage.getItem('pendingCollectionDetails'));
-        const mintPriceInCoins = parseFloat(pendingCollectionDetails.mint_price) / 100000000;
-        const minUtxoValue = mintPriceInCoins + 0.30;
+    // Automatically update UTXO dropdown based on selected wallet
+    const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+    const mintPriceInCoins = parseFloat(pendingCollectionDetails.mint_price) / 100000000;
+    const minUtxoValue = mintPriceInCoins + 0.30;
 
-        if (selectedWallet && selectedWallet.utxos && selectedWallet.utxos.length > 0) {
-            const filteredUtxos = selectedWallet.utxos
-                .filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1);
+    const selectedWalletUtxos = selectedWallet.utxos
+        .filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1);
 
-            numMintsDropdown.innerHTML = '';
-            for (let i = 1; i <= filteredUtxos.length; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                numMintsDropdown.appendChild(option);
-            }
+    numMintsDropdown.innerHTML = '';
+    for (let i = 1; i <= selectedWalletUtxos.length; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        numMintsDropdown.appendChild(option);
+    }
 
-            if (filteredUtxos.length === 0) {
-                numMintsDropdown.innerHTML = '<option disabled>No UTXOs available above the required amount with sufficient confirmations</option>';
-            }
-        } else {
-            numMintsDropdown.innerHTML = '<option disabled>No UTXOs available</option>';
-        }
-
-        if (selectedWallet) {
-            localStorage.setItem('selectedWalletLabel', selectedWallet.label);
-        } else {
-            localStorage.removeItem('selectedWalletLabel');
-        }
-    });
-
-    if (selectedWallet.label) {
-        walletDropdown.value = selectedWallet.label;
-        walletDropdown.dispatchEvent(new Event('change'));
+    if (selectedWalletUtxos.length === 0) {
+        numMintsDropdown.innerHTML = '<option disabled>No UTXOs available above the required amount with sufficient confirmations</option>';
     }
 
     // Bulk Inscribe button
@@ -116,20 +76,8 @@ export function mintPadBulkUI(selectedWallet) {
 
     function generateBulkTransactions() {
         return new Promise((resolve, reject) => {
-            const selectedWallet = wallets.find(wallet => wallet.label === walletDropdown.value);
-            if (!selectedWallet) {
-                alert('Please select a wallet.');
-                return reject('No wallet selected');
-            }
-
             const numMints = parseInt(numMintsDropdown.value, 10);
-            const pendingCollectionDetails = JSON.parse(localStorage.getItem('pendingCollectionDetails'));
-            const mintPriceInCoins = parseFloat(pendingCollectionDetails.mint_price) / 100000000;
-            const minUtxoValue = mintPriceInCoins + 0.30;
-
-            const selectedUtxos = selectedWallet.utxos
-                .filter(utxo => parseFloat(utxo.value) >= minUtxoValue && utxo.confirmations >= 1)
-                .slice(0, numMints);
+            const selectedUtxos = selectedWalletUtxos.slice(0, numMints);
 
             if (selectedUtxos.length === 0) {
                 alert('Please select a UTXO.');
