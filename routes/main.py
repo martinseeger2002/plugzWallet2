@@ -10,6 +10,10 @@ def show_endpoints():
 def index():
     return render_template('wallet.html')
 
+@main_bp.route('/developer')
+def developer():
+    return render_template('developer.html')
+
 @main_bp.route('/')
 def settings():
     return render_template('index.html')
