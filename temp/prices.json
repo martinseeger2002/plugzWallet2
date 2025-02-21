@@ -1,58 +1,58 @@
 {
     "DOGE": {
-        "nonkyc": "0.252844775000",
+        "nonkyc": "0.251982000000",
         "xeggex": null,
-        "mecacex": "0.25182",
+        "mecacex": "0.25276",
         "exbitron": "0.22721",
-        "bitcointry": "0.25197",
-        "aggregated": "0.2459611938"
+        "bitcointry": "0.25333",
+        "aggregated": "0.2463205000"
     },
     "PEP": {
         "nonkyc": "0.000413",
         "xeggex": null,
-        "mecacex": "0.000348",
+        "mecacex": "0.00034",
         "exbitron": null,
         "bitcointry": null,
-        "aggregated": "0.0003805000"
+        "aggregated": "0.0003765000"
     },
     "SHIC": {
-        "nonkyc": "0.000007711000",
+        "nonkyc": "0.000009121000",
         "xeggex": null,
-        "mecacex": "0.00000727",
+        "mecacex": "0.00000729",
         "exbitron": "0.0000088998",
         "bitcointry": null,
-        "aggregated": "0.0000079603"
+        "aggregated": "0.0000084369"
     },
     "BONC": {
-        "nonkyc": "0.000007010095",
+        "nonkyc": "0.000007021480",
         "xeggex": null,
         "mecacex": null,
         "exbitron": "0.00000304",
         "bitcointry": null,
-        "aggregated": "0.0000050250"
+        "aggregated": "0.0000050307"
     },
     "FLOP": {
         "nonkyc": null,
         "xeggex": null,
         "mecacex": "5.09E-7",
         "exbitron": "4.54E-7",
-        "bitcointry": "6.286E-7",
-        "aggregated": "5.305E-7"
+        "bitcointry": "6.278E-7",
+        "aggregated": "5.303E-7"
     },
     "DGB": {
-        "nonkyc": "0.008230000000",
+        "nonkyc": "0.008247000000",
         "xeggex": null,
         "mecacex": null,
         "exbitron": "0.007129",
-        "bitcointry": "0.00823",
-        "aggregated": "0.0078630000"
+        "bitcointry": "0.00826",
+        "aggregated": "0.0078786667"
     },
     "DEV": {
         "nonkyc": null,
         "xeggex": null,
-        "mecacex": "6.217E-7",
+        "mecacex": "6.293E-7",
         "exbitron": "6.1E-7",
         "bitcointry": null,
-        "aggregated": "6.158E-7"
+        "aggregated": "6.196E-7"
     }
 }

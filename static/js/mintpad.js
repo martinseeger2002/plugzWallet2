@@ -13,6 +13,9 @@ const ordExplorerUrls = {
     DEV: 'https://ord-dogecoinev.io/content/'
 };
 
+// Define a blacklist of collection names
+const collectionBlacklist = ["BC-Plugz"];
+
 export function mintPadUI(selectedWallet) {
     const landingPage = document.getElementById('landing-page');
     landingPage.innerHTML = ''; // Clear existing content
@@ -151,11 +154,25 @@ export function mintPadUI(selectedWallet) {
 
                 if (data.status === "success") {
                     const collections = Object.entries(data.collections)
-                        .filter(([_, collectionData]) => collectionData.coin_ticker === selectedWallet.ticker)
+                        .filter(([collectionName, collectionData]) => 
+                            collectionData.coin_ticker === selectedWallet.ticker &&
+                            !collectionBlacklist.includes(collectionName) // Exclude blacklisted collections
+                        )
                         .map(([collectionName, collectionData]) => ({
                             collectionName,
                             collectionData
                         }));
+
+                    // Sort collections: highest number of mints at the top, fully minted at the bottom
+                    collections.sort((a, b) => {
+                        if (a.collectionData.percent_minted === 100 && b.collectionData.percent_minted !== 100) {
+                            return 1;
+                        }
+                        if (b.collectionData.percent_minted === 100 && a.collectionData.percent_minted !== 100) {
+                            return -1;
+                        }
+                        return b.collectionData.minted - a.collectionData.minted;
+                    });
 
                     if (collections.length === 0) {
                         const noCollections = doc.createElement('div');
